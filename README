@@ -70,11 +70,3 @@ does one thing and does it well in a very transparent manner.
 *** trouble shooting
 - are there files in the album directory that are not images?
 - is the permission of the album directory 777?
-
-
-*** todo:
-- need to have better error/ exception handling
-  absolutely no more white screens or server errors
-- resize based on height as well as width
-- write a means for clearing image caches from the web so all the 'nobody' files
-  will go away.
