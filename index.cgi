@@ -33,12 +33,10 @@ class Presenter:
 				line = string.replace(line, '@breadcrumb@', self.formatBreadCrumb(album, pic )) 
 				line = string.replace(line, '@title@',      self.formatTitle(     album, pic ))
 				line = string.replace(line, '@albums@',     self.formatAlbums(    album      ))
-				#line = string.replace(line, '@album-description@', self.formatAlbumDescription(album))
 				line = string.replace(line, '@pics-list@',  self.formatPicsList(  album      ))
 				line = string.replace(line, '@pics-thumb@', self.formatPicsThumb( album      ))
-				#line = string.replace(line, '@web-pic@',    self.formatWebPic(    pic ))
-				#line = string.replace(line, '@comment@',    pic.getComment())
-				line = self.formatContent(line, album, pic)
+
+				line = self.formatContent(line, album, currDir, pic)
 			except:
 				line = 'Unexpected error:', sys.exc_info()[0]
 				#raise
@@ -134,15 +132,28 @@ class Presenter:
 
 		return string.join(outLines, '\n')
 
-	def formatContent(self, line, album, pic):
-		if pic.getOriginal() == '':
-			line = string.replace(line, '@album-description@', album.getDescription())
-			line = string.replace(line, '@web-pic@',           '')
-			line = string.replace(line, '@comment@',           '')
-		else:
+	def formatContent(self, line, album, currDir,  pic):
+		albumDescription = string.strip(album.getDescription())
+
+		# TODO: this can be done better
+		if pic.getOriginal() != '':
 			line = string.replace(line, '@album-description@', '')
 			line = string.replace(line, '@web-pic@',           self.formatWebPic(pic))
 			line = string.replace(line, '@comment@',           pic.getComment())
+
+		elif albumDescription != '': 
+			line = string.replace(line, '@album-description@', albumDescription)
+			line = string.replace(line, '@web-pic@',           '')
+			line = string.replace(line, '@comment@',           '')
+
+		else:
+			firstPic = album.getPics()[0].getFileName()
+			pic = Pic('%s%s%s' % (currDir, os.sep, firstPic))
+
+			line = string.replace(line, '@album-description@', '')
+			line = string.replace(line, '@web-pic@',           self.formatWebPic(pic))
+			line = string.replace(line, '@comment@',           pic.getComment())
+
 		return line
 
 

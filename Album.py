@@ -21,9 +21,6 @@ class Album:
 					elif os.path.isfile(entryAndPath):
 						self.pics.append(Pic(entryAndPath))
 
-			#except:
-			#	print '<h1>unable to process album, are the file permissions correct?'
-
 
 	def getAlbums(self):
 		return self.albums
@@ -64,7 +61,7 @@ class Album:
 		try:
 			metaFile = open('%s%s.meta' % (self.albumDir, os.sep))
 		except:
-			return '<!-- no meta file found -->'
+			return ''
 
 		description = ''
 		startReading = 0
