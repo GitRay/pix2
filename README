@@ -25,6 +25,8 @@ does one thing and does it well in a very transparent manner.
 *** album setup and guidelines
 - your directory structure will dictate the hierarhcy for albums and picture
   placement
+- to hide a picture rename it with .<picture name> just like you'd hide
+  a file in unix
 - use underscores in album names and picture names
   for example: 'new_years_eve_2004'
   or: 'demian_posing_with_elvis.jpg'
