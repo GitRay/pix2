@@ -28,11 +28,43 @@ does one thing and does it well in a very transparent manner.
 - use underscores in album names and picture names
   for example: 'new_years_eve_2004'
   or: 'demian_posing_with_elvis.jpg'
-- in each directory optionally create a .meta file, the format is
+- .meta file guide 
+  in each directory optionally create a .meta file, the format is
   <pic file name> = <description>
   it's not necessary to have every file in there.  in vim do: ':r!ls' to get a
   complete listing of the files in this directory.
   the description can only be on 1 line!
+- template guide
+  the template file is just a simple html document you can pretty much do with
+  it what you want, you place the tokens for the generated elements into your 
+  html.
+  - @title@
+    shows you the current directory with a pipe in front of it (the assumption
+    is that you will have a string before the pipe, like the name of your site
+  - @breadcrumb@
+    a pipe "|" delimited string that shows you where you are at in the directory
+    hierarchy inside the albums.  it gives you links to go to what ever level
+    you want
+  - @albums@
+    if there are no sub-directories in the current directory this returns an
+    empty string.
+    if there are sub-directories this gives you the string '<h2>albums</h1>'
+    followed by an unordered list of albums.
+  - @pics-thumb@
+    this returns thumbnail images of all the pictures in the current directory.
+    the thumbnails dictate what the web sized pic will be
+  - @pics-list@
+    if there are no pics in the current directory this returns an empty string.
+    if there are pics this gives you the string '<h2>pictures</h2>' followed by
+    an unordered list of pics.  this might be a good option if bandwidth is a
+    concern.
+  - @web-pic@
+    when the user selects a thumbnail or picture from the list, the web pic is
+    displayed.  the web pic is resized for typical web viewing.  if the user
+    wants to see the original image (assuming it's larger than the web-pic)
+    they can click on the web version to be directed to the actual original.
+  - @comment@
+    this is where the comment (if any) associated with the picture is placed.
 
 
 *** trouble shooting
@@ -46,6 +78,3 @@ does one thing and does it well in a very transparent manner.
 - resize based on height as well as width
 - write a means for clearing image caches from the web so all the 'nobody' files
   will go away.
-
-
-
