@@ -71,17 +71,11 @@ class Presenter:
 		if len(albums) == 0:
 			return ''
 
-		outLines = []
-		outLines.append('<h2>%s albums</h2>' % (len(albums)))
-		outLines.append('<ul>')
-
+		outLines = ['<h2>%s albums</h2>' % (len(albums))]
 		for album in albums:
-			outLines.append('<li><a href="?album=%s">%s</a>' % (
+			outLines.append('<a href="?album=%s">%s</a><br>' % (
 				album.getLinkPath(), 
 				album.getName()))
-
-		outLines.append('</ul>')
-
 		return string.join(outLines, '\n')
 
 
@@ -141,7 +135,7 @@ class Presenter:
 
 		outLines = []
 		outLines.append(
-			'<a href="%s"><img alt="%s" title="%s" src="%s"/></a>' % (
+			'<a href="%s"><img align="right" alt="%s" title="%s" src="%s"/></a>' % (
 				pic.getOriginal(), 
 				'click here to view the original image',
 				'click here to view the original image',

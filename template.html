@@ -8,25 +8,29 @@
 				type="text/css"/>
 	</head>
 	<body>
-		<h1><a href="index.cgi">pix</a> @breadcrumb@</h1>
-		<table>
-			<tr> 
-				<td> 
-					<font size="-1">
-						@albums@
-						@pics@
-					</font>
+		<table >
+			<tr><td colspan="2">
+				<h1><a href="index.cgi">pix</a> @breadcrumb@</h1>
+				</td></tr>
+			<tr>
+				<td>
+				@albums@
+				@pics@
 				</td>
-				<td class="pic">
+				<td align="right" width="500">
 					@album-description@
-					@web-pic@
-					<br>@comment@
+					<table>
+						<tr><td>@web-pic@</td></tr>
+						<tr><td>@comment@</td></tr>
+					</table>
 				</td>
 			</tr>
-      </table>
-		<p class="footer">
-			<a href="help.html">help</a> | 
-			powered by <a href="http://pix.sf.net">pix</a>
-		</p>
+			<tr><td colspan="2">
+				<p class="footer">
+					<a href="help.html">help</a> | 
+					powered by <a href="http://pix.sf.net">pix</a>
+				</p>
+			</td></tr>
+		</table>
 	</body>
 </html>
