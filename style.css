@@ -1,32 +1,32 @@
 /*
 steel structure 
+easy on the eyes
 http://www.adampolselli.com/colorschemes/steel_structure.php
 
 description  code     where it's used
 -----------  -------  -------------------------
-lt gray      #000000  background 
-lt blue      #227700  header banners
+lt gray      #dfe0e5  background 
+lt blue      #99abb5  header banners
 red          #993333  links
-dk blue      #227700  text and borders
+dk blue      #333333  text and borders
 
 */
 Body, h1, h2{
-	font-size:        16px;
-	font-family:      monospace;
-	font-weight:       bold;
-	background-color: #000000; 
-	color:            #227700;
+	font-size:        14px;
+	font-family:      Arial, Verdana, sans-serif, Courier;
+	background-color: #dfe0e5; 
+	color:            #333333;
 }
 
 h1 {
-	background-color: #223322;
-	border:           2px solid #227700;
-	color:            #227700;
+	background-color: #99abb5;
+	border:           2px solid #333333;
+	color:            #993333;
 }
 
 h2 {
-	background-color: #223322;
-	border:           2px solid #227700;
+	background-color: #99abb5;
+	border:           2px solid #333333;
 }
 
 body {
@@ -36,29 +36,29 @@ body {
 }
 
 a:link, a:active, a:visited {
-	color:           #227700;
+	color:           #993333;
 	text-decoration: none;
 }
 
 a:hover {
-	color:         #881100; 
+	color:         #333333; 
 }
 
 img {
-	border: 2px solid #227700;
+	border: 2px solid #333333;
 	margin: 0px;
 }
 
 .footer {
 	text-align:  right;
 	font-size:   10px;
-	border:      2px solid #227700;
-	background-color: #223322;
+	border-top:  1px solid #333333;
+	border-left: 1px solid #333333;
 }
 
 #selected-pic {
 	/* this is used for the selected thumbnail */	
-	border: 2px solid #881100;
+	border: 2px solid #993333;
 }
 
 table {
@@ -69,8 +69,6 @@ table {
 }
 
 td {
-	vertical-align:   top;
-	text-align:       justify;
-	font-size:        16px;
-	font-weight:      bold;
+	vertical-align: top;
+	text-align:     justify;
 }
