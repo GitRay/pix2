@@ -20,13 +20,13 @@ Body, h1, h2{
 
 h1 {
 	background-color: #99abb5;
-	border:           2px solid #333333;
+	border:           1px solid #333333;
 	color:            #993333;
 }
 
 h2 {
 	background-color: #99abb5;
-	border:           2px solid #333333;
+	border:           1px solid #333333;
 }
 
 body {
@@ -45,8 +45,15 @@ a:hover {
 }
 
 img {
-	border: 2px solid #333333;
+	border: 1px solid #333333;
+	margin: 2px;
+	border-style: solid;
+}
+
+#selected-pic {
+	border: 3px solid #993333;
 	margin: 0px;
+	border-style: solid;
 }
 
 .footer {
@@ -54,11 +61,6 @@ img {
 	font-size:   10px;
 	border-top:  1px solid #333333;
 	border-left: 1px solid #333333;
-}
-
-#selected-pic {
-	/* this is used for the selected thumbnail */	
-	border: 2px solid #993333;
 }
 
 table {

@@ -2,7 +2,7 @@
 pix is a minimalist gallery system.  less than 400 lines of code allow you to
 organize all your photos, we traverse a directory structure and as-needed
 generate thumb-nails and web optimized versions of your images.  thru a simple
-'.meta' file in each directory you can assign descriptions to each image.
+'.meta' file in each directory you can assign comments to each image.
 
 pix doesn't try to do what other programs do well.  in true unix style pix
 does one thing and does it well in a very transparent manner. 
@@ -28,28 +28,47 @@ does one thing and does it well in a very transparent manner.
 - use underscores in album names and picture names
   for example: 'new_years_eve_2004'
   or: 'demian_posing_with_elvis.jpg'
-- .meta file guide 
-  - in each directory optionally create a .meta file, the format is
-    <pic file name> = <description>
+
+
+*** anatomy of a .meta file
+  - in each directory optionally create a .meta file, the format for the 
+    picture comments are
+    <pic file name> = <comment>
   - it's not necessary to have every file in there.  in vim do: ':r!ls' to get a
     complete listing of the files in this directory.  then just slap a 
-    '= <description>' on each line you want ot provide a description.
-  - the description can only be on 1 line!
-  - the only lines that can have an '=' are description lines, don't put them
-    into the description
+    '= <comment>' on each line you want to provide a comment.
+  - the comment for a picture can only be on 1 line!
   - to add a description for the current album create 2 lines at the top,
     literally <album description> and </album description>.  between these
-    lines put the description.  don't use the '=' character because i use
-    that as the token to fine picture description lines.
+    lines put the description.
+  - to control the thumbnail order, add a '=' after the file name wether or
+    not the picture has a comment associated with it and put them in the
+    order you want in the .meta file.
+    pictures with no '=' and pictures not in the .meta file will be put at
+    the end of the thumbnails in no particular order.
+  - here is a sample .meta file (in between the snip tags!)
+    so in the example below demian_and_leo.jpg would go first, then 
+    dawn_demian_bobbi.jpg and lastly mom.jpg.  mom.jpg would go last since
+    it has no '='
+<snip>
+<album description>
+here are some pictures of my family.  these
+were taken at family reunions and stuff.
+</album description>
+demian_and_leo.jpg = this is me and my cousin leo
+mom.jpg
+dawn_demian_bobbi.jpg =
+</snip>
+
 
 *** style sheets
 - some extra style sheets are in pix/extra_styles.  the easiest way to use them
   is to just "cp pix/extra_styles/red_pill.css pix/style.css".
 
-*** template guide
-the template file is just a simple html document you can pretty much do with
-it what you want, you place the tokens for the generated elements into your 
-html.
+*** anatomy of the template file
+the template file is 'pix/template.html' it's just a simple html document,  
+you can pretty much do with it what you want, you place the tokens for the 
+generated elements into your html.
 - @title@
  shows you the current directory with a pipe in front of it (the assumption
  is that you will have a string before the pipe, like the name of your site
@@ -95,6 +114,13 @@ html.
 
 
 *** change log
+- 1.2.1 from 1.2.0
+  - improved the processing performance, i was doing a ton of 
+    un-necessary processing for each line wether or not it was needed.
+  - pictures can now be ordered in the .meta file.  pictures with no '=' 
+    after them or pictures not included in the .meta file will be 
+    forgivingly dumped at the end of the sorted thumbnails.
+
 - 1.2.0 from 1.1.3
 stole lots of great stuff form the quickypix project (http://quarl.org)
   - minor defect fixes

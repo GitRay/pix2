@@ -26,19 +26,32 @@ class Album:
 		return self.albums
 
 
+	def getNumPics(self):
+		return len(self.pics)
+
+
 	def getPics(self):
-		# try:
-		# 	metaFile = open('%s%s.meta' % (self.albumDir, os.sep))
-		# except:
-		# 	return self.pics
+		try:
+			metaFile = open('%s%s.meta' % (self.albumDir, os.sep))
+		except:
+			return self.pics
 
-		# displayPics = []
-		# for metaLine in metaFile:
-		# 	if string.find(metaLine, '=') != -1:
-		# 		splitMetaLine = string.split(metaLine, '=')
-		# 		imageName = string.strip(splitMetaLine[0])
+		copyOfPics = []
+		copyOfPics = copyOfPics + self.pics
 
-		return self.pics
+		displayPics = []
+		for metaLine in metaFile:
+			if string.find(metaLine, '=') != -1:
+				splitMetaLine = string.split(metaLine, '=')
+				currMetaImage = string.strip(splitMetaLine[0])
+				for currPic in copyOfPics:
+					if (currMetaImage == currPic.getFileName()):
+						displayPics.append(currPic)
+						copyOfPics.remove( currPic)
+
+		# we got the ordered ones, now get the rest
+		displayPics.extend(copyOfPics)
+		return displayPics
 
 
 	def getName(self):
@@ -85,10 +98,3 @@ class Album:
 			if startReading:
 				description.append(metaLine)
 		return string.join(description[1:])
-		
-
-if __name__=='__main__':
-	a = Album('album/demian/marines/marine_combat_training')
-	#print a
-	print 'description: %s' % (a.getDescription())
-

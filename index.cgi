@@ -24,14 +24,13 @@ class Presenter:
 
 		self.printMetaData(albumLoc, currDir, pic)
 
-		for line in templateLines:
-			line = string.replace(line, '@breadcrumb@', 
-				self.formatBreadCrumb(album, pic )) 
-			line = string.replace(line, '@title@', self.formatTitle( album, pic ))
-			line = string.replace(line, '@albums@',self.formatAlbums(album      ))
-			line = string.replace(line, '@pics@',  self.formatPics(  album, pic ))
-			line = self.formatContent(line, album, currDir, pic)
-			print line,
+		line = string.join(templateLines, '')
+		line = string.replace(line, '@breadcrumb@', self.formatBreadCrumb(album, pic )) 
+		line = string.replace(line, '@title@',      self.formatTitle( album, pic ))
+		line = string.replace(line, '@albums@',     self.formatAlbums(album      ))
+		line = string.replace(line, '@pics@',       self.formatPics(  album, pic ))
+		line = self.formatContent(line, album, currDir, pic)
+		print line,
 
 
 	def printMetaData(self, albumLoc, currDir, pic):
@@ -80,11 +79,10 @@ class Presenter:
 
 
 	def formatPics(self, album, pic):
-		pics = album.getPics()
-
-		if len(pics) == 0:
+		if album.getNumPics() == 0:
 			return ''
 
+		pics     = album.getPics()
 		outLines = ['<h2>%s pictures </h2>' % (len(pics))]
 
 		for currPic in pics:
@@ -116,7 +114,7 @@ class Presenter:
 			line = string.replace(line, '@comment@',           '')
 
 		else:
-			if len(album.getPics()) > 0:
+			if album.getNumPics() > 0:
 				firstPic = album.getPics()[0].getFileName()
 				pic = Pic('%s%s%s' % (currDir, os.sep, firstPic))
 			else:

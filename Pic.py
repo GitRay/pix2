@@ -5,7 +5,7 @@ import sys, os, string
 try:
 	from PIL import Image
 except ImportError:
-	print >> sys.stderr, ("PIL not installed http://www.pythonware.com/products/pil")
+	print >> sys.stderr, ("get PIL at http://www.pythonware.com/products/pil")
 	sys.exit(0)
 
 class Pic:
@@ -88,12 +88,3 @@ class Pic:
 
 	def __repr__(self):
 		return self.getName() 
-
-
-# if __name__=='__main__':
-# 	p = Pic('album/demian/ape_demon.jpg')
-# 	print p
-# 	(width, height) = p.getThumbDimensions()
-# 	print width
-# 	print height
-
