@@ -7,7 +7,9 @@ import string
 from Album import Album
 from Pic   import Pic
 
-albumLoc = 'album'
+albumLoc   = 'album'
+seperator  = '|'
+pixVersion = '1.2.0'
 
 class Presenter: 
 	def __init__(self, subAlbum, pic):
@@ -19,29 +21,16 @@ class Presenter:
 			pic = Pic('%s%s%s' % (currDir, os.sep, pic))
 		else:
 			pic = Pic('')
-		#else:
-		#	if len(album.getPics()) == 0:
-		#		pic = Pic('')
-		#	else:
-		#		firstPic = album.getPics()[0].getFileName()
-		#		pic = Pic('%s%s%s' % (currDir, os.sep, firstPic))
 
 		self.printMetaData(albumLoc, currDir, pic)
 
 		for line in templateLines:
-			#try:
-
-			line = string.replace(line, '@breadcrumb@', self.formatBreadCrumb(album, pic )) 
-			line = string.replace(line, '@title@',      self.formatTitle(     album, pic ))
-			line = string.replace(line, '@albums@',     self.formatAlbums(    album      ))
-			line = string.replace(line, '@pics-list@',  self.formatPicsList(  album      ))
-			line = string.replace(line, '@pics-thumb@', self.formatPicsThumb( album      ))
+			line = string.replace(line, '@breadcrumb@', 
+				self.formatBreadCrumb(album, pic )) 
+			line = string.replace(line, '@title@', self.formatTitle( album, pic ))
+			line = string.replace(line, '@albums@',self.formatAlbums(album      ))
+			line = string.replace(line, '@pics@',  self.formatPics(  album, pic ))
 			line = self.formatContent(line, album, currDir, pic)
-
-			#except:
-				#line = 'Unexpected error:', sys.exc_info()[0]
-				#raise
-
 			print line,
 
 
@@ -50,6 +39,7 @@ class Presenter:
 		print 'albumLoc : %s' % albumLoc
 		print 'subAlbum : %s' % currDir
 		print 'pic      : %s' % pic
+		print 'pix ver  : %s' % pixVersion
 		print '-->'
 
 
@@ -57,18 +47,18 @@ class Presenter:
 		outLines = []
 		outLines.append(album.getBreadCrumb())
 		if (pic.getName() != ''):
-			outLines.append(' | %s' % (pic))
+			outLines.append(' %s %s' % (seperator, pic))
 
 		return string.join(outLines) 
 
 
 	def formatTitle(self, album, pic):
 
-		albumSep = ' | '
+		albumSep = ' %s ' % (seperator)
 		if (album.getName() == ''):
 			albumSep = ''
 
-		picSep = ' | '
+		picSep = ' %s ' % (seperator)
 		if (pic.getName() == ''):
 			picSep = ''
 
@@ -82,7 +72,7 @@ class Presenter:
 			return ''
 
 		outLines = []
-		outLines.append('<h2>albums</h2>')
+		outLines.append('<h2>%s albums</h2>' % (len(albums)))
 		outLines.append('<ul>')
 
 		for album in albums:
@@ -95,42 +85,26 @@ class Presenter:
 		return string.join(outLines, '\n')
 
 
-
-	def formatPicsList(self, album):
+	def formatPics(self, album, pic):
 		pics = album.getPics()
 
 		if len(pics) == 0:
 			return ''
 
-		outLines = ['<h2>pictures</h2>']
-		outLines.append('<ul>')
+		outLines = ['<h2>%s pictures </h2>' % (len(pics))]
 
-		for pic in pics:
-			outLines.append('<li><a href="?%s=%s&pic=%s">%s</a></li>' % (
-				albumLoc,
-				album.getName(), 
-				pic.getOriginal(),
-				pic))
-		
-		outLines.append('</ul>')
+		for currPic in pics:
+			selected = ''
+			if (currPic.getName() == pic.getName()):
+				selected = 'id="selected-pic"'
 
-		return string.join(outLines, '\n')
-
-
-	def formatPicsThumb(self, album):
-		pics = album.getPics()
-
-		if len(pics) == 0:
-			return ''
-
-		outLines = ['<h2>pictures</h2>']
-
-		for pic in pics:
-			outLines.append('<a href="?album=%s&pic=%s"><img src="%s"/></a>' % (
+			outLines.append('<a href="?album=%s&pic=%s"><img %s alt="%s" title="%s" src="%s"/></a>' % ( 
 				album.getLinkPath(), 
-				pic.getFileName(),
-				pic.getThumb()))
-
+				currPic.getFileName(),
+				selected,
+				currPic.getName(), 
+				currPic.getName(), 
+				currPic.getThumb())) 
 		return string.join(outLines, '\n')
 
 	def formatContent(self, line, album, currDir,  pic):
@@ -155,8 +129,8 @@ class Presenter:
 				pic = Pic('')
 
 			line = string.replace(line, '@album-description@', '')
-			line = string.replace(line, '@web-pic@',           self.formatWebPic(pic))
-			line = string.replace(line, '@comment@',           pic.getComment())
+			line = string.replace(line, '@web-pic@', self.formatWebPic(pic))
+			line = string.replace(line, '@comment@', pic.getComment())
 
 		return line
 
@@ -167,8 +141,10 @@ class Presenter:
 
 		outLines = []
 		outLines.append(
-			'<a href="%s"><img src="%s"/></a>' % (
+			'<a href="%s"><img alt="%s" title="%s" src="%s"/></a>' % (
 				pic.getOriginal(), 
+				'click here to view the original image',
+				'click here to view the original image',
 				pic.getWeb()))
 		return string.join(outLines, '\n')
 
@@ -180,9 +156,38 @@ def getArg(aForm, aKey):
 	return ''
 
 
+def doAdminFunction(action, album, pic):
+	# TODO: 
+	# presumablye in the future if there were any other admin functions
+	# besides clean there would be some if statements here
+	print '<pre>'
+	print 'cleaning cache recursively from %s%s' % (albumLoc, album)
+
+	albumToClean = '%s%s' % (albumLoc, album)
+	for root, dirs, files in os.walk(albumToClean):
+		for file in files:
+			if string.find(file, '.web_') == 0 or string.find(file, '.thumb_') == 0:
+				pathAndEntry = '%s%s%s' % (root, os.sep, file)
+				os.remove(pathAndEntry)
+				print 'deleted <i>%s</i>' % (pathAndEntry)
+	print '</pre>'
+
+
 if __name__=='__main__': 
 
 	sys.stderr == sys.stdout 
 	print 'Content-type:text/html\n' 
-	iForm = cgi.FieldStorage() 
-	Presenter(getArg(iForm, 'album'), getArg(iForm, 'pic'))
+
+	try:
+		iForm       = cgi.FieldStorage() 
+		album       = getArg(iForm, 'album')
+		pic         = getArg(iForm, 'pic')
+		adminAction = getArg(iForm, 'admin')
+		if (adminAction != ''):
+			doAdminFunction(adminAction, album, pic)
+		else:
+			Presenter(album, pic)
+	except Exception, exceptionData:
+		print '''
+			<pre><h1>pix broke, you get to keep both pieces</h1>%s</pre>
+		''' % exceptionData

@@ -15,11 +15,11 @@ class Album:
 		if (recurse):
 			for entry in os.listdir(albumDir):
 				if (entry[0] != '.'):
-					entryAndPath = '%s%s%s' % (albumDir, os.sep, entry)
-					if os.path.isdir(entryAndPath):
-						self.albums.append(Album(entryAndPath, 0))
-					elif os.path.isfile(entryAndPath):
-						self.pics.append(Pic(entryAndPath))
+					pathAndEntry = '%s%s%s' % (albumDir, os.sep, entry)
+					if os.path.isdir(pathAndEntry):
+						self.albums.append(Album(pathAndEntry, 0))
+					elif os.path.isfile(pathAndEntry):
+						self.pics.append(Pic(pathAndEntry))
 
 
 	def getAlbums(self):
@@ -27,6 +27,17 @@ class Album:
 
 
 	def getPics(self):
+		# try:
+		# 	metaFile = open('%s%s.meta' % (self.albumDir, os.sep))
+		# except:
+		# 	return self.pics
+
+		# displayPics = []
+		# for metaLine in metaFile:
+		# 	if string.find(metaLine, '=') != -1:
+		# 		splitMetaLine = string.split(metaLine, '=')
+		# 		imageName = string.strip(splitMetaLine[0])
+
 		return self.pics
 
 
@@ -63,7 +74,7 @@ class Album:
 		except:
 			return ''
 
-		description = ''
+		description = [] 
 		startReading = 0
 		for metaLine in metaFile:
 			if string.find(metaLine, '<album description>') == 0:
@@ -72,8 +83,8 @@ class Album:
 				startReading = 0 
 
 			if startReading:
-				description = "%s%s" % (description, metaLine)
-		return description
+				description.append(metaLine)
+		return string.join(description[1:])
 		
 
 if __name__=='__main__':
