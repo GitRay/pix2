@@ -11,8 +11,11 @@ except ImportError:
 class Pic:
 
 	def __init__(self, aPicPath):
+		# validate that it is a pic if it has a filename
 		self.picPath = aPicPath
-		
+		if (aPicPath != ''):
+			originalImage = Image.open(aPicPath)
+
 
 	def getComment(self):
 		if self.getOriginal() == '':

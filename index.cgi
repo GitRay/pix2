@@ -99,6 +99,12 @@ class Presenter:
 				currPic.getThumb())) 
 		return string.join(outLines, '\n')
 
+
+	#def formatMeta(self, album):
+	#	return '<a target="_new" href="%s%s%s.meta">meta</a>' % (
+	#		albumLoc, album.getLinkPath(), os.sep)
+
+
 	def formatContent(self, line, album, currDir,  pic):
 		albumDescription = string.strip(album.getDescription())
 
@@ -183,3 +189,4 @@ if __name__=='__main__':
 		print '''
 			<pre><h1>pix broke, you get to keep both pieces</h1>%s</pre>
 		''' % exceptionData
+

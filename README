@@ -120,6 +120,7 @@ generated elements into your html.
   - pictures can now be ordered in the .meta file.  pictures with no '=' 
     after them or pictures not included in the .meta file will be 
     forgivingly dumped at the end of the sorted thumbnails.
+  - nicely handle non-image files in albums; they're just ignored.
 
 - 1.2.0 from 1.1.3
 stole lots of great stuff form the quickypix project (http://quarl.org)

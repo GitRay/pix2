@@ -12,14 +12,19 @@ class Album:
 		self.albums = []
 		self.pics   = []
 
-		if (recurse):
-			for entry in os.listdir(albumDir):
-				if (entry[0] != '.'):
-					pathAndEntry = '%s%s%s' % (albumDir, os.sep, entry)
-					if os.path.isdir(pathAndEntry):
-						self.albums.append(Album(pathAndEntry, 0))
-					elif os.path.isfile(pathAndEntry):
+		if not recurse:
+			return
+
+		for entry in os.listdir(albumDir):
+			if (entry[0] != '.'):
+				pathAndEntry = '%s%s%s' % (albumDir, os.sep, entry)
+				if os.path.isdir(pathAndEntry):
+					self.albums.append(Album(pathAndEntry, 0))
+				elif os.path.isfile(pathAndEntry):
+					try:
 						self.pics.append(Pic(pathAndEntry))
+					except: 
+						print '<!-- not a picture: %s -->' % (pathAndEntry)
 
 
 	def getAlbums(self):
