@@ -13,6 +13,8 @@ class Album:
 		self.pics   = []
 
 		if (recurse):
+			#try:
+
 			for entry in os.listdir(albumDir):
 				if (entry[0] != '.'):
 					entryAndPath = '%s%s%s' % (albumDir, os.sep, entry)
@@ -20,6 +22,9 @@ class Album:
 						self.albums.append(Album(entryAndPath, 0))
 					elif os.path.isfile(entryAndPath):
 						self.pics.append(Pic(entryAndPath))
+
+			#except:
+			#	print '<h1>unable to process album, are the file permissions correct?'
 
 
 	def getAlbums(self):

@@ -25,13 +25,17 @@ class Presenter:
 				pic = Pic('%s%s%s' % (currDir, os.sep, firstPic))
 
 		for line in templateLines:
-			line = string.replace(line, '@breadcrumb@', self.formatBreadCrumb(album, pic )) 
-			line = string.replace(line, '@title@',      self.formatTitle(     album, pic ))
-			line = string.replace(line, '@albums@',     self.formatAlbums(    album      ))
-			line = string.replace(line, '@pics-list@',  self.formatPicsList(  album      ))
-			line = string.replace(line, '@pics-thumb@', self.formatPicsThumb( album      ))
-			line = string.replace(line, '@web-pic@',    self.formatWebPic(    pic ))
-			line = string.replace(line, '@comment@',    pic.getComment())
+			try:
+
+				line = string.replace(line, '@breadcrumb@', self.formatBreadCrumb(album, pic )) 
+				line = string.replace(line, '@title@',      self.formatTitle(     album, pic ))
+				line = string.replace(line, '@albums@',     self.formatAlbums(    album      ))
+				line = string.replace(line, '@pics-list@',  self.formatPicsList(  album      ))
+				line = string.replace(line, '@pics-thumb@', self.formatPicsThumb( album      ))
+				line = string.replace(line, '@web-pic@',    self.formatWebPic(    pic ))
+				line = string.replace(line, '@comment@',    pic.getComment())
+			except:
+				line = 'something bad happened'
 			print line,
 
 
@@ -120,7 +124,8 @@ class Presenter:
 			return ''
 
 		outLines = []
-		outLines.append('<a href="%s"><img src="%s"/></a>' % (pic.getOriginal(), pic.getWeb()))
+		outLines.append(
+			'<a href="%s"><img src="%s"/></a>' % (pic.getOriginal(), pic.getWeb()))
 		return string.join(outLines, '\n')
 
 
@@ -132,6 +137,7 @@ def getArg(aForm, aKey):
 
 
 if __name__=='__main__': 
+
 	sys.stderr == sys.stdout 
 	print 'Content-type:text/html\n' 
 	iForm = cgi.FieldStorage() 
