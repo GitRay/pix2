@@ -1,0 +1,66 @@
+/*
+professional.css
+very basic, good contrast and easy to read
+*/
+Body, h1, h2{
+	font-size:        14px;
+	font-family:      Arial, Verdana, sans-serif, Courier;
+	background-color: #ffffff; 
+	color:            #333333;
+}
+
+h1 {
+	font-weight: bold;
+	background-color: #cccccc;
+	border:           2px solid #000000;
+	color:            #993333;
+}
+
+h2 {
+	background-color: #cccccc;
+	border:           1px dashed #000000;
+}
+
+body {
+	margin:      20px;
+	font-style:  normal;
+	line-height: 1.3em;
+}
+
+a:link, a:active, a:visited {
+	color:           #993333;
+	text-decoration: none;
+}
+
+a:hover {
+	color:         #333333; 
+}
+
+img {
+	border: 2px solid #333333;
+	margin: 3px;
+}
+
+.footer {
+	text-align:  right;
+	font-size:   10px;
+	background-color: #cccccc;
+	border:      1px dashed #000000;
+}
+
+table {
+	border:          0px ;
+	width:           100%;
+	border-spacing:  5px;
+	border-collapse: separate;
+}
+
+td {
+	vertical-align: top;
+	text-align:     left;
+}
+
+#selected-pic {
+	/* this is used for the selected thumbnail */	
+	border: 2px solid #993333;
+}

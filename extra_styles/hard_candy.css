@@ -1,0 +1,65 @@
+/*
+hard_candy.css
+not sure what sensibility this appeals to
+*/
+Body, h1, h2{
+	font-size:        14px;
+	font-family:      Arial, Verdana, sans-serif, Courier;
+	background-color: #ccffbb; 
+	color:            #000000;
+}
+
+h1 {
+	background-color: #ffee11;
+	border:           2px solid #55dd00;
+	color:            #000000;
+}
+
+h2 {
+	background-color: #ffee11;
+	border:           2px solid #55dd00;
+}
+
+body {
+	margin:      20px;
+	font-style:  normal;
+	line-height: 1.3em;
+}
+
+a:link, a:active, a:visited {
+	color:           #227700;
+	text-decoration: none;
+}
+
+a:hover {
+	color:         #000000; 
+}
+
+img {
+	border: 1px solid #227700;
+	margin: 0px;
+}
+
+.footer {
+	text-align:  right;
+	font-size:   10px;
+	border-top:  2px solid #227700;
+	border-left: 2px solid #227700;
+}
+
+table {
+	border:          0px ;
+	width:           100%;
+	border-spacing:  5px;
+	border-collapse: separate;
+}
+
+td {
+	vertical-align: top;
+	text-align:     left;
+}
+
+#selected-pic {
+	/* this is used for the selected thumbnail */	
+	border: 1px solid #227700;
+}
