@@ -1,5 +1,5 @@
 *** summary
-pix is a minimalist gallery system.  less than 300 lines of code allow you to
+pix is a minimalist gallery system.  less than 400 lines of code allow you to
 organize all your photos, we traverse a directory structure and as-needed
 generate thumb-nails and web optimized versions of your images.  thru a simple
 '.meta' file in each directory you can assign descriptions to each image.
@@ -42,36 +42,40 @@ does one thing and does it well in a very transparent manner.
     lines put the description.  don't use the '=' character because i use
     that as the token to fine picture description lines.
 
-- template guide
-  the template file is just a simple html document you can pretty much do with
-  it what you want, you place the tokens for the generated elements into your 
-  html.
-  - @title@
-    shows you the current directory with a pipe in front of it (the assumption
-    is that you will have a string before the pipe, like the name of your site
-  - @breadcrumb@
-    a pipe "|" delimited string that shows you where you are at in the directory
-    hierarchy inside the albums.  it gives you links to go to what ever level
-    you want
-  - @albums@
-    if there are no sub-directories in the current directory this returns an
-    empty string.
-    if there are sub-directories this gives you the string '<h2>albums</h1>'
-    followed by an unordered list of albums.
-  - @pics@
-    this returns thumbnail images of all the pictures in the current directory.
-    the thumbnails dictate what the web sized pic will be
-  - @album-description@
-    if there is no currently selected web-pic we print the album description, 
-    this is found in the '.meta' file.  all lines between the "album
-    description" tags will be displayed as the album description.
-  - @web-pic@
-    when the user selects a thumbnail or picture from the list, the web pic is
-    displayed.  the web pic is resized for typical web viewing.  if the user
-    wants to see the original image (assuming it's larger than the web-pic)
-    they can click on the web version to be directed to the actual original.
-  - @comment@
-    this is where the comment (if any) associated with the picture is placed.
+*** style sheets
+- some extra style sheets are in pix/extra_styles.  the easiest way to use them
+  is to just "cp pix/extra_styles/red_pill.css pix/style.css".
+
+*** template guide
+the template file is just a simple html document you can pretty much do with
+it what you want, you place the tokens for the generated elements into your 
+html.
+- @title@
+ shows you the current directory with a pipe in front of it (the assumption
+ is that you will have a string before the pipe, like the name of your site
+- @breadcrumb@
+ a pipe "|" delimited string that shows you where you are at in the directory
+ hierarchy inside the albums.  it gives you links to go to what ever level
+ you want
+- @albums@
+ if there are no sub-directories in the current directory this returns an
+ empty string.
+ if there are sub-directories this gives you the string '<h2>albums</h1>'
+ followed by an unordered list of albums.
+- @pics@
+ this returns thumbnail images of all the pictures in the current directory.
+ the thumbnails dictate what the web sized pic will be
+- @album-description@
+ if there is no currently selected web-pic we print the album description, 
+ this is found in the '.meta' file.  all lines between the "album
+ description" tags will be displayed as the album description.
+- @web-pic@
+ when the user selects a thumbnail or picture from the list, the web pic is
+ displayed.  the web pic is resized for typical web viewing.  if the user
+ wants to see the original image (assuming it's larger than the web-pic)
+ they can click on the web version to be directed to the actual original.
+- @comment@
+ this is where the comment (if any) associated with the picture is placed.
 
 
 *** administration
@@ -107,3 +111,4 @@ stole lots of great stuff form the quickypix project (http://quarl.org)
   - removed the 'list' form of displaying the pictures, the thumbnails
     are much more useful and it simplifies the code
   - display the numbers of sub-albums and pictures in the current album
+  - included a handful of optional style sheets that are easy to use
