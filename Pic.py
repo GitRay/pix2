@@ -88,3 +88,12 @@ class Pic:
 
 	def __repr__(self):
 		return self.getName() 
+
+
+# if __name__=='__main__':
+# 	p = Pic('album/demian/ape_demon.jpg')
+# 	print p
+# 	(width, height) = p.getThumbDimensions()
+# 	print width
+# 	print height
+

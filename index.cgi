@@ -16,27 +16,42 @@ class Presenter:
 		currDir = '%s%s%s' % (albumLoc, os.sep, subAlbum)	
 		album = Album(currDir)
 		if (pic != ''):
-			pic   = Pic('%s%s%s' % (currDir, os.sep, pic))
+			pic = Pic('%s%s%s' % (currDir, os.sep, pic))
 		else:
-			if len(album.getPics()) == 0:
-				pic = Pic('')
-			else:
-				firstPic = album.getPics()[0].getFileName()
-				pic = Pic('%s%s%s' % (currDir, os.sep, firstPic))
+			pic = Pic('')
+		#else:
+		#	if len(album.getPics()) == 0:
+		#		pic = Pic('')
+		#	else:
+		#		firstPic = album.getPics()[0].getFileName()
+		#		pic = Pic('%s%s%s' % (currDir, os.sep, firstPic))
+
+		self.printMetaData(albumLoc, currDir, pic)
 
 		for line in templateLines:
 			try:
-
 				line = string.replace(line, '@breadcrumb@', self.formatBreadCrumb(album, pic )) 
 				line = string.replace(line, '@title@',      self.formatTitle(     album, pic ))
 				line = string.replace(line, '@albums@',     self.formatAlbums(    album      ))
+				#line = string.replace(line, '@album-description@', self.formatAlbumDescription(album))
 				line = string.replace(line, '@pics-list@',  self.formatPicsList(  album      ))
 				line = string.replace(line, '@pics-thumb@', self.formatPicsThumb( album      ))
-				line = string.replace(line, '@web-pic@',    self.formatWebPic(    pic ))
-				line = string.replace(line, '@comment@',    pic.getComment())
+				#line = string.replace(line, '@web-pic@',    self.formatWebPic(    pic ))
+				#line = string.replace(line, '@comment@',    pic.getComment())
+				line = self.formatContent(line, album, pic)
 			except:
-				line = 'something bad happened'
+				line = 'Unexpected error:', sys.exc_info()[0]
+				#raise
+
 			print line,
+
+
+	def printMetaData(self, albumLoc, currDir, pic):
+		print '<!--'
+		print 'albumLoc : %s' % albumLoc
+		print 'subAlbum : %s' % currDir
+		print 'pic      : %s' % pic
+		print '-->'
 
 
 	def formatBreadCrumb(self, album, pic):
@@ -81,6 +96,7 @@ class Presenter:
 		return string.join(outLines, '\n')
 
 
+
 	def formatPicsList(self, album):
 		pics = album.getPics()
 
@@ -118,6 +134,17 @@ class Presenter:
 
 		return string.join(outLines, '\n')
 
+	def formatContent(self, line, album, pic):
+		if pic.getOriginal() == '':
+			line = string.replace(line, '@album-description@', album.getDescription())
+			line = string.replace(line, '@web-pic@',           '')
+			line = string.replace(line, '@comment@',           '')
+		else:
+			line = string.replace(line, '@album-description@', '')
+			line = string.replace(line, '@web-pic@',           self.formatWebPic(pic))
+			line = string.replace(line, '@comment@',           pic.getComment())
+		return line
+
 
 	def formatWebPic(self, pic):
 		if pic.getOriginal() == '':
@@ -125,7 +152,9 @@ class Presenter:
 
 		outLines = []
 		outLines.append(
-			'<a href="%s"><img src="%s"/></a>' % (pic.getOriginal(), pic.getWeb()))
+			'<a href="%s"><img src="%s"/></a>' % (
+				pic.getOriginal(), 
+				pic.getWeb()))
 		return string.join(outLines, '\n')
 
 

@@ -13,8 +13,6 @@ class Album:
 		self.pics   = []
 
 		if (recurse):
-			#try:
-
 			for entry in os.listdir(albumDir):
 				if (entry[0] != '.'):
 					entryAndPath = '%s%s%s' % (albumDir, os.sep, entry)
@@ -61,3 +59,28 @@ class Album:
 					displayCrumb)
 
 		return breadCrumb[3:]
+
+	def getDescription(self):
+		try:
+			metaFile = open('%s%s.meta' % (self.albumDir, os.sep))
+		except:
+			return '<!-- no meta file found -->'
+
+		description = ''
+		startReading = 0
+		for metaLine in metaFile:
+			if string.find(metaLine, '<album description>') == 0:
+				startReading = 1
+			elif string.find(metaLine, '</album description>') == 0:
+				startReading = 0 
+
+			if startReading:
+				description = "%s%s" % (description, metaLine)
+		return description
+		
+
+if __name__=='__main__':
+	a = Album('album/demian/marines/marine_combat_training')
+	#print a
+	print 'description: %s' % (a.getDescription())
+
