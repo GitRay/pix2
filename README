@@ -58,6 +58,10 @@ does one thing and does it well in a very transparent manner.
     if there are pics this gives you the string '<h2>pictures</h2>' followed by
     an unordered list of pics.  this might be a good option if bandwidth is a
     concern.
+  - @album-description@
+    if there is no currently selected web-pic we print the album description, 
+    this is found in the '.meta' file.  all lines between the "album
+    description" tags will be displayed as the album description.
   - @web-pic@
     when the user selects a thumbnail or picture from the list, the web pic is
     displayed.  the web pic is resized for typical web viewing.  if the user
