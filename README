@@ -1,0 +1,51 @@
+*** summary
+pix is a minimalist gallery system.  less than 300 lines of code allow you to
+organize all your photos, we traverse a directory structure and as-needed
+generate thumb-nails and web optimized versions of your images.  thru a simple
+'.meta' file in each directory you can assign descriptions to each image.
+
+pix doesn't try to do what other programs do well.  in true unix style pix
+does one thing and does it well in a very transparent manner. 
+- no image cropping or rotating; irfanview, gimp, etc.. all do a better job and 
+  are more flexible.
+- no album management; the filesystem is a familiar and intuitive way 
+  to manage your images.
+- no uploads; if you have an account on a box and are running cgi/ php scripts,
+  you should have a firm grasp on ftp or scp.
+
+
+*** install instructions
+- make sure python image library is installed
+  on debian you can do: apt-get install python-imaging
+  or find PIL and extract it in the same directory as pix
+- create a directory pix/album
+- chmod -R 777 pix/album
+
+
+*** album setup and guidelines
+- your directory structure will dictate the hierarhcy for albums and picture
+  placement
+- use underscores in album names and picture names
+  for example: 'new_years_eve_2004'
+  or: 'demian_posing_with_elvis.jpg'
+- in each directory optionally create a .meta file, the format is
+  <pic file name> = <description>
+  it's not necessary to have every file in there.  in vim do: ':r!ls' to get a
+  complete listing of the files in this directory.
+  the description can only be on 1 line!
+
+
+*** trouble shooting
+- are there files in the album directory that are not images?
+- is the permission of the album directory 777?
+
+
+*** todo:
+- need to have better error/ exception handling
+  absolutely no more white screens or server errors
+- resize based on height as well as width
+- write a means for clearing image caches from the web so all the 'nobody' files
+  will go away.
+
+
+

@@ -1,0 +1,96 @@
+<html>
+	<head>
+		<title>pix @title@</title>
+<style type="text/css" media="screen">
+/*
+steel structure 
+http://www.adampolselli.com/colorschemes/steel_structure.php
+
+description  code     where it's used
+-----------  -------  -------------------------
+lt gray      #dfe0e5  background 
+lt blue      #99abb5  header banners
+red          #993333  links
+dk blue      #333333  text and borders
+
+*/
+Body, h1, h2{
+	font-size:        14px;
+	font-family:      Arial, Verdana, sans-serif, Courier;
+	background-color: #dfe0e5; 
+	color:            #333333;
+}
+
+h1 {
+	background-color: #99abb5;
+	border:           1px solid #333333;
+	color:            #993333;
+}
+
+h2 {
+	background-color: #99abb5;
+	border:           1px solid #333333;
+}
+
+body {
+	margin:      20px;
+	font-style:  normal;
+	line-height: 1.3em;
+}
+
+a:link, a:active, a:visited {
+	color:           #993333;
+	text-decoration: none;
+}
+
+a:hover {
+	color:         #333333; 
+}
+
+img {
+	border: 1px solid #333333;
+	margin: 10px;
+}
+
+.footer {
+	text-align:  right;
+	font-size:   10px;
+	border-top:  1px solid #333333;
+	border-left: 1px solid #333333;
+}
+
+table {
+	border:          0px ;
+	width:           100%;
+	border-spacing:  0px;
+	border-collapse: collapse;
+}
+
+td {
+	vertical-align: top;
+	text-align:     justify;
+}
+</style>
+
+	</head>
+	<body>
+		<h1><a href="index.cgi">pix</a> @breadcrumb@</h1>
+		<table>
+			<tr> 
+				<td> 
+					<font size="-1">
+						@albums@
+						@pics-thumb@
+					</font>
+				</td>
+				<td align="right">@web-pic@
+					<br>
+					@comment@
+				</td>
+			</tr>
+      </table>
+		<p class="footer">
+			powered by <a href="http://pix.sf.net">pix</a>
+		</p>
+	</body>
+</html>
