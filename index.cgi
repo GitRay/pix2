@@ -29,16 +29,17 @@ class Presenter:
 		self.printMetaData(albumLoc, currDir, pic)
 
 		for line in templateLines:
-			try:
-				line = string.replace(line, '@breadcrumb@', self.formatBreadCrumb(album, pic )) 
-				line = string.replace(line, '@title@',      self.formatTitle(     album, pic ))
-				line = string.replace(line, '@albums@',     self.formatAlbums(    album      ))
-				line = string.replace(line, '@pics-list@',  self.formatPicsList(  album      ))
-				line = string.replace(line, '@pics-thumb@', self.formatPicsThumb( album      ))
+			#try:
 
-				line = self.formatContent(line, album, currDir, pic)
-			except:
-				line = 'Unexpected error:', sys.exc_info()[0]
+			line = string.replace(line, '@breadcrumb@', self.formatBreadCrumb(album, pic )) 
+			line = string.replace(line, '@title@',      self.formatTitle(     album, pic ))
+			line = string.replace(line, '@albums@',     self.formatAlbums(    album      ))
+			line = string.replace(line, '@pics-list@',  self.formatPicsList(  album      ))
+			line = string.replace(line, '@pics-thumb@', self.formatPicsThumb( album      ))
+			line = self.formatContent(line, album, currDir, pic)
+
+			#except:
+				#line = 'Unexpected error:', sys.exc_info()[0]
 				#raise
 
 			print line,
@@ -147,8 +148,11 @@ class Presenter:
 			line = string.replace(line, '@comment@',           '')
 
 		else:
-			firstPic = album.getPics()[0].getFileName()
-			pic = Pic('%s%s%s' % (currDir, os.sep, firstPic))
+			if len(album.getPics()) > 0:
+				firstPic = album.getPics()[0].getFileName()
+				pic = Pic('%s%s%s' % (currDir, os.sep, firstPic))
+			else:
+				pic = Pic('')
 
 			line = string.replace(line, '@album-description@', '')
 			line = string.replace(line, '@web-pic@',           self.formatWebPic(pic))
