@@ -29,6 +29,12 @@ h2 {
 	border:           1px solid #333333;
 }
 
+h3{
+	font-size:   12px;
+	border-top:  1px solid #333333;
+	border-left: 1px solid #333333;
+}
+
 body {
 	margin:      20px;
 	font-style:  normal;

@@ -171,14 +171,16 @@ class Presenter:
 		if pic.getOriginal() == '':
 			return ''
 
-		outLines = []
-		outLines.append(
-			'<a href="%s"><img align="right" alt="%s" title="%s" src="%s"/></a>' % (
-				pic.getOriginal(), 
-				'click here to view the original image',
-				'click here to view the original image',
-				pic.getWeb()))
-		return string.join(outLines, '\n')
+		# use this return so that the users can click on the web-sized image and
+		# then see the original image.  of course sometimes the originals are huge
+		# so using the alternate return will keep your bandwidth usage down.
+		# return '<a href="%s"><img align="right" alt="%s" title="%s" src="%s"/></a>' % (
+		# 		pic.getOriginal(), 
+		# 		'click here to view the original image',
+		# 		'click here to view the original image',
+		# 		pic.getWeb())
+
+		return '<img align="right" src="%s"/>' % (pic.getWeb())
 
 
 def getArg(aForm, aKey):
