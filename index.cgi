@@ -127,7 +127,7 @@ class Presenter:
 
 
 	def formatControl(self, album, pic):
-		control   = '<a href="?album=%s&pic=%s&control=%s">%s</a>'
+		control   = '&nbsp; <a href="?album=%s&pic=%s&control=%s">%s</a> &nbsp; '
 		albumPath = album.getLinkPath()
 		picFile   = pic.getFileName()
 
@@ -136,7 +136,7 @@ class Presenter:
 		nextLink     = control % (albumPath, picFile, 'next',     '>>')
 		lastLink     = control % (albumPath, picFile, 'last',     '>|')
 
-		return '%s &nbsp; %s &nbsp; %s &nbsp; %s' % (firstLink, previousLink, nextLink, lastLink) 
+		return '%s %s %s %s' % (firstLink, previousLink, nextLink, lastLink) 
 
 
 	def formatContent(self, line, album, currDir,  pic):
