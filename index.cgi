@@ -127,6 +127,9 @@ class Presenter:
 
 
 	def formatControl(self, album, pic):
+		if (len(album.getPics()) < 4):
+			return ''
+
 		control   = '&nbsp; <a href="?album=%s&pic=%s&control=%s">%s</a> &nbsp; '
 		albumPath = album.getLinkPath()
 		picFile   = pic.getFileName()

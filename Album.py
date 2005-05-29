@@ -48,9 +48,13 @@ class Album:
 
 
 	def getNextPic(self, picName):
-		nextIndex = self.findIndex(picName) + 1
-		if (nextIndex >= len(self.getPics())):
+		if (picName == ''):
 			nextIndex = 0
+		else:
+			nextIndex = self.findIndex(picName) + 1
+			if (nextIndex >= len(self.getPics())):
+				nextIndex = 0
+
 		return self.getPics()[nextIndex].getFileName()
 
 	
