@@ -35,6 +35,34 @@ class Album:
 		return len(self.pics)
 
 
+	def getFirstPic(self):
+		return self.getPics()[0].getFileName()
+
+
+	def getLastPic(self):
+		return self.getPics()[-1].getFileName()
+
+
+	def getPreviousPic(self, picName):
+		return self.getPics()[self.findIndex(picName) - 1].getFileName()
+
+
+	def getNextPic(self, picName):
+		nextIndex = self.findIndex(picName) + 1
+		if (nextIndex >= len(self.getPics())):
+			nextIndex = 0
+		return self.getPics()[nextIndex].getFileName()
+
+	
+	def findIndex(self, picName):
+		currNum = 0
+		for pic in self.getPics():
+			if (picName == pic.getFileName()):
+				return currNum
+			currNum = currNum + 1
+		return 0
+
+
 	def getPics(self):
 		try:
 			metaFile = open('%s%s.meta' % (self.albumDir, os.sep))

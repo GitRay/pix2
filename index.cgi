@@ -6,38 +6,55 @@ import sys
 import string
 from Album import Album
 from Pic   import Pic
+from Video import Video
+
 
 albumLoc   = 'album'
 seperator  = '|'
-pixVersion = '1.2.0'
+pixVersion = '1.2.2'
 
 class Presenter: 
-	def __init__(self, subAlbum, pic):
+	def __init__(self, subAlbum, picName, control):
 		templateLines = open('template.html')
 
 		currDir = '%s%s%s' % (albumLoc, os.sep, subAlbum)	
 		album = Album(currDir)
-		if (pic != ''):
-			pic = Pic('%s%s%s' % (currDir, os.sep, pic))
-		else:
-			pic = Pic('')
 
-		self.printMetaData(albumLoc, currDir, pic)
+		if (control == ''):
+			if (picName != ''):
+				pic = Pic('%s%s%s' % (currDir, os.sep, picName))
+			else:
+				pic = Pic('')
+		else:
+			if (control == 'first'):
+				pic = Pic('%s%s%s' % (currDir, os.sep, album.getFirstPic()))
+			if (control == 'previous'):
+				pic = Pic('%s%s%s' % (currDir, os.sep, album.getPreviousPic(picName)))
+			if (control == 'next'):
+				pic = Pic('%s%s%s' % (currDir, os.sep, album.getNextPic(picName)))
+			if (control == 'last'):
+				pic = Pic('%s%s%s' % (currDir, os.sep, album.getLastPic()))
+
+
+		self.printMetaData(albumLoc, currDir, pic, control)
 
 		line = string.join(templateLines, '')
 		line = string.replace(line, '@breadcrumb@', self.formatBreadCrumb(album, pic )) 
-		line = string.replace(line, '@title@',      self.formatTitle( album, pic ))
-		line = string.replace(line, '@albums@',     self.formatAlbums(album      ))
-		line = string.replace(line, '@pics@',       self.formatPics(  album, pic ))
+		line = string.replace(line, '@title@',      self.formatTitle(     album, pic ))
+		line = string.replace(line, '@albums@',     self.formatAlbums(    album      ))
+		line = string.replace(line, '@pics@',       self.formatPics(      album, pic ))
+		line = string.replace(line, '@meta@',       self.formatMeta(      album      ))
+		line = string.replace(line, '@control@',    self.formatControl(   album, pic ))
 		line = self.formatContent(line, album, currDir, pic)
 		print line,
 
 
-	def printMetaData(self, albumLoc, currDir, pic):
+	def printMetaData(self, albumLoc, currDir, pic, control):
 		print '<!--'
 		print 'albumLoc : %s' % albumLoc
 		print 'subAlbum : %s' % currDir
 		print 'pic      : %s' % pic
+		print 'control  : %s' % control
 		print 'pix ver  : %s' % pixVersion
 		print '-->'
 
@@ -100,9 +117,26 @@ class Presenter:
 		return string.join(outLines, '\n')
 
 
-	#def formatMeta(self, album):
-	#	return '<a target="_new" href="%s%s%s.meta">meta</a>' % (
-	#		albumLoc, album.getLinkPath(), os.sep)
+	def formatMeta(self, album):
+		try:
+			metaFileName = '%s%s%s.meta' % (albumLoc, album.getLinkPath(), os.sep)
+			metaFile = open(metaFileName)
+		except:
+			return ''
+		return '<a target="_new" href="%s%s%s.meta">m</a> %s ' % (albumLoc, album.getLinkPath(), os.sep, seperator) 
+
+
+	def formatControl(self, album, pic):
+		control   = '<a href="?album=%s&pic=%s&control=%s">%s</a>'
+		albumPath = album.getLinkPath()
+		picFile   = pic.getFileName()
+
+		firstLink    = control % (albumPath, picFile, 'first',    '|<')
+		previousLink = control % (albumPath, picFile, 'previous', '<<')
+		nextLink     = control % (albumPath, picFile, 'next',     '>>')
+		lastLink     = control % (albumPath, picFile, 'last',     '>|')
+
+		return '%s &nbsp; %s &nbsp; %s &nbsp; %s' % (firstLink, previousLink, nextLink, lastLink) 
 
 
 	def formatContent(self, line, album, currDir,  pic):
@@ -180,11 +214,12 @@ if __name__=='__main__':
 		iForm       = cgi.FieldStorage() 
 		album       = getArg(iForm, 'album')
 		pic         = getArg(iForm, 'pic')
+		control     = getArg(iForm, 'control')
 		adminAction = getArg(iForm, 'admin')
 		if (adminAction != ''):
 			doAdminFunction(adminAction, album, pic)
 		else:
-			Presenter(album, pic)
+			Presenter(album, pic, control)
 	except Exception, exceptionData:
 		print '''
 			<pre><h1>pix broke, you get to keep both pieces</h1>%s</pre>

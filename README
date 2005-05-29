@@ -116,6 +116,16 @@ generated elements into your html.
 
 
 *** change log
+- 1.2.2 from 1.2.1
+  - add an 'r' link that gives access to the README file, not sure about that
+    one.
+  - add an 'm' link that brings up the .meta file for the current directory.
+    only displayed when there is a .meta file for the current directory.
+  - add a 'polaroid' style sheet
+  - add a set of controls so you can navigate within your current album, we give
+    a first, previous, next and last button.  
+
+
 - 1.2.1 from 1.2.0
   - improved the processing performance, i was doing a ton of 
     un-necessary processing for each line wether or not it was needed.
