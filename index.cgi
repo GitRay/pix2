@@ -6,7 +6,6 @@ import sys
 import string
 from Album import Album
 from Pic   import Pic
-from Video import Video
 
 
 albumLoc   = 'album'

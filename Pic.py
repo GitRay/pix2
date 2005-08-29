@@ -2,19 +2,24 @@
 
 import sys, os, string
 
-try:
-	from PIL import Image
-except ImportError:
-	print >> sys.stderr, ("get PIL at http://www.pythonware.com/products/pil")
-	sys.exit(0)
+# if this is false we try to use ImageMagick
+# if you set it to true we try to import and use PIL
+USE_PIL = 0 
+
+if (USE_PIL):
+	try:
+		from PIL import Image
+	except ImportError:
+		print "get PIL at http://www.pythonware.com/products/pil"
+		USE_PIL = 0
 
 class Pic:
 
 	def __init__(self, aPicPath):
 		# validate that it is a pic if it has a filename
 		self.picPath = aPicPath
-		if (aPicPath != ''):
-			originalImage = Image.open(aPicPath)
+		#if (aPicPath != ''):
+		#	originalImage = Image.open(aPicPath)
 
 
 	def getComment(self):
@@ -50,19 +55,45 @@ class Pic:
 
 
 	def getResized(self, newName, newWidth, newHeight):
-		originalImage = Image.open(self.picPath)
-		width, height = originalImage.size
+		if (USE_PIL):
+			# using Pyton Imaging Library
+			originalImage = Image.open(self.picPath)
+			width, height = originalImage.size
 
-		if ((width < newWidth) or (height < newHeight)):
-			return self.picPath
+			if ((width < newWidth) or (height < newHeight)):
+				return self.picPath
+			else:
+				if not os.path.exists(newName):
+
+					newHeight = (height * newWidth) / width
+					newImage  = originalImage.resize((
+						newWidth, newHeight))
+					newImage.save(newName)
+
+				return newName
+
 		else:
-			if not os.path.exists(newName):
+			# using ImageMagick
+			pipe = os.popen("identify %s" % self.picPath, 'r')
+			text = pipe.read()
+			sts  = pipe.close() # not sure why you do this
+			
+			wordNum = 0
+			width   = 0
+			height  = 0 
+			for word in text.split():
+				if (wordNum == 2):
+					width, height = word.split('x')
+				wordNum = wordNum + 1
 
-				newHeight = (height * newWidth) / width
-				newImage  = originalImage.resize((newWidth, newHeight))
-				newImage.save(newName)
-
-			return newName
+			if ((width < newWidth) or (height < newHeight)):
+				return self.picPath
+			else:
+				if not os.path.exists(newName):
+					newHeight = (int(height) * newWidth) / int(width)
+					os.popen('convert "%s" -sample %sx%s "%s"' % (
+						self.picPath, newWidth, newHeight, newName))
+				return newName
 
 
 	def getOriginal(self):
