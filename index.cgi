@@ -10,18 +10,20 @@ from Pic   import Pic
 
 albumLoc   = 'album'
 seperator  = '|'
-pixVersion = '1.2.2'
+pixVersion = '1.3.1'
 
 class Presenter: 
 	def __init__(self, subAlbum, picName, control):
 		templateLines = open('template.html')
 
 		currDir = '%s%s%s' % (albumLoc, os.sep, subAlbum)	
+		#currDir = '%s%s' % (albumLoc, subAlbum)	
 		album = Album(currDir)
 
 		if (control == ''):
 			if (picName != ''):
 				pic = Pic('%s%s%s' % (currDir, os.sep, picName))
+				#pic = Pic('%s%s' % (currDir, picName))
 			else:
 				pic = Pic('')
 		else:

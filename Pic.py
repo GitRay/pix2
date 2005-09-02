@@ -17,7 +17,11 @@ class Pic:
 
 	def __init__(self, aPicPath):
 		# validate that it is a pic if it has a filename
-		self.picPath = aPicPath
+		# this is a TOTAL hack, i should be ashamed of that this line of code is necessary, 
+		# we get some stray '//' in the urls, causes trouble on freebsd for some reason. 
+		self.picPath = string.replace(aPicPath, '%s%s' % (os.sep, os.sep), os.sep) 
+			
+		#self.picPath = aPicPath
 		#if (aPicPath != ''):
 		#	originalImage = Image.open(aPicPath)
 
@@ -104,8 +108,11 @@ class Pic:
 		fileNameEnd   = string.rfind(self.picPath, '.')
 		fileNameBegin = string.rfind(self.picPath, os.sep) + 1
 
-		return '%s.%s_%s' % (
-			self.picPath[:fileNameBegin], prefix, self.picPath[fileNameBegin:]) 
+		resizedPicPath = '%s.%s_%s' % (self.picPath[:fileNameBegin], prefix, self.picPath[fileNameBegin:]) 
+		#print '<pre>self.picPath: %s</pre>' % (self.picPath)
+		#print '<pre>returning resizedPicPath: %s</pre>' % (resizedPicPath)
+
+		return resizedPicPath
 
 
 	def getName(self):
@@ -117,7 +124,10 @@ class Pic:
 
 	def getFileName(self):
 		sepLoc = string.rfind(self.picPath, os.sep) + 1
-		return self.picPath[sepLoc:]
+		fileName = self.picPath[sepLoc:]
+
+		#print '<pre>returning fileName: %s</pre>' % (fileName)
+		return fileName 
 
 
 	def __repr__(self):
