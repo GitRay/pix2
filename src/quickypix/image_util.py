@@ -1,4 +1,4 @@
-# $Id: image_util.py 140 2005-10-10 00:34:42Z quarl $
+# $Id: image_util.py 174 2005-10-15 08:58:42Z quarl $
 
 import time
 import config
@@ -35,7 +35,7 @@ class image_info:
         self.file_size = os.stat(fpath).st_size
         self.video_codec = None
         self.duration = None
-        if util.get_ext(fpath) in ['jpg', 'jpeg']:
+        if util.path_ext(fpath) in ['jpg', 'jpeg']:
             self.process_exif(fpath)
         else:
             self.process_tcprobe(fpath)
@@ -82,7 +82,7 @@ def convert_to_image(movie_file, image_file):
 def reencode(file):
     # re-encode a file (hopefully using a better codec and/or encoder - for
     # avi files the mencoder DivX4 encoder shrinks the file by more than 50%)
-    if util.get_ext(file) in config.MOVIE_TYPES:
+    if util.path_ext(file) in config.MOVIE_TYPES:
         cmd = ['mencoder', '-quiet', '-oac', 'copy', file, '-ovc', 'lavc',
                '-lavcopts', 'vcodec=mpeg4', '-o', tmp]
     else:
@@ -90,7 +90,7 @@ def reencode(file):
 
 def rotate_image(file, degrees):
     tmp = file+'.tmp'
-    ext = util.get_ext(file)
+    ext = util.path_ext(file)
     if ext in config.MOVIE_TYPES:
         cmd = ['/home/quarl/bin/movie-rotate', file, tmp, str(degrees)]
     elif ext in config.IMAGE_TYPES:

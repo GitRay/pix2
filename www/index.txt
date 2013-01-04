@@ -25,10 +25,10 @@ QuickyPix, or start with Pix and cherry-pick some features from QuickyPix.
 Download
 --------
 
-- `quickypix-1.1.2.tar.gz`_ (2005-10-07)
+- `quickypix-1.2.1.tar.gz`_ (2005-10-15)
 - `Browse for other versions or other archive formats`_
 
-.. _quickypix-1.1.2.tar.gz: releases/quickypix-1.1.2.tar.gz
+.. _quickypix-1.2.1.tar.gz: releases/quickypix-1.2.1.tar.gz
 .. _Browse for other versions or other archive formats: releases/
 
 Installation
