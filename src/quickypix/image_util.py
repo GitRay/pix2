@@ -1,4 +1,4 @@
-# $Id: image_util.py 113 2005-09-27 23:28:33Z quarl $
+# $Id: image_util.py 125 2005-10-03 05:09:30Z quarl $
 
 import time
 import config
@@ -7,6 +7,13 @@ import re
 import commands
 import exif
 import util
+
+# use PIL if available
+try:
+    import image_pil as image_ops
+except ImportError:
+    #util.log("Python Imaging Library (http://www.pythonware.com/products/pil/) not available\n")
+    import image_im as image_ops
 
 def reformat_exif_time(time_str):
     if not time_str or str(time_str) == '0000:00:00 00:00:00':
@@ -35,7 +42,7 @@ class image_info:
 
     def process_exif(self, fpath):
         d = exif.process_file(open(fpath,'rb'))
-        self.dimensions = get_image_size(fpath)
+        self.dimensions = image_ops.get_size(fpath)
         if d:
             self.time_str = reformat_exif_time(d.get('EXIF DateTimeOriginal'))
             l = d.get('EXIF ExifImageLength')
@@ -92,14 +99,6 @@ def rotate_image(file, degrees):
     util.tdel(file)
     os.rename(tmp, file)
 
-def get_image_size(fpath):
-    cmd = 'identify' + commands.mkarg(fpath)
-    m = re.search(' (?:PNG|JPEG|GIF) ([0-9]+)x([0-9]+) ', commands.getoutput(cmd))
-    if m:
-        return int(m.group(1)), int(m.group(2))
-    else:
-        raise "Couldn't get image size of %s"%fpath
-
 def resize_image(fpath, resized_fpath, (new_width, new_height), movie):
     # Resize an image and cache it as resized_fpath.  Returns the filename
     # which could be resized_fpath or fpath; it could be fpath if fpath is
@@ -109,7 +108,7 @@ def resize_image(fpath, resized_fpath, (new_width, new_height), movie):
         if util.newer_than(resized_fpath, fpath):
             return resized_fpath
     util.ensure_dir(resized_fpath)
-    original_width, original_height = get_image_size(fpath)
+    original_width, original_height = image_ops.get_size(fpath)
     if original_width < new_width and original_height < new_height:
         # original picture already smaller
         if movie:
@@ -124,20 +123,6 @@ def resize_image(fpath, resized_fpath, (new_width, new_height), movie):
             new_height = int(new_width / original_aspect)
         else:
             new_width = int(new_height * original_aspect)
-    cmd = ['convert', '-thumbnail', '%dx%d' %(new_width, new_height)]
-    # print >>open('/tmp/pix.log','a'), cmd
-    # if it was originally a movie, then add a label saying so
-    if movie:
-        if new_width > 80:
-            pointsize = 12
-        else:
-            pointsize = 8
-        cmd += [ '-fill', 'white', '-box', '#00000080',
-                 '-gravity', 'NorthEast',
-                 '-draw', 'text 5,5 " movie "',
-                 '-pointsize', str(pointsize) ]
-    cmd += [fpath, resized_fpath]
 
-    if os.spawnlp(os.P_WAIT, cmd[0], *cmd):
-        raise "Couldn't resize picture"
+    image_ops.resize(fpath, resized_fpath, (new_width, new_height), movie)
     return resized_fpath

@@ -1,4 +1,4 @@
-# $Id: Album.py 113 2005-09-27 23:28:33Z quarl $
+# $Id: Album.py 124 2005-10-03 04:53:36Z quarl $
 
 import sys, os, string
 from Pic import Pic
@@ -20,12 +20,14 @@ class Album(object):
             try:
                 self.title = '(%s)' %os.path.basename(os.path.dirname(self.path))
             except util.AccessError, e:
-                print >>sys.stderr, "QuickyPix: warning: AccessError while setting title"
+                #print >>sys.stderr, "QuickyPix: warning: AccessError while setting title"
+                pass
         if not self.highlight_name:
             try:
                 self.highlight_name = self.default_highlight_name()
             except util.AccessError, e:
-                print >>sys.stderr, "QuickyPix: warning: AccessError while setting highlight"
+                #print >>sys.stderr, "QuickyPix: warning: AccessError while setting highlight"
+                pass
 
     def _get_rel_path(self):
         return os.path.basename(os.path.dirname(self.path))

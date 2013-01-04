@@ -1,4 +1,4 @@
-# $Id: util.py 113 2005-09-27 23:28:33Z quarl $
+# $Id: util.py 124 2005-10-03 04:53:36Z quarl $
 
 import sys
 import os
@@ -202,10 +202,10 @@ class MetadataProperty:
         fn = config.ALBUMS_DIR + obj.path + self.filename
         if not obj.path.startswith('/') or '/' in self.filename or '../' in fn:
             raise ValueError
-        log("Modifying %s: from %s to %s"%(fn, repr(old_value), repr(value)))
         #del obj.__dict__[self.cname]
         obj.__dict__[self.cname] = value
         write_file(fn, value)
+        log("Modifying %s: from %s to %s"%(fn, repr(old_value), repr(value)))
 
 def metadata_property(filename):
     # Returns a property with getter and setter for reading and writing file.

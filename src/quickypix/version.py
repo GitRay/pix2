@@ -1,4 +1,4 @@
-# $Id: version.py 113 2005-09-27 23:28:33Z quarl $
+# $Id: version.py 131 2005-10-08 03:39:13Z quarl $
 
-version = '1.1'
-rev = '$Rev: 113 $'
+version = '1.1.2'
+rev = '$Rev: 131 $'

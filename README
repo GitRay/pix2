@@ -1,5 +1,5 @@
 -*-text-*-
-;; $Id: README 117 2005-09-28 02:52:07Z quarl $
+;; $Id: README 130 2005-10-08 03:32:31Z quarl $
 
 QuickyPix
 =========
@@ -16,6 +16,8 @@ the way I wanted it.  The best one I found was "Pix" by Demian Neidetcher
 <http://pix.sf.net>, so I wrote one based on Pix, with the exact set of
 features I wanted.  I owe Demian Neidetcher a lot for a great do-it-yourself
 framework.
+
+Web site: http://www.quarl.org/projects/quickypix/
 
 Demo: http://photo.quarl.org/
 
@@ -86,8 +88,11 @@ Metadata files:
     album/pic.comment - pic comment
 
 Dependencies:
-- ImageMagick (convert, identify) for getting image information, resizing
-  images, rotating images, adding "movie" label
+- Python2.3 (python2.2 can be ported to, but I haven't bothered)
+- PIL and/or ImageMagick (convert, identify) for getting image information,
+  resizing images, rotating images, adding "movie" label
+    - PIL is faster since quickypix doesn't have to start new processes, but
+      can't do all operations.
 - MPlayer (mencoder) for rotating movies, making thumbnails
 - Transcode (tcprobe) for getting movie information
 

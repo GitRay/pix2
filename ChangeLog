@@ -1,4 +1,9 @@
-2005-09-xx  Karl Chen  <quarl@quarl.org>
+2005-10-02  Hollis Blanchard <hollis@penguinppc.org>
+	Disable warnings for default .title and .hightlight.
+	Use PIL when available -- it avoids the overhead of forking
+	to use ImageMagick's `identify' and `convert'.
+
+2005-09-27  Karl Chen  <quarl@quarl.org>
 	Release version 1.1
 
 2005-09-27  Karl Chen  <quarl@quarl.org>
@@ -12,6 +17,10 @@
 
 	Remove extensions from URLs.  Canonicalize extensionless URLs.
 	Photos must be unambiguous without extension.
+
+	I used to prefer keeping the extension, but I want search engines
+	to index these pages, and they blindly assume that an image link
+	pointing to a .jpg URL is another image.
 
 2005-06-09  Karl Chen <quarl@quarl.org> 
 	Use 'fullsize' instead of 'original'

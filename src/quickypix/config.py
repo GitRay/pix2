@@ -1,4 +1,4 @@
-# $Id: config.py 113 2005-09-27 23:28:33Z quarl $
+# $Id: config.py 129 2005-10-08 03:28:42Z quarl $
 
 ALBUMS_DIR = '/srv/albums'
 
@@ -25,4 +25,8 @@ TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 # 'recently-modified'
 RECENT_THRESHOLD = 120
 
+# this is the program invoked to perform deletions; you can use /bin/rm if you
+# want, or disable deletions with e.g. /bin/false.
+#
+# You can get tdel at http://www.quarl.org/~quarl/kc-bin/tdel
 TDEL_PATH = '/home/quarl/bin/tdel'
