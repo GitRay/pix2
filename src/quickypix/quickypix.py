@@ -1,6 +1,6 @@
 #!/usr/bin/python2.3
 
-# $Id: quickypix.py 113 2005-09-27 23:28:33Z quarl $
+# $Id: quickypix.py 164 2005-10-15 08:34:36Z quarl $
 
 import cgi
 import cgitb; cgitb.enable()
@@ -37,16 +37,17 @@ def cls_recent(obj):
         return ''
 
 class Presenter:
-    def __init__(self):
-        config.input_path = input_path = os.environ.get('PATH_INFO') or '/'
-        config.root = os.environ.get('SCRIPT_NAME','')
-        config.request_uri = os.environ.get('REQUEST_URI')
+    def __init__(self, environ):
+        config.input_path = input_path = environ.get('PATH_INFO') or '/'
+        # see config.py for setting of config.root, which is by default
+        # $SCRIPT_NAME
+        config.request_uri = environ.get('REQUEST_URI')
         config.authenticated = False
         config.editing = False
-        self.remote_user = os.environ.get('REMOTE_USER')
+        self.remote_user = environ.get('REMOTE_USER')
         self.form = cgi.FieldStorage()
         config.cookie = Cookie.SimpleCookie()
-        config.cookie.load(os.environ.get('HTTP_COOKIE',''))
+        config.cookie.load(environ.get('HTTP_COOKIE',''))
         new_cookie = Cookie.SimpleCookie()
         if self.remote_user:
             config.authenticated = True
@@ -110,13 +111,26 @@ class Presenter:
         while input_path:
             part = input_path.pop(0)
             util.name_validate(part)
-            path = os.path.join(path, part)
+            ppath = path
+            path = os.path.join(ppath, part)
             if os.path.isdir(config.ALBUMS_DIR+path):
                 self.album_path.append(Album(path))
                 continue
 
+            ext = util.path_ext(part)
+            if not input_path and ext:
+                # If we have "IMAGE.jpg" (as the last component), treat it the
+                # same as "IMAGE/fullsize"
+                path = os.path.join(ppath, util.path_nonext(part))
+            else:
+                ext = ''
             self.pic = findPic(path)
             if self.pic:
+                if ext:
+                    if self.pic.pathext != ext:
+                        util.not_found()
+                    assert(not input_path)
+                    input_path = [util.FULLSIZE]
                 break
 
             util.not_found()
@@ -523,7 +537,7 @@ class Presenter:
 
 if __name__=='__main__':
     try:
-        Presenter()
+        Presenter(os.environ)
     except util.AccessError, e:
         e.print_exit()
 

@@ -1,3 +1,32 @@
+2005-10-15  Karl Chen  <quarl@quarl.org>
+	Release 1.2
+
+2005-10-15  Karl Chen  <quarl@quarl.org>
+	Changed URL for fullsize pics to IMAGE.jpg instead of
+	IMAGE/fullsize (resized pics are still IMAGE/123x456)
+
+2005-10-15  Karl Chen  <quarl@quarl.org>
+	* src/quickypix/util.py (MetadataProperty.set): Fixed 'recent' bug
+	due to 2005-09-26 change
+	Other minor bug fixes	
+	
+2005-10-14  Karl Chen  <quarl@quarl.org>
+	init.d/quickypix-scgi: startup script
+
+2005-10-13 Hollis Blanchard <hollis@penguinppc.org>
+	New SCGI handler.
+
+2005-10-12  Karl Chen  <quarl@quarl.org>
+	Based on patch by Hollis; move config.root setting to config.py
+	and add comments for alternate ways to set config.root.
+
+2005-10-09  Karl Chen  <quarl@quarl.org>
+	Better error checking for movie rotation.
+	Allow .highlight to contain extensionless names.
+
+2005-10-07  Karl Chen  <quarl@quarl.org>
+	Configuration clarification.
+
 2005-10-02  Hollis Blanchard <hollis@penguinppc.org>
 	Disable warnings for default .title and .hightlight.
 	Use PIL when available -- it avoids the overhead of forking
@@ -14,7 +43,6 @@
 	if the filesystem isn't writable.
 
 2005-09-18  Karl Chen <quarl@quarl.org>
-
 	Remove extensions from URLs.  Canonicalize extensionless URLs.
 	Photos must be unambiguous without extension.
 
@@ -65,7 +93,7 @@
 	loads it first.
 
 2005-01-12  Karl Chen <quarl@quarl.org>
-	Totally cool rewrite.
+	Major rewrite.
 
 2005-01-13  Karl Chen <quarl@quarl.org>
 	initial import from pix.sf.net

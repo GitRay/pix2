@@ -1,0 +1,250 @@
+/* $Id: style.css 113 2005-09-27 23:28:33Z quarl $ */
+
+/* quickypix style for photo.quarl.org */
+
+/* body, h1, h2 { */
+/*     font-size:        14px; */
+/*     font-family:      Arial, Verdana, sans-serif; */
+/*     background-color: #dfe0e5; */
+/*     color:            #333333; */
+/* } */
+
+/* h1 { */
+/*     background-color: #99abb5; */
+/*     border:           1px solid #333333; */
+/*     color:            #990000; */
+/* } */
+
+h2 {
+    background-color: rgb(37,84,122) !important;
+    color: white !important;
+    /* border:           1px solid #333333; */
+    /* margin-top:       0; */
+    padding: 4px !important;
+    /* font-size:  */
+}
+
+/* body { */
+/*     margin:        20px; */
+/*     font-style:    normal; */
+/* } */
+
+/* a:link, a:active, a:visited { */
+/*     color:           #993333; */
+/*     text-decoration: none; */
+/* } */
+
+/* a:hover { */
+/*     color: #333333; */
+/* } */
+
+/* apparently MSIE doesn't render correctly if we combine these two  '*/
+
+img {
+    border: 1px solid #333333;
+}
+
+input[type="image"] {
+    border: 1px solid #333333;
+}
+
+.albums dl {
+    width: 104px;
+}
+
+.albums dt {
+    height: 83px;
+}
+
+.albums img {
+    border: 2px outset #333333;
+}
+
+.albums input[type="image"] {
+    border: 2px outset #333333;
+}
+
+#selected-pic {
+    border: 1px solid #ff4455;
+}
+
+.comment p {
+    margin: 0;
+    margin-bottom: 0.5ex;
+}
+
+table {
+    border:          0px ;
+    width:           100%;
+    border-spacing:  0px;
+    border-collapse: collapse;
+}
+
+td {
+    vertical-align: top;
+}
+
+td.filler {
+    padding: 0;
+    margin:  0;
+}
+
+.pic {
+    margin:      0;
+    padding:     0;
+    margin-left: 10px;
+}
+
+.pic img, .pic input[type="image"] {
+    margin:        0;
+    margin-bottom: 5px;
+    display:       block;
+}
+
+.info {
+    margin-top: 4px;
+    border:     1px dashed #333333;
+    width:      260px;
+    font-size:  10px;
+    float:      right;
+}
+
+.info td:first-child {
+    text-align: right;
+}
+
+.info td:first-child + td {
+    font-weight: bold;
+    color:       black;
+}
+
+.dummy {
+    margin:      0;
+}
+
+.nav {
+    /* font-size: 80%; */
+}
+
+.nav div {
+    clear: both;
+}
+
+.nav dl {
+    float:      left;
+    margin:     10px;
+    text-align: center;
+}
+
+.nav .albums dl {
+    width: 120px;
+}
+
+.nav .pictures dl {
+    width: 75px;
+}
+
+.editing .nav .pictures dl {
+    width: 100px;
+}
+
+.nav dt {
+    display:    block;
+    text-align: center;
+}
+
+.albums dd {
+    font-size: 90%;
+}
+
+.nav dd {
+    display: block;
+    margin:  0;
+    height:  35px;
+}
+
+/* .footer { */
+/*     clear:        both; */
+/*     text-align:   right; */
+/*     font-size:    10px; */
+/*     /\* border-top:   1px solid #333333; *\/ */
+/*     margin-top:   1em; */
+/* } */
+
+br {
+    clear: both;
+}
+
+.login {
+    font-size: 80%;
+}
+
+.login span {
+    font-weight: bold;
+}
+
+input[type="submit"] {
+    float:       right;
+    width:       100px;
+    margin-left: 3px;
+}
+
+label {
+    font-size: 80%;
+}
+
+input[type="text"], textarea, label {
+    display: block;
+}
+
+#edit-buttons {
+    padding-bottom: 10px;
+    text-align: right;
+}    
+
+#edit-buttons form {
+    display: inline;
+}
+
+#edit-buttons input {
+    float: none;
+    display: inline;
+}
+
+#album-comment {
+    float: left;
+}
+
+#album-comment textarea {
+    margin-bottom: 6px;
+}
+
+#album-title {
+    float: right;
+}
+
+#album-title input {
+    width: 200px;
+}    
+
+#pic-filename {
+    float: left;
+}
+
+#pic-comment {
+    clear: left;
+    margin-top: 40px;
+}
+
+#pic-comment textarea {
+    width: 99%;
+}
+
+#pic-commit {
+    float: right;
+}
+
+.recently-modified {
+    color: green;
+}
+

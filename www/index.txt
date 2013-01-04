@@ -1,0 +1,115 @@
+QuickyPix_
+==========
+
+**QuickyPix** is an instant thumbnail web photo gallery software in Python.
+
+.. _QuickyPix: http://www.quarl.org/projects/quickypix/
+
+Yet ANOTHER photo gallery system?
+---------------------------------
+
+I've used a bunch of photo galleries and before QuickyPix was using Gallery_
+(which I recommend if you just want a kitchen sink).  I researched looking for
+something that fit my needs exactly but found none.  Demian Neidetcher
+correctly noted that everyone wants to customize their photo gallery, so he
+created Pix_, a simple gallery system that is easily customizable.  Pix is a
+great base for writing the gallery system of your dreams.  So I forked it and
+created my own.  Eventually I added enough features that I wanted to call it
+something other than "Pix with quarl's additions", but I still wanted to
+credit Pix.  If you want to create your own custom one you might start with
+QuickyPix, or start with Pix and cherry-pick some features from QuickyPix.
+
+.. _Gallery: http://gallery.menalto.com/
+.. _Pix: http://pix.sourceforge.net/
+
+Download
+--------
+
+- `quickypix-1.1.2.tar.gz`_ (2005-10-07)
+- `Browse for other versions or other archive formats`_
+
+.. _quickypix-1.1.2.tar.gz: releases/quickypix-1.1.2.tar.gz
+.. _Browse for other versions or other archive formats: releases/
+
+Installation
+------------
+See `installation documentation`_.
+
+.. _installation documentation: install.html
+
+Development
+-----------
+
+- Browse/checkout the Subversion_ repository:
+
+    svn checkout http://svn.quarl.org/repos/quickypix/trunk/quickypix/
+
+- ChangeLog_
+
+.. _Subversion: http://subversion.tigris.org/
+.. _ChangeLog: http://svn.quarl.org/repos/quickypix/trunk/quickypix/ChangeLog
+
+Screenshot
+----------
+
+.. Image:: quickypix-screenshot.png
+    :alt: [Screenshot of QuickyPix in a browser]
+
+Demo
+----
+My personal photo website is http://photo.quarl.org/.
+
+Features
+--------
+
+Thumbnails
+  - Album highlight with outset border
+  - Movie thumbnails, with distinctive "movie" label
+
+"Instant-on"
+  - No import needed: add pictures simply by copying to the photo directory
+  - Cached, on-demand image resizing
+
+Meaningful URLs
+  - Web hierarchy reflects file system hierarchy
+
+The photo tree is untouched (except when editing metadata)
+  - Cache data goes in a separate tree
+  - Thus, you can easily backup the entire photo tree
+
+Supported formats
+  - jpg, png, gif, etc.; avi, mpg
+
+Picture info
+  - Image dimensions, picture-taken timestamp, movie length, codec, etc.
+
+Metadata
+  - album title, album comment, picture comment, album highlight
+
+Admin mode
+  - Resizing, deleting, editing captions, changing highlight
+
+Template engine using XHTML and CSS
+  - Fluid-yet-aligned thumbnail arrangement (no tables)
+  - Validated XHTML 1.0 Strict, CSS
+
+Authors
+-------
+
+- Demian Neidetcher (Pix)
+- Karl Chen <quarl@quarl.org>
+- Hollis Blanchard <hollis@penguinppc.org>
+
+License: GPL v2+
+----------------
+
+QuickyPix is free software; you can redistribute it and/or modify it under the
+terms of the `GNU General Public License`_ as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+QuickyPix is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+.. _GNU General Public License: http://www.gnu.org/copyleft/gpl.html

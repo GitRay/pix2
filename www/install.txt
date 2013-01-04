@@ -1,0 +1,71 @@
+QuickyPix: Installation
+=======================
+
+QuickyPix has three modes:
+
+- REGULAR mode is what users see.
+
+- ADMIN mode is what users see, plus a "EDIT" link to EDIT mode.
+
+  - Authentication: none.  It's just a convenience.
+
+  - To enter admin mode: append ?admin=1 to URL.  This will set a permanent cookie.
+
+- EDIT mode allows editing: album comment, album name, pic comment; rename pic;
+  delete pic (with tdel).
+
+  - Authentication: Apache. I.e., authenticated if REMOTE_USER is set.
+
+    - You can set up whatever authentication and/or encryption (e.g. SSL)
+      you want
+
+Example setup with Apache::
+
+    <Directory /home/quarl/proj/quickypix>
+        Options ExecCGI
+        Order allow,deny
+        Allow from all
+    </Directory>
+
+    ScriptAlias / /home/quarl/proj/quickypix/src/quickypix/quickypix.py/
+
+
+Metadata
+--------
+
+You can edit these manually, or through the web interface.
+
+.. List-table::
+
+    * - ``album/.title``
+      - album title
+
+    * - ``album/.comment``
+      - album comment
+
+    * - ``album/.highlight``
+      - highlighted picture (for album icon)
+
+    * - ``album/pic.comment``
+      - picture comment
+
+
+Dependencies
+------------
+
+- Python2.3 (python2.2 can be ported to, but I haven't bothered)
+
+- PIL and/or ImageMagick
+
+  - QuickyPix uses PIL or ImageMagick (convert, identify) to get image
+    information and resize images
+
+  - QuickyPix uses ImageMagick to rotate images, add "movie" labels
+
+- MPlayer
+
+  - QuickyPix uses mencoder for rotating movies, making thumbnails
+
+- Transcode
+
+  - QuickyPix uses tcprobe for getting movie information

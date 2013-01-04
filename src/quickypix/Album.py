@@ -1,7 +1,7 @@
-# $Id: Album.py 124 2005-10-03 04:53:36Z quarl $
+# $Id: Album.py 141 2005-10-10 00:35:05Z quarl $
 
 import sys, os, string
-from Pic import Pic
+from Pic import Pic, findPic
 import config
 import util
 
@@ -43,14 +43,9 @@ class Album(object):
         h = self.highlight_name
         if not h:
             return None
-        path = os.path.join(self.path, h)
-        fpath = config.ALBUMS_DIR + path
-        if os.path.isdir(fpath):
-            return Album(path)
-        elif os.path.isfile(fpath):
-            return Pic(path)
-        else:
-            return None
+
+        return findPic(os.path.join(self.path, h),dir_ok=True)
+
     def _set_highlight(self, h):
         self.highlight_name = h.rel_path
     highlight = property(_get_highlight, _set_highlight)

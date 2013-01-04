@@ -1,0 +1,17 @@
+
+general
+-------
+
+- ?admin=0 doesn't work - cookie problem?
+
+- .deb
+
+SCGI daemon
+-----------
+
+- encapsulate state, so we don't need preforking
+
+- runit/daemontools script
+
+
+

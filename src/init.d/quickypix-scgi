@@ -1,0 +1,58 @@
+#! /bin/sh
+
+# $Id: quickypix-scgi 155 2005-10-15 06:41:09Z quarl $
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/home/quarl/proj/quickypix/src/quickypix/quickypix.scgi
+NAME=quickypix-scgi
+DESC="QuickyPix SCGI daemon"
+USER=www-data
+PIDFILE=/var/run/quickypix.pid
+
+test -x $DAEMON || exit 0
+
+set -e
+
+do_start()
+{
+    start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE --chuid $USER --exec $DAEMON --
+}
+
+do_stop()
+{
+    if [ -f $PIDFILE ]; then
+        kill -INT $(cat $PIDFILE)
+        #start-stop-daemon --stop --quiet --pidfile $PIDFILE --oknodo --exec $DAEMON
+        rm -f $PIDFILE
+    else
+        echo " (not running)"
+        return 1
+    fi
+}
+
+case "$1" in
+  start)
+	echo -n "Starting $DESC: "
+        do_start
+	echo "$NAME."
+	;;
+  stop)
+	echo -n "Stopping $DESC: "
+	do_stop
+	echo "$NAME."
+	;;
+  restart|force-reload)
+	echo -n "Restarting $DESC: "
+        do_stop || true
+	sleep 1
+        do_start
+	echo "$NAME."
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	echo "Usage: $N {start|stop|restart|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

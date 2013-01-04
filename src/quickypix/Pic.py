@@ -1,4 +1,4 @@
-# $Id: Pic.py 113 2005-09-27 23:28:33Z quarl $
+# $Id: Pic.py 164 2005-10-15 08:34:36Z quarl $
 
 import os
 import glob
@@ -8,9 +8,12 @@ import image_util
 
 # TODO: cache the multiple os.stat calls
 
-def findPic(path):
+def findPic(path, dir_ok=False):
     if os.path.isfile(config.ALBUMS_DIR+path):
         return Pic(path)
+    if dir_ok and os.path.isdir(config.ALBUMS_DIR+path):
+        from Album import Album
+        return Album(path)
 
     # careful to only match filename.ext where ext is in MEDIA_TYPES
     # -- don't match filename.ext.* or filename.*.ext
@@ -67,7 +70,10 @@ class Pic(object):
         return util.recent(util.xstat(config.ALBUMS_DIR+self.path))
 
     def img_rel_path(self, size):
-        u = "%s/%s" %(self.rel_path, util.sized(size))
+        if size == (-1,-1):
+            u = "%s.%s" %(self.rel_path, self.pathext)
+        else:
+            u = "%s/%s" %(self.rel_path, util.sized(size))
         if self._recent():
             # force browser to retrieve latest, since this was recently
             # modified
@@ -75,7 +81,10 @@ class Pic(object):
         return u
 
     def img_path(self, size):
-        return "%s/%s" %(self.path, util.sized(size))
+        if size == (-1,-1):
+            return "%s.%s" %(self.path, self.pathext)
+        else:
+            return "%s/%s" %(self.path, util.sized(size))
 
     def is_image(self):
         return (self.pathext in config.IMAGE_TYPES)

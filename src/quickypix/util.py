@@ -1,4 +1,4 @@
-# $Id: util.py 124 2005-10-03 04:53:36Z quarl $
+# $Id: util.py 165 2005-10-15 08:41:42Z quarl $
 
 import sys
 import os
@@ -203,6 +203,7 @@ class MetadataProperty:
         if not obj.path.startswith('/') or '/' in self.filename or '../' in fn:
             raise ValueError
         #del obj.__dict__[self.cname]
+        value.recent = True
         obj.__dict__[self.cname] = value
         write_file(fn, value)
         log("Modifying %s: from %s to %s"%(fn, repr(old_value), repr(value)))
@@ -215,15 +216,13 @@ def metadata_property(filename):
     mp = MetadataProperty(filename, cname)
     return property(mp.get, mp.set)
 
+
+badchars = re.compile('[/\\*?\n\r|~;&$^]')
 def name_validate(rel_name):
-    if (not rel_name or '/' in rel_name or '\\' in rel_name or
-        '*' in rel_name or '?' in rel_name or
-        '\n' in rel_name or '\r' in rel_name or
+    if (not rel_name or
+        re.search(badchars,rel_name) or
         rel_name.startswith('.')):
         error_forbidden()
-
-def get_ext(path):
-    return path.split('.')[-1]
 
 def ensure_dir(fpath):
     dir = os.path.dirname(fpath)
@@ -240,10 +239,16 @@ def tdel(fpath):
         raise "Couldn't tdel %s"%fpath
 
 def path_ext(path):
-    return path.split('.')[-1]
+    if '.' in path:
+        return path.split('.')[-1]
+    else:
+        return ''
 
 def path_nonext(path):
-    return path[:path.rfind('.')]
+    if '.' in path:
+        return path[:path.rfind('.')]
+    else:
+        return path
 
 def is_media(path):
     return (path_ext(path) in config.MEDIA_TYPES)

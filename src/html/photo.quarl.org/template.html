@@ -1,0 +1,83 @@
+<!-- -- $Id: template.html 154 2005-10-15 06:08:28Z quarl $ -- -->
+<!-- -- This kind of comment gets deleted by QuickyPix -- -->
+
+<!-- -- This is the template for http://photo.quarl.org/ -- -->
+
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <meta name="generator" content="QuickyPix http://www.quarl.org/projects/quickypix/" />
+    <title>@title@</title>
+    <style type="text/css">@import url(@root@/style.css);</style>
+    <link rel="stylesheet" type="text/css" href="http://www.quarl.org/css/screen.css" media="screen, tv, projection" title="Default" />
+    <link rel="stylesheet" type="text/css" href="http://www.quarl.org/css/print.css" media="print" />
+    <link rel="icon" href="/images/icons/quarl16" />
+  </head>
+  <body class="@bodyclass@">
+    @login@
+
+    <div class="header">
+      <ul class="navigation simple">
+        <li><a class="reference" href="http://www.quarl.org/">Home</a> &middot; </li>
+        <li><a class="reference" href="http://www.quarl.org/about.html">About</a> &middot; </li>
+        <li><a class="reference" href="http://www.quarl.org/notes/">Notes</a> &middot; </li>
+        <li><a class="reference" href="http://www.quarl.org/resources/">Resources</a> &middot; </li>
+        <li><a class="reference" href="http://www.quarl.org/projects/">Projects</a> &middot; </li>
+        <li class="selected"><a class="reference" href="http://photo.quarl.org/">Photos</a> &middot; </li>
+        <li><a class="reference" href="http://www.quarl.org/schedule.html">Schedule</a> &middot; </li>
+        <li><a class="reference" href="http://www.quarl.org/contact.html">Contact</a> </li>
+      </ul>
+      <hr class="header"/>
+    </div>
+
+    <div class="document" id="photo">
+      <h1 class="title">@breadcrumb@</h1>
+      <div class="comment">@comment@</div>
+      <table>
+        <!-- @BEGINPIC@ -->
+        <tr>
+          <!-- --
+               This rowspan trick allows us to put .pic earlier in the file even
+               though it's to the right of .nav.  Floating works in Moz but not
+                         IE.
+                         -- -->
+                         <td class="filler"></td>
+          <td rowspan="2" width="1%">
+            <div class="pic">
+              @pic@
+              @pic-info@
+              @pic-comment@
+              @pic-dl@
+            </div>
+          </td>
+        </tr>
+        <!-- @ENDPIC@ -->
+        <tr>
+          <td class="nav">
+            <div class="dummy"></div>
+            <div class="albums">
+	      @albums@
+            </div>
+            <div class="pictures">
+	      @pics@
+            </div>
+          </td>
+        </tr>
+      </table>
+      @endlogin@
+
+      </div>
+
+    <div class="footer">
+      Karl Chen &lt;<a id="email" href="mailto:&#113;&#117;&#097;&#114;&#108;&#064;&#110;&#111;&#115;&#112;&#097;&#109;&#046;&#113;&#117;&#097;&#114;&#108;&#046;&#111;&#114;&#103;">&#113;&#117;&#097;&#114;&#108;<img src="" alt="&#064;" border="0"/>&#113;&#117;&#097;&#114;&#108;&#046;&#111;&#114;&#103;</a>&gt;
+
+      <script type="text/javascript">
+        addr = "q"+"u"+"a"+"r"+"l"+"@"+"q"+"u"+"a"+"r"+"l"+"."+"o"+"r"+"g";
+        document.getElementById('email').innerHTML=addr;
+        document.getElementById('email').href="mailto:"+addr;
+      </script>
+    </div>
+  </body>
+</html>

@@ -3,5 +3,6 @@ Copyright (C) 2005 Demian Neidetcher.
 
 QuickyPix was originally based on Pix by Demian Neidetcher.
 
-Contributors:
-* Hollis Blanchard <hollis@penguinppc.org>
+Current developers:
+    Karl Chen <quarl@quarl.org>
+    Hollis Blanchard <hollis@penguinppc.org>

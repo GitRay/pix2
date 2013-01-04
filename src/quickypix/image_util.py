@@ -1,4 +1,4 @@
-# $Id: image_util.py 125 2005-10-03 05:09:30Z quarl $
+# $Id: image_util.py 140 2005-10-10 00:34:42Z quarl $
 
 import time
 import config
@@ -90,12 +90,15 @@ def reencode(file):
 
 def rotate_image(file, degrees):
     tmp = file+'.tmp'
-    if util.get_ext(file) in config.MOVIE_TYPES:
+    ext = util.get_ext(file)
+    if ext in config.MOVIE_TYPES:
         cmd = ['/home/quarl/bin/movie-rotate', file, tmp, str(degrees)]
-    else:
+    elif ext in config.IMAGE_TYPES:
         cmd = ['convert', '-rotate', str(degrees), file, tmp]
+    else:
+        raise Exception("Invalid file type - not movie or image: '%s'"%file)
     if os.spawnlp(os.P_WAIT, cmd[0], *cmd):
-        raise "Couldn't rotate %s"%file
+        raise Exception("Couldn't rotate '%s'"%file)
     util.tdel(file)
     os.rename(tmp, file)
 
