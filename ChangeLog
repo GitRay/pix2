@@ -1,102 +1,134 @@
-2005-10-15  Karl Chen  <quarl@quarl.org>
-	Release 1.2.1 (brown paper bag - fixed get_ext bug)
+2005-11-02  Karl Chen  <quarl@quarl.org>
+    * Release v1.2.2.
+
+    * Use PRAT [http://www.quarl.org/projects/prat/]
+
+2005-11-01  Karl Chen  <quarl@quarl.org>
+    * Fixed form problem in SCGI mode
+
+2005-10-21  Karl Chen  <quarl@quarl.org>
+    * Modularize info box lines; configure which ones to display
+
+    * Configure default album title; default to '%(basename)s' instead
+      of '(%(basename)s)'
+
+    * Updated installation notes
+
+2005-10-21  Hollis Blanchard  <hollis@penguinppc.org>
+    * Info box: show exposure, shutter speed, and ISO rating
+
+    * Updated installation notes for lighttpd
 
 2005-10-15  Karl Chen  <quarl@quarl.org>
-	Release 1.2
+    * Fix another 'value.recent' bug
+
+2005-10-15  Hollis Blanchard  <hollis@penguinppc.org>
+    * Fix SCGI bug to prevent quickypix from exiting after every
+      invocation
 
 2005-10-15  Karl Chen  <quarl@quarl.org>
-	Changed URL for fullsize pics to IMAGE.jpg instead of
-	IMAGE/fullsize (resized pics are still IMAGE/123x456)
+    * Added missing copyright statements
+    * Use explicit python in init.d script
 
 2005-10-15  Karl Chen  <quarl@quarl.org>
-	* src/quickypix/util.py (MetadataProperty.set): Fixed 'recent' bug
-	due to 2005-09-26 change
-	Other minor bug fixes	
-	
+    * Release v1.2.1 (brown paper bag - fixed get_ext bug)
+
+2005-10-15  Karl Chen  <quarl@quarl.org>
+    * Release v1.2
+
+2005-10-15  Karl Chen  <quarl@quarl.org>
+    * Changed URL for fullsize pics to IMAGE.jpg instead of
+      IMAGE/fullsize (resized pics are still IMAGE/123x456)
+
+2005-10-15  Karl Chen  <quarl@quarl.org>
+    * src/quickypix/util.py (MetadataProperty.set): Fixed 'recent' bug
+      due to 2005-09-26 change
+      Other minor bug fixes
+
 2005-10-14  Karl Chen  <quarl@quarl.org>
-	init.d/quickypix-scgi: startup script
+    * init.d/quickypix-scgi: startup script
 
-2005-10-13 Hollis Blanchard <hollis@penguinppc.org>
-	New SCGI handler.
+2005-10-13  Hollis Blanchard  <hollis@penguinppc.org>
+    * New SCGI handler.
 
 2005-10-12  Karl Chen  <quarl@quarl.org>
-	Based on patch by Hollis; move config.root setting to config.py
-	and add comments for alternate ways to set config.root.
+    * Based on patch by Hollis; move config.root setting to config.py
+      and add comments for alternate ways to set config.root.
 
 2005-10-09  Karl Chen  <quarl@quarl.org>
-	Better error checking for movie rotation.
-	Allow .highlight to contain extensionless names.
+    * Better error checking for movie rotation.
+    * Allow .highlight to contain extensionless names.
 
 2005-10-07  Karl Chen  <quarl@quarl.org>
-	Configuration clarification.
+    * Configuration clarification.
 
-2005-10-02  Hollis Blanchard <hollis@penguinppc.org>
-	Disable warnings for default .title and .hightlight.
-	Use PIL when available -- it avoids the overhead of forking
-	to use ImageMagick's `identify' and `convert'.
-
-2005-09-27  Karl Chen  <quarl@quarl.org>
-	Release version 1.1
+2005-10-02  Hollis Blanchard  <hollis@penguinppc.org>
+    * Disable warnings for default .title and .hightlight.
+    * Use PIL when available -- it avoids the overhead of forking
+      to use ImageMagick's `identify' and `convert'.
 
 2005-09-27  Karl Chen  <quarl@quarl.org>
-	Directory structure reorg
+    * Release version 1.1
 
-2005-09-26  Hollis Blanchard <hollis@penguinppc.org>
-	Ensure that the default settings (title, highlight) are used, even
-	if the filesystem isn't writable.
+2005-09-27  Karl Chen  <quarl@quarl.org>
+    * Directory structure reorg
 
-2005-09-18  Karl Chen <quarl@quarl.org>
-	Remove extensions from URLs.  Canonicalize extensionless URLs.
-	Photos must be unambiguous without extension.
+2005-09-26  Hollis Blanchard  <hollis@penguinppc.org>
+    * Ensure that the default settings (title, highlight) are used, even
+      if the filesystem isn't writable.
 
-	I used to prefer keeping the extension, but I want search engines
-	to index these pages, and they blindly assume that an image link
-	pointing to a .jpg URL is another image.
+2005-09-18  Karl Chen  <quarl@quarl.org>
+    * Remove extensions from URLs.  Canonicalize extensionless URLs.
+      Photos must be unambiguous without extension.
 
-2005-06-09  Karl Chen <quarl@quarl.org> 
-	Use 'fullsize' instead of 'original'
-	
-	Add download button (appears only in admin mode) and implement
-	download using content-disposition filename
+    * I used to prefer keeping the extension, but I want search engines
+      to index these pages, and they blindly assume that an image link
+      pointing to a .jpg URL is another image.
 
-2005-06-07  Karl Chen <quarl@quarl.org>
-	Don't die on permission errors
-	
-2005-02-21  Karl Chen <quarl@quarl.org>
-	Renamed pix -> quickypix
+2005-06-09  Karl Chen  <quarl@quarl.org>
+    * Use 'fullsize' instead of 'original'
 
-	Use exif.py, imagemagick, instead of PIL
+    * Add download button (appears only in admin mode) and implement
+      download using content-disposition filename
 
-2005-02-06  Karl Chen <quarl@quarl.org> 
-	* style.css: Add explicit album thumbnail height/width
-	  in case of weird-aspect photos.
+2005-06-07  Karl Chen  <quarl@quarl.org>
+    * Don't die on permission errors
 
-	* Album.py: fixed bug with missing highlight
+2005-02-21  Karl Chen  <quarl@quarl.org>
+    * Renamed pix -> quickypix
 
-2005-01-15  Karl Chen <quarl@quarl.org>
-	Restructuring/refactoring; moved stuff to image_util.py
-	Support MPEGs
+    * Use exif.py, imagemagick, instead of PIL
 
-	Movie rotation, resizing, labeling - everything working!
+2005-02-06  Karl Chen  <quarl@quarl.org>
+    * style.css: Add explicit album thumbnail height/width
+      in case of weird-aspect photos.
 
-2005-01-15  Karl Chen <quarl@quarl.org> 
-	Get movie info
+    * Album.py: fixed bug with missing highlight
 
-	Video rotating; use mplayer for video->image conversion also.
+2005-01-15  Karl Chen  <quarl@quarl.org>
+    * Restructuring/refactoring; moved stuff to image_util.py
+    * Support MPEGs
 
-	Implemented rotation
+    * Movie rotation, resizing, labeling - everything working!
 
-	Implemented deletion
-	
-	Edit mode, quick edit buttons, better caching.
+2005-01-15  Karl Chen  <quarl@quarl.org>
+    * Get movie info
 
-2005-01-13  Karl Chen <quarl@quarl.org> 
-	template: Get rid of tables; use floating div for
-	@pic@. Now we can put it before the nav pics so that the browser
-	loads it first.
+    * Video rotating; use mplayer for video->image conversion also.
 
-2005-01-12  Karl Chen <quarl@quarl.org>
-	Major rewrite.
+    * Implemented rotation
 
-2005-01-13  Karl Chen <quarl@quarl.org>
-	initial import from pix.sf.net
+    * Implemented deletion
+
+    * Edit mode, quick edit buttons, better caching.
+
+2005-01-13  Karl Chen  <quarl@quarl.org>
+    * template: Get rid of tables; use floating div for
+      @pic@. Now we can put it before the nav pics so that the browser
+      loads it first.
+
+2005-01-12  Karl Chen  <quarl@quarl.org>
+    * Major rewrite.
+
+2005-01-13  Karl Chen  <quarl@quarl.org>
+    * Initial import from pix.sf.net

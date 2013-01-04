@@ -1,6 +1,8 @@
 #! /bin/sh
 
-# $Id: quickypix-scgi 155 2005-10-15 06:41:09Z quarl $
+# $Id: quickypix-scgi 182 2005-10-15 22:45:13Z quarl $
+
+# This file was placed in the public domain by Karl Chen, 2005
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/home/quarl/proj/quickypix/src/quickypix/quickypix.scgi
@@ -8,14 +10,16 @@ NAME=quickypix-scgi
 DESC="QuickyPix SCGI daemon"
 USER=www-data
 PIDFILE=/var/run/quickypix.pid
+PYTHON=/usr/bin/python2.4
 
 test -x $DAEMON || exit 0
+test -x $PYTHON || exit 0
 
 set -e
 
 do_start()
 {
-    start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE --chuid $USER --exec $DAEMON --
+    start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE --chuid $USER --exec $PYTHON -- $DAEMON
 }
 
 do_stop()

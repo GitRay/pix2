@@ -17,12 +17,13 @@
 <li>REGULAR mode is what users see.</li>
 <li>ADMIN mode is what users see, plus a &quot;EDIT&quot; link to EDIT mode.<ul>
 <li>Authentication: none.  It's just a convenience.</li>
-<li>To enter admin mode: append ?admin=1 to URL.  This will set a permanent cookie.</li>
+<li>To enter admin mode: append <tt class="docutils literal"><span class="pre">?admin=1</span></tt> to URL.  This will set a
+permanent cookie.</li>
 </ul>
 </li>
 <li>EDIT mode allows editing: album comment, album name, pic comment; rename pic;
 delete pic (with tdel).<ul>
-<li>Authentication: Apache. I.e., authenticated if REMOTE_USER is set.<ul>
+<li>Authentication: web server. I.e., authenticated if <tt class="docutils literal"><span class="pre">REMOTE_USER</span></tt> is set.<ul>
 <li>You can set up whatever authentication and/or encryption (e.g. SSL)
 you want</li>
 </ul>
@@ -30,7 +31,10 @@ you want</li>
 </ul>
 </li>
 </ul>
-<p>Example setup with Apache:</p>
+<div class="section" id="cgi">
+<h1><a name="cgi">CGI</a></h1>
+<div class="section" id="apache-cgi-sample-configuration">
+<h2><a name="apache-cgi-sample-configuration">Apache CGI sample configuration</a></h2>
 <pre class="literal-block">
 &lt;Directory /home/quarl/proj/quickypix&gt;
     Options ExecCGI
@@ -40,6 +44,63 @@ you want</li>
 
 ScriptAlias / /home/quarl/proj/quickypix/src/quickypix/quickypix.py/
 </pre>
+</div>
+<div class="section" id="lighttpd-cgi-sample-configuration">
+<h2><a name="lighttpd-cgi-sample-configuration"><a class="reference" href="http://www.lighttpd.net/">Lighttpd</a> CGI sample configuration</a></h2>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">lighttpd.conf</span></tt>:</p>
+<pre class="literal-block">
+cgi.assign = ( &quot;.py&quot; =&gt; &quot;/usr/bin/python&quot; )
+url.rewrite = ( &quot;^/(.*)$&quot; =&gt; &quot;/quickypix.py/$1&quot; )
+</pre>
+</li>
+<li><p class="first">Create a symlink to <tt class="docutils literal"><span class="pre">quickypix.py</span></tt> from the
+<tt class="docutils literal"><span class="pre">server.document-root</span></tt> directory.</p>
+</li>
+<li><p class="first">lighttpd has a problem where the CGI <tt class="docutils literal"><span class="pre">SCRIPT_NAME</span></tt> environment
+variable is set to a non-virtual path; i.e. it is the post-redirect path
+to the script.  Thus, you must hardcode QuickyPix's notion of root
+in <tt class="docutils literal"><span class="pre">config.py</span></tt>:</p>
+<pre class="literal-block">
+root = ''
+</pre>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="scgi">
+<h1><a name="scgi">SCGI</a></h1>
+<p><a class="reference" href="#scgi">SCGI</a> (like FastCGI) reuses the QuickyPix python process, making it much more
+efficient.</p>
+<p>Arrange to have <tt class="docutils literal"><span class="pre">quickypix.scgi</span></tt> always running.  On Debian you can use
+<tt class="docutils literal"><span class="pre">quickypix/src/init.d/quickypix.scgi</span></tt>.</p>
+<div class="section" id="apache-scgi-sample-configuration">
+<h2><a name="apache-scgi-sample-configuration">Apache SCGI sample configuration</a></h2>
+<pre class="literal-block">
+SCGIMount /photos/ 127.0.0.1:4010
+</pre>
+</div>
+<div class="section" id="lighttpd-scgi-sample-configuration">
+<h2><a name="lighttpd-scgi-sample-configuration">Lighttpd SCGI sample configuration</a></h2>
+<p>Create a toplevel symlink to <tt class="docutils literal"><span class="pre">quickypix.scgi</span></tt> (in <tt class="docutils literal"><span class="pre">server.document-root</span></tt>).</p>
+<p><tt class="docutils literal"><span class="pre">lighttpd.conf</span></tt>:</p>
+<pre class="literal-block">
+url.rewrite = ( &quot;^/photos(.*)$&quot; =&gt; &quot;/quickypix.scgi/$1&quot; )
+scgi.server = ( &quot;.scgi&quot; =&gt;
+                ( &quot;localhost&quot; =&gt;
+                  ( 
+                    &quot;host&quot; =&gt; &quot;127.0.0.1&quot;,
+                    &quot;port&quot; =&gt; 4010,
+                  )
+                )
+              )
+</pre>
+<p><tt class="docutils literal"><span class="pre">config.py</span></tt>:</p>
+<pre class="literal-block">
+root = '/photos'
+</pre>
+</div>
+</div>
 <div class="section" id="metadata">
 <h1><a name="metadata">Metadata</a></h1>
 <p>You can edit these manually, or through the web interface.</p>
@@ -67,28 +128,29 @@ ScriptAlias / /home/quarl/proj/quickypix/src/quickypix/quickypix.py/
 <div class="section" id="dependencies">
 <h1><a name="dependencies">Dependencies</a></h1>
 <ul class="simple">
-<li>Python2.3 (python2.2 can be ported to, but I haven't bothered)</li>
-<li>PIL and/or ImageMagick<ul>
+<li>Python2.3</li>
+<li>PIL and/or ImageMagick (optional)<ul>
 <li>QuickyPix uses PIL or ImageMagick (convert, identify) to get image
 information and resize images</li>
 <li>QuickyPix uses ImageMagick to rotate images, add &quot;movie&quot; labels</li>
 </ul>
 </li>
-<li>MPlayer<ul>
+<li>MPlayer (optional)<ul>
 <li>QuickyPix uses mencoder for rotating movies, making thumbnails</li>
 </ul>
 </li>
-<li>Transcode<ul>
+<li>Transcode (optional)<ul>
 <li>QuickyPix uses tcprobe for getting movie information</li>
 </ul>
 </li>
 </ul>
+<!-- SCGI_: http://www.mems-exchange.org/software/scgi/ -->
 </div>
 </div>
 <div class="footer">
 <hr class="footer" />
 <p>Karl Chen &lt;<a id="email" href="mailto:&#113;&#117;&#097;&#114;&#108;&#064;&#110;&#111;&#115;&#112;&#097;&#109;&#046;&#113;&#117;&#097;&#114;&#108;&#046;&#111;&#114;&#103;">&#113;&#117;&#097;&#114;&#108;<img src="" alt="&#064;" border="0"/>&#113;&#117;&#097;&#114;&#108;&#046;&#111;&#114;&#103;</a>&gt;<script type="text/javascript">addr = "q"+"u"+"a"+"r"+"l"+"@"+"q"+"u"+"a"+"r"+"l"+"."+"o"+"r"+"g";document.getElementById('email').innerHTML=addr;document.getElementById('email').href="mailto:"+addr;</script></p>
-<p>Last modified 2005-10-07.</p>
+<p>Last modified 2005-10-21.</p>
 
 </div>
 </body>

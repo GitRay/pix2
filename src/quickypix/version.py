@@ -1,4 +1,6 @@
-# $Id: version.py 176 2005-10-15 08:59:30Z quarl $
+# $Id: version.py 202 2005-11-02 08:47:22Z quarl $
 
-version = '1.2.1'
-rev = '$Rev: 176 $'
+# This file was placed in the public domain by Karl Chen, 2005.
+
+version = '1.2.2'
+rev = '$Rev: 202 $'

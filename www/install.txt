@@ -9,17 +9,23 @@ QuickyPix has three modes:
 
   - Authentication: none.  It's just a convenience.
 
-  - To enter admin mode: append ?admin=1 to URL.  This will set a permanent cookie.
+  - To enter admin mode: append ``?admin=1`` to URL.  This will set a
+    permanent cookie.
 
 - EDIT mode allows editing: album comment, album name, pic comment; rename pic;
   delete pic (with tdel).
 
-  - Authentication: Apache. I.e., authenticated if REMOTE_USER is set.
+  - Authentication: web server. I.e., authenticated if ``REMOTE_USER`` is set.
 
     - You can set up whatever authentication and/or encryption (e.g. SSL)
       you want
 
-Example setup with Apache::
+CGI
+---
+
+Apache CGI sample configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+::
 
     <Directory /home/quarl/proj/quickypix>
         Options ExecCGI
@@ -29,6 +35,60 @@ Example setup with Apache::
 
     ScriptAlias / /home/quarl/proj/quickypix/src/quickypix/quickypix.py/
 
+
+Lighttpd_ CGI sample configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- ``lighttpd.conf``::
+
+    cgi.assign = ( ".py" => "/usr/bin/python" )
+    url.rewrite = ( "^/(.*)$" => "/quickypix.py/$1" )
+
+- Create a symlink to ``quickypix.py`` from the
+  ``server.document-root`` directory.
+
+- lighttpd has a problem where the CGI ``SCRIPT_NAME`` environment
+  variable is set to a non-virtual path; i.e. it is the post-redirect path
+  to the script.  Thus, you must hardcode QuickyPix's notion of root
+  in ``config.py``::
+
+    root = ''
+
+SCGI
+----
+
+SCGI_ (like FastCGI) reuses the QuickyPix python process, making it much more
+efficient.
+
+Arrange to have ``quickypix.scgi`` always running.  On Debian you can use
+``quickypix/src/init.d/quickypix.scgi``.
+
+Apache SCGI sample configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+::
+
+    SCGIMount /photos/ 127.0.0.1:4010
+
+Lighttpd SCGI sample configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Create a toplevel symlink to ``quickypix.scgi`` (in ``server.document-root``).
+
+``lighttpd.conf``::
+
+    url.rewrite = ( "^/photos(.*)$" => "/quickypix.scgi/$1" )
+    scgi.server = ( ".scgi" =>
+                    ( "localhost" =>
+                      ( 
+                        "host" => "127.0.0.1",
+                        "port" => 4010,
+                      )
+                    )
+                  )
+
+``config.py``::
+
+    root = '/photos'
 
 Metadata
 --------
@@ -53,19 +113,23 @@ You can edit these manually, or through the web interface.
 Dependencies
 ------------
 
-- Python2.3 (python2.2 can be ported to, but I haven't bothered)
+- Python2.3
 
-- PIL and/or ImageMagick
+- PIL and/or ImageMagick (optional)
 
   - QuickyPix uses PIL or ImageMagick (convert, identify) to get image
     information and resize images
 
   - QuickyPix uses ImageMagick to rotate images, add "movie" labels
 
-- MPlayer
+- MPlayer (optional)
 
   - QuickyPix uses mencoder for rotating movies, making thumbnails
 
-- Transcode
+- Transcode (optional)
 
   - QuickyPix uses tcprobe for getting movie information
+
+.. SCGI_: http://www.mems-exchange.org/software/scgi/
+
+.. _lighttpd: http://www.lighttpd.net/

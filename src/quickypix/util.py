@@ -1,4 +1,24 @@
-# $Id: util.py 165 2005-10-15 08:41:42Z quarl $
+# $Id: util.py 187 2005-10-21 08:32:34Z quarl $
+
+## Copyright (C) 2005 Karl Chen
+## Copyright (C) 2005 Hollis Blanchard
+
+## This file is part of QuickyPix.
+
+## QuickyPix is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free
+## Software Foundation; either version 2, or (at your option) any later
+## version.
+
+## QuickyPix is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+## more details.
+
+## You should have received a copy of the GNU General Public License along
+## with QuickyPix; see the file COPYING.  If not, write to the Free Software
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+## USA.
 
 import sys
 import os
@@ -9,6 +29,10 @@ import mimetypes
 import config
 
 FULLSIZE = 'fullsize'
+
+def frac_to_dec(fraction):
+    numerator, denominator = str(fraction).split('/')
+    return float(numerator) / float(denominator)
 
 # returns tuple (x,y) for requested size.  (-1,-1) means fullsize.
 def parse_size(arg):
@@ -203,6 +227,7 @@ class MetadataProperty:
         if not obj.path.startswith('/') or '/' in self.filename or '../' in fn:
             raise ValueError
         #del obj.__dict__[self.cname]
+        value = StrWithStat(value)
         value.recent = True
         obj.__dict__[self.cname] = value
         write_file(fn, value)

@@ -1,4 +1,6 @@
-# $Id: config.py 157 2005-10-15 07:05:15Z quarl $
+# $Id: config.py 190 2005-10-21 08:57:34Z quarl $
+
+# This file was placed in the public domain by Karl Chen, 2005.
 
 ALBUMS_DIR = '/srv/albums'
 
@@ -10,6 +12,18 @@ LOG_PATH = '/var/log/pix.log'
 TEMPLATES_FILE = '/home/quarl/proj/quickypix/src/html/photo.quarl.org/template.html'
 STYLE_FILE = '/home/quarl/proj/quickypix/src/html/photo.quarl.org/style.css'
 
+## Which stats to display
+DISPLAY_INFO = ['time_str', 'dimensions', 'original_dimensions',
+                'duration', 'video_codec', 'file_size']
+
+## Available stats:
+DISPLAY_INFO = ['time_str', 'dimensions', 'original_dimensions',
+                'frame_rate', 'duration', 'video_codec', 'file_size',
+                'aperture', 'exposure', 'iso']
+
+## Default title to use when none specified by .title file
+DEFAULT_TITLE = '%(basename)s'
+
 EDIT_ROOT = 'https://quarl.org/pix'
 PUBLIC_ROOT = 'http://photo.quarl.org'
 
@@ -17,7 +31,7 @@ WEB_SIZE = 500,400
 THUMB_SIZE = 80,60
 ALBUM_THUMB_SIZE = 100,75
 
-IMAGE_TYPES = ['jpg', 'png', 'bmp', 'gif']
+IMAGE_TYPES = ['jpg', 'jpeg', 'png', 'bmp', 'gif']
 MOVIE_TYPES = ['avi', 'mpg']
 MEDIA_TYPES = IMAGE_TYPES + MOVIE_TYPES
 

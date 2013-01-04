@@ -1,4 +1,24 @@
-# $Id: Pic.py 164 2005-10-15 08:34:36Z quarl $
+# $Id: Pic.py 189 2005-10-21 08:52:06Z quarl $
+
+## Copyright (C) 2005 Demian Neidetcher
+## Copyright (C) 2005 Karl Chen
+
+## This file is part of QuickyPix.
+
+## QuickyPix is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free
+## Software Foundation; either version 2, or (at your option) any later
+## version.
+
+## QuickyPix is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+## more details.
+
+## You should have received a copy of the GNU General Public License along
+## with QuickyPix; see the file COPYING.  If not, write to the Free Software
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+## USA.
 
 import os
 import glob
@@ -126,21 +146,11 @@ class Pic(object):
             info = image_util.image_info(config.ALBUMS_DIR+self.fullpath)
         except Exception, e:
             return '<!-- Pic._get_info exception: %s -->'%e
-        if info.time_str:
-            ret.append('<tr><td>Picture taken:</td><td>%s</td></tr>' %info.time_str)
-        if info.dimensions:
-            ret.append('<tr><td>Dimensions:</td><td>%dx%d</td></tr>' %info.dimensions)
-        if info.original_dimensions and not image_util.dimensions_equal(info.dimensions, info.original_dimensions):
-            ret.append('<tr><td>Original Dimensions:</td><td>%dx%d</td></tr>' %info.original_dimensions)
-        # if info.frame_rate:
-        #     ret.append('<tr><td>Frame Rate:</td><td>%s</td></tr>' %info.frame_rate)
-        if info.duration:
-            ret.append('<tr><td>Duration:</td><td>%.1f sec</td></tr>' %info.duration)
-        if info.video_codec:
-            ret.append('<tr><td>Video codec:</td><td>%s</td></tr>' %info.video_codec)
-        if info.file_size:
-            ret.append('<tr><td>File size:</td><td>%s bytes</td></tr>' %
-                       util.commify(info.file_size))
+
+        for display in config.DISPLAY_INFO:
+            d = info.describe(display)
+            if d:
+                ret.append('<tr><td>%s:</td><td>%s</td></tr>'%d)
 
         if ret:
             ret = ['<table class="info">']+ret+['</table>']

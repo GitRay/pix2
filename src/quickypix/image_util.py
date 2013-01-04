@@ -1,4 +1,23 @@
-# $Id: image_util.py 174 2005-10-15 08:58:42Z quarl $
+# $Id: image_util.py 189 2005-10-21 08:52:06Z quarl $
+
+## Copyright (C) 2005 Karl Chen
+
+## This file is part of QuickyPix.
+
+## QuickyPix is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free
+## Software Foundation; either version 2, or (at your option) any later
+## version.
+
+## QuickyPix is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+## more details.
+
+## You should have received a copy of the GNU General Public License along
+## with QuickyPix; see the file COPYING.  If not, write to the Free Software
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+## USA.
 
 import time
 import config
@@ -34,8 +53,12 @@ class image_info:
         self.dimensions = None
         self.file_size = os.stat(fpath).st_size
         self.video_codec = None
+        self.frame_rate = None
         self.duration = None
-        if util.path_ext(fpath) in ['jpg', 'jpeg']:
+        self.aperture = None
+        self.iso = None
+        self.exposure = None
+        if util.path_ext(fpath).lower() in ['jpg', 'jpeg']:
             self.process_exif(fpath)
         else:
             self.process_tcprobe(fpath)
@@ -49,6 +72,9 @@ class image_info:
             w = d.get('EXIF ExifImageWidth')
             if l and w:
                 self.original_dimensions = (int(str(w)),int(str(l)))
+            self.aperture = d.get('EXIF ApertureValue')
+            self.iso = d.get('EXIF ISOSpeedRatings')
+            self.exposure = d.get('EXIF ExposureTime')
 
     def process_tcprobe(self, fpath):
         cmd = 'tcprobe -i' + commands.mkarg(fpath)
@@ -65,6 +91,47 @@ class image_info:
         m = re.search('V:.*codec=([A-Za-z0-9]+)', output)
         if m:
             self.video_codec = m.group(1)
+
+    def describe(self, what):
+        func = getattr(self, 'describe_'+what)
+        assert(func)
+        return func()
+
+    def describe_time_str(self):
+        if self.time_str:
+            return 'Picture taken', self.time_str
+    def describe_dimensions(self):
+        if self.dimensions:
+            return 'Dimensions', '%dx%d'%self.dimensions
+    def describe_original_dimensions(self):
+        if self.original_dimensions and not dimensions_equal(self.dimensions, self.original_dimensions):
+            return 'Original Dimensions', '%dx%d'%self.original_dimensions
+    def describe_frame_rate(self):
+        if self.frame_rate:
+            return 'Frame Rate', self.frame_rate
+    def describe_duration(self):
+        if self.duration:
+            return 'Duration', '%.1f sec'%self.duration
+    def describe_video_codec(self):
+        if self.video_codec:
+            return 'Video codec', self.video_codec
+    def describe_file_size(self):
+        if self.file_size:
+            return 'File size', '%s bytes'%util.commify(self.file_size)
+    def describe_aperture(self):
+        if self.aperture:
+            try:
+                aperture = util.frac_to_dec(self.aperture)
+            except ValueError:
+                # malformed fraction
+                aperture = self.aperture
+            return 'Aperture', aperture
+    def describe_exposure(self):
+        if self.exposure:
+            return 'Exposure', self.exposure
+    def describe_iso(self):
+        if self.iso:
+            return 'ISO', self.iso
 
 def do_convert_to_image(source_file, target_file):
     # TODO: add filmstrip border or something to show it's a movie
@@ -91,9 +158,9 @@ def reencode(file):
 def rotate_image(file, degrees):
     tmp = file+'.tmp'
     ext = util.path_ext(file)
-    if ext in config.MOVIE_TYPES:
+    if ext.lower() in config.MOVIE_TYPES:
         cmd = ['/home/quarl/bin/movie-rotate', file, tmp, str(degrees)]
-    elif ext in config.IMAGE_TYPES:
+    elif ext.lower() in config.IMAGE_TYPES:
         cmd = ['convert', '-rotate', str(degrees), file, tmp]
     else:
         raise Exception("Invalid file type - not movie or image: '%s'"%file)

@@ -1,4 +1,4 @@
-# $Id: exif.py 7401 2005-01-01 05:16:42Z quarl $
+# $Id: exif.py 187 2005-10-21 08:32:34Z quarl $
 
 # http://home.cfl.rr.com/genecash/digital_camera/EXIF.py
 
@@ -635,7 +635,7 @@ MAKERNOTE_CANON_TAG_0x004={
 
 # extract multibyte integer in Motorola format (little endian)
 def s2n_motorola(str):
-    x=0
+    x=0L
     for c in str:
         x=(x << 8) | ord(c)
     return x
