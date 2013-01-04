@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# $Id: quickypix-scgi 213 2005-11-17 01:10:23Z quarl $
+# $Id: quickypix-scgi 283 2005-12-17 01:21:17Z quarl $
 
 # This file was placed in the public domain by Karl Chen, 2005
 
@@ -9,7 +9,7 @@ DAEMON=/home/quarl/proj/quickypix/src/quickypix/quickypix.scgi
 NAME=quickypix-scgi
 DESC="QuickyPix SCGI daemon"
 #USER=www-data
-USER=photo-data
+USER=photo-data-read
 #USER=nobody
 PIDFILE=/var/run/quickypix.pid
 PYTHON=/usr/bin/python2.4

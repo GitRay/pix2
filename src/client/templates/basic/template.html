@@ -1,4 +1,4 @@
-<!-- -- $Id: template.html 154 2005-10-15 06:08:28Z quarl $ -- -->
+<!-- -- $Id: template.html 346 2006-09-22 02:23:52Z quarl $ -- -->
 <!-- -- This kind of comment gets deleted by QuickyPix -- -->
 
 <?xml version="1.0"?>
@@ -6,15 +6,18 @@
           "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
   <head>
-    <meta name="generator" content="QuickyPix http://www.quarl.org/projects/quickypix/" />
+    <meta name="generator" content="QuickyPix http://www.cubewano.org/quickypix/" />
     <title>@title@</title>
-    <style type="text/css">@import url(@root@/style.css);</style>
+    <style type="text/css">
+      @import url(@root@/skin/quickypix.css);
+      @import url(@root@/skin/pix.css);
+    </style>
   </head>
-  <body class="@bodyclass@">
+  <body class="quickypix-tables @bodyclass@">
     @login@
     <h1>@breadcrumb@</h1>
     <div class="comment">@comment@</div>
-    <table>
+    <table class="ftable">
       <!-- @BEGINPIC@ -->
       <tr>
         <!-- --
@@ -24,7 +27,7 @@
              -- -->
         <td class="filler"></td>
         <td rowspan="2" width="1%">
-          <div class="pic">
+          <div class="pic" id="pic">
             @pic@
             @pic-info@
             @pic-comment@

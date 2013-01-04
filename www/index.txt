@@ -3,7 +3,7 @@ QuickyPix_
 
 **QuickyPix** is an instant thumbnail web photo gallery software in Python.
 
-.. _QuickyPix: http://www.quarl.org/projects/quickypix/
+.. _QuickyPix: http://www.cubewano.org/quickypix/
 
 QuickyPix is a photo gallery system.  See `history of development`_.
 
@@ -38,12 +38,12 @@ Development
 
 - Browse/checkout the Subversion_ repository:
 
-    svn checkout http://svn.quarl.org/repos/quickypix/trunk/quickypix/
+    svn checkout http://svn.cubewano.org/repos/quickypix/trunk/quickypix/
 
 - ChangeLog_
 
 .. _Subversion: http://subversion.tigris.org/
-.. _ChangeLog: http://svn.quarl.org/repos/quickypix/trunk/quickypix/ChangeLog
+.. _ChangeLog: http://svn.cubewano.org/repos/quickypix/trunk/quickypix/ChangeLog
 
 Screenshot
 ----------
@@ -85,6 +85,9 @@ Metadata
 Admin mode
   - Resizing, rotating (including movies), transcoding, deleting, editing
     captions, changing highlight
+  - Security: can partition read-only normal mode into separate user id; only
+    authenticated users can even run under process that has file system write
+    permissions
 
 Template engine using XHTML and CSS
   - Fluid-yet-aligned thumbnail arrangement (no tables)

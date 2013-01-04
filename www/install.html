@@ -70,8 +70,8 @@ PUBLIC_ROOT = 'http://public.photo.site.example.com/'
     Allow from all
 &lt;/Directory&gt;
 
-# Note: the trailing slash after quickypix.py is significant!
-ScriptAlias / /home/quarl/proj/quickypix/src/quickypix/quickypix.py/
+# Note: the trailing slash after quickypix.cgi is significant!
+ScriptAlias / /home/quarl/proj/quickypix/src/quickypix/quickypix.cgi/
 </pre>
 </div>
 <div class="section" id="lighttpd-cgi-sample-configuration">
@@ -80,10 +80,10 @@ ScriptAlias / /home/quarl/proj/quickypix/src/quickypix/quickypix.py/
 <li><p class="first"><tt class="docutils literal"><span class="pre">lighttpd.conf</span></tt>:</p>
 <pre class="literal-block">
 cgi.assign = ( &quot;.py&quot; =&gt; &quot;/usr/bin/python&quot; )
-url.rewrite = ( &quot;^/(.*)$&quot; =&gt; &quot;/quickypix.py/$1&quot; )
+url.rewrite = ( &quot;^/(.*)$&quot; =&gt; &quot;/quickypix.cgi/$1&quot; )
 </pre>
 </li>
-<li><p class="first">Create a symlink to <tt class="docutils literal"><span class="pre">quickypix.py</span></tt> from the
+<li><p class="first">Create a symlink to <tt class="docutils literal"><span class="pre">quickypix.cgi</span></tt> from the
 <tt class="docutils literal"><span class="pre">server.document-root</span></tt> directory.</p>
 </li>
 <li><p class="first">lighttpd has a problem where the CGI <tt class="docutils literal"><span class="pre">SCRIPT_NAME</span></tt> environment
@@ -156,6 +156,27 @@ root = '/photos'
 <p>The included script <tt class="docutils literal"><span class="pre">convert_descript_ion</span></tt> converts 4DOS/ACDSee
 <tt class="docutils literal"><span class="pre">descript.ion</span></tt> files to QuickyPix comment format.</p>
 </div>
+<div class="section" id="permissions-configuration">
+<h1><a name="permissions-configuration">Permissions Configuration</a></h1>
+<p>If you use EDIT mode, the following setup is recommended, for security.</p>
+<p>Run normal-mode quickypix under a userid (e.g. <tt class="docutils literal"><span class="pre">photo-data-read</span></tt>) that can
+only:</p>
+<ul class="simple">
+<li>Read the photo directory</li>
+<li>Read and write to the cache directory</li>
+</ul>
+<p>Run edit-mode quickypix under a different userid (e.g. <tt class="docutils literal"><span class="pre">photo-data</span></tt>)
+that can only:</p>
+<ul class="simple">
+<li>Read and write to the photo directory</li>
+<li>Set <tt class="docutils literal"><span class="pre">config.ALWAYS_USE_PUBLIC_FOR_PHOTOS=True</span></tt> so you don't need access to
+the cache directory</li>
+</ul>
+<p>The <tt class="docutils literal"><span class="pre">init.d/quickypix-scgi</span></tt> script runs the scgi process under a given user
+id.</p>
+<p>A small wrapper, <tt class="docutils literal"><span class="pre">src/wrapper/quickypix.cgi.su</span></tt>, is provided for running the
+cgi process under a user id different from httpd.</p>
+</div>
 <div class="section" id="dependencies">
 <h1><a name="dependencies">Dependencies</a></h1>
 <ul class="simple">
@@ -181,7 +202,7 @@ information and resize images</li>
 <div class="footer">
 <hr class="footer" />
 <p>Karl Chen &lt;<a id="email" href="mailto:&#113;&#117;&#097;&#114;&#108;&#064;&#110;&#111;&#115;&#112;&#097;&#109;&#046;&#113;&#117;&#097;&#114;&#108;&#046;&#111;&#114;&#103;">&#113;&#117;&#097;&#114;&#108;<img src="" alt="&#064;" border="0"/>&#113;&#117;&#097;&#114;&#108;&#046;&#111;&#114;&#103;</a>&gt;<script type="text/javascript">addr = "q"+"u"+"a"+"r"+"l"+"@"+"q"+"u"+"a"+"r"+"l"+"."+"o"+"r"+"g";document.getElementById('email').innerHTML=addr;document.getElementById('email').href="mailto:"+addr;</script></p>
-<p>Last modified 2005-12-05.</p>
+<p>Last modified 2005-12-16.</p>
 
 </div>
 </body>

@@ -1,3 +1,47 @@
+2006-09-21  Karl Chen  <quarl@quarl.org>
+    * Release v1.4.1
+    * Hosted at Cubewano.org
+
+2006-01-20  Karl Chen  <quarl@quarl.org>
+    * Added support for EXIF ImageDescription (enable with DISPLAY_INFO)
+
+    * New template/stylesheet/etc structure: quickypix/src/client is a
+      directory containing templates/ and skin/.  Skin/ contains files
+      served statically to the client and may be Aliased through Apache
+      for efficiency.  Factored the various stylesheets; quickypix.css
+      contains the common definitions.  Begin working on a new style that
+      fixes image position.
+
+    * Use first Pic as default highlight instead of first item (Pic or
+      Album); reported by Grant Brown
+
+    * Fixed crash when highlight pointed to an empty album; reported by
+      Grant Brown
+
+    * Don't write default values for .title, .highlight to disk (added
+      "default" feature to MetadataProperty); reported by Grant Brown
+
+    * Add configuration option for whether/how to sort root and non-root
+      albums (reported by Grant Brown)
+
+2006-01-19  Karl Chen  <quarl@quarl.org>
+    * Removed '&' from banned filename characters, issue reported by Grant
+      Brown
+
+2005-12-16  Karl Chen  <quarl@quarl.org>
+    * Created quickypix.cgi.su, a setuid wrapper (written in C, based on
+      Apache 2.0.54's suexec).
+    * New recommended permissions setup (install.html)
+    * Added configuration option ALWAYS_USE_PUBLIC_FOR_PHOTOS: in admin
+      mode, all jpgs are linked to the public root.  Advantages:
+        - Client only needs to download pictures once if you move between
+          roots
+        - If the edit root and public root (s)cgi processes are under
+          different userids, permissions for the cache directory are
+          easier to manage if only one userid writes to it.
+    * Factored quickypix.py to Presenter.py and quickypix.cgi
+    * Move conversion scripts to new directory src/import/
+
 2005-12-15  Karl Chen  <quarl@quarl.org>
     * Release v1.3.0
 
@@ -97,7 +141,7 @@
 2005-10-15  Karl Chen  <quarl@quarl.org>
     * src/quickypix/util.py (MetadataProperty.set): Fixed 'recent' bug
       due to 2005-09-26 change
-      Other minor bug fixes
+    * Other minor bug fixes
 
 2005-10-14  Karl Chen  <quarl@quarl.org>
     * init.d/quickypix-scgi: startup script

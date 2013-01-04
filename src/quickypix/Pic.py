@@ -1,4 +1,4 @@
-# $Id: Pic.py 257 2005-12-07 00:18:29Z quarl $
+# $Id: Pic.py 289 2005-12-17 01:32:48Z quarl $
 
 ## Copyright (C) 2005 Demian Neidetcher
 ## Copyright (C) 2005 Karl Chen
@@ -89,22 +89,34 @@ class Pic(object):
     def _recent(self):
         return util.recent(util.xstat(config.ALBUMS_DIR+self.path))
 
+    def _add_question_if_recent(self, u):
+        if self._recent():
+            # force browser to retrieve latest, since this was recently
+            # modified
+            return u + '?'
+        else:
+            return u
+
     def img_rel_path(self, size):
         if size == (-1,-1):
             u = "%s.%s" %(self.rel_path, self.pathext)
         else:
             u = "%s/%s" %(self.rel_path, util.sized(size))
-        if self._recent():
-            # force browser to retrieve latest, since this was recently
-            # modified
-            u += '?'
-        return u
+        return self._add_question_if_recent(u)
+
+    def m_img_rel_path(self, size):
+        '''Like 'img_rel_path', but heed config.ALWAYS_USE_PUBLIC_FOR_PHOTOS'''
+        if config.authenticated and config.ALWAYS_USE_PUBLIC_FOR_PHOTOS:
+            return config.PUBLIC_ROOT + self.img_path(size)
+        else:
+            return self.img_rel_path(size)
 
     def img_path(self, size):
         if size == (-1,-1):
-            return "%s.%s" %(self.path, self.pathext)
+            u = "%s.%s" %(self.path, self.pathext)
         else:
-            return "%s/%s" %(self.path, util.sized(size))
+            u = "%s/%s" %(self.path, util.sized(size))
+        return self._add_question_if_recent(u)
 
     def is_image(self):
         return (self.pathext.lower() in config.IMAGE_TYPES)

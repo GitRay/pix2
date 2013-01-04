@@ -1,6 +1,6 @@
-# $Id: version.py 250 2005-12-06 04:42:48Z quarl $
+# $Id: version.py 347 2006-09-22 02:24:18Z quarl $
 
 # This file was placed in the public domain by Karl Chen, 2005.
 
-version = '1.3.0'
-rev = '$Rev: 250 $'
+version = '1.4.1'
+rev = '$Rev: 347 $'

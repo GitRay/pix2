@@ -1,6 +1,6 @@
-# $Id: util.py 262 2005-12-07 21:29:43Z quarl $
+# $Id: util.py 325 2006-01-21 02:25:11Z quarl $
 
-## Copyright (C) 2005 Karl Chen
+## Copyright (C) 2005, 2006 Karl Chen
 ## Copyright (C) 2005 Hollis Blanchard
 
 ## This file is part of QuickyPix.
@@ -199,21 +199,29 @@ def write_file(filename, data):
 def log(stuff):
     print >>open(config.LOG_PATH,'a'), time.strftime('[%Y-%m-%d %H:%M:%S]'), stuff
 
-class StrWithStat(str):
+class MetadataValue(str):
     pass
 
 class MetadataProperty:
-    def __init__(self, filename, cname):
+    def __init__(self, filename, cname, default):
         self.filename = filename
         self.cname = cname
         self.cache = None
+        self.default = default
 
     def get(self, obj):
         if self.cname in obj.__dict__:
             return obj.__dict__[self.cname]
 
         fn = config.ALBUMS_DIR + obj.fullpath + self.filename
-        v = StrWithStat(read_file(fn))
+        v = read_file(fn)
+
+        if not v and self.default:
+            # If there's a default (a function), evaluate it: caching it,
+            # without writing to disk.
+            v = self.default(obj)
+
+        v = MetadataValue(v)
         v.stat = xstat(fn)
         v.recent = recent(v.stat)
         obj.__dict__[self.cname] = v
@@ -228,27 +236,32 @@ class MetadataProperty:
         if not path.startswith('/') or '/' in self.filename or '../' in fn:
             raise ValueError
         #del obj.__dict__[self.cname]
-        value = StrWithStat(value)
+        value = MetadataValue(value)
         value.recent = True
-        obj.__dict__[self.cname] = value
-        write_file(fn, value)
-        log("Modifying %s: from %s to %s"%(fn, repr(old_value), repr(value)))
+        if not getattr(value,'nosave',False):
+            obj.__dict__[self.cname] = value
+            write_file(fn, value)
+            log("Modifying %s: from %s to %s"%(fn, repr(old_value), repr(value)))
 
-def metadata_property(filename):
+def metadata_property(filename, default=None):
     # Returns a property with getter and setter for reading and writing file.
     # Memoized.  Automatic strip()ing.  Value returned by getter also has a
     # 'recent' subproperty.
     cname = 'cache|%s'%filename
-    mp = MetadataProperty(filename, cname)
+    mp = MetadataProperty(filename, cname, default)
     return property(mp.get, mp.set)
 
-
-badchars = re.compile('[/\\*?\n\r|~;&$^]')
+badchars = re.compile('[/\\*?\n\r|~;$^]')
+# '&' no longer in badchars
 def name_validate(rel_name):
     if (not rel_name or
         re.search(badchars,rel_name) or
         rel_name.startswith('.')):
         error_forbidden('16bbc225-e04e-47de-b074-99aad21831ac')
+
+def skin_path_validate(name):
+    if (not re.match('([a-zA-Z][a-zA-Z_.]*/)*[a-zA-Z][a-zA-Z_.]*[.](css|js)', name)):
+        error_forbidden('a7149d71-cd46-49a2-a7c7-ed3ea6c7dd00')
 
 def ensure_dir(fpath):
     dir = os.path.dirname(fpath)

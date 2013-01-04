@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+# $Id: quickypix.scgi 278 2005-12-16 23:20:36Z quarl $
+
 #
 # Uses the scgi package from http://www.mems-exchange.org/software/scgi/
 #
@@ -25,7 +28,7 @@
 
 from scgi.scgi_server import SCGIHandler
 from scgi.scgi_server import SCGIServer
-import quickypix
+import Presenter
 import sys
 
 class QuickypixSCGIHandler(SCGIHandler):
@@ -37,7 +40,7 @@ class QuickypixSCGIHandler(SCGIHandler):
         sys.stdout = output
 
         try:
-            quickypix.Presenter(environ)
+            Presenter.Presenter(environ)
         except SystemExit:
             # don't exit; just terminate this connection
             pass

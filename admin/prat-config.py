@@ -1,9 +1,9 @@
 
-# config file for PRAT (see http://www.quarl.org/projects/prat/)
+# config file for PRAT (see http://www.cubewano.org/prat/)
 
 PROJ_NAME = 'quickypix'
 
-REPO_BASE = 'https://svn.quarl.org/repos/%(PROJ_NAME)s'%locals()
+REPO_BASE = 'https://svn.cubewano.org/repos/%(PROJ_NAME)s'%locals()
 
 REPO_TRUNK = '%(REPO_BASE)s/trunk/%(PROJ_NAME)s'%locals()
 REPO_TAG_DIR = '%(REPO_BASE)s/tags'%locals()

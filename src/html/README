@@ -1,8 +1,0 @@
--*- text -*-
-
-About the directory quickypix/src/html:
-
-    Specify the path to template.html and style.css in config.py.
-
-    Apache doesn't need to be able to read them directly; they are served by
-    quickypix.

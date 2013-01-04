@@ -1,7 +1,7 @@
-# $Id: Album.py 228 2005-11-30 03:23:04Z quarl $
+# $Id: Album.py 304 2006-01-20 23:40:32Z quarl $
 
+## Copyright (C) 2005, 2006 Karl Chen
 ## Copyright (C) 2005 Demian Neidetcher
-## Copyright (C) 2005 Karl Chen
 
 ## This file is part of QuickyPix.
 
@@ -35,25 +35,24 @@ def sorted(l):
     l.sort()
     return l
 
+def reverse_sorted(l):
+    l = l[:]
+    l.sort()
+    l.reverse()
+    return l
+
+album_sort = {
+    'sorted': sorted,
+    'reverse_sorted': reverse_sorted,
+    'None': None
+    }
+
 class Album(object):
     def __init__(self, path):
         # path should start with / and be relative to config.ALBUMS_DIR
         assert(path.startswith('/'))
         self.path = os.path.join(path,'')
         self._albums = None
-        if not self.title:
-            try:
-                basename = os.path.basename(os.path.dirname(self.path))
-                self.title = config.DEFAULT_TITLE %locals()
-            except util.AccessError, e:
-                #print >>sys.stderr, "QuickyPix: warning: AccessError while setting title"
-                pass
-        if not self.highlight_name:
-            try:
-                self.highlight_name = self.default_highlight_name()
-            except util.AccessError, e:
-                #print >>sys.stderr, "QuickyPix: warning: AccessError while setting highlight"
-                pass
 
     def _get_rel_path(self):
         return os.path.basename(os.path.dirname(self.path))
@@ -63,7 +62,10 @@ class Album(object):
         return self.path
     fullpath = property(_get_fullpath)
 
-    highlight_name = util.metadata_property('.highlight')
+    def default_highlight_name(self):
+        return self.pics and self.pics[0].rel_path or ''
+
+    highlight_name = util.metadata_property('.highlight', default_highlight_name)
 
     def _get_highlight(self):
         h = self.highlight_name
@@ -76,21 +78,31 @@ class Album(object):
         self.highlight_name = h.rel_path
     highlight = property(_get_highlight, _set_highlight)
 
-    title = util.metadata_property('.title')
+    def default_title(self):
+        basename = os.path.basename(os.path.dirname(self.path))
+        return config.DEFAULT_TITLE %locals()
+
+    title = util.metadata_property('.title', default_title)
     comment = util.metadata_property('.comment')
+
+    def m_rel_path(self):
+        if config.authenticated and config.ALWAYS_USE_PUBLIC_FOR_PHOTOS:
+            return config.PUBLIC_ROOT + self.path
+        else:
+            return self.rel_path
 
     def _get_breadcrumb(self):
         return '<a href="%s%s">%s</a>' %(config.root, self.path, self.title)
     breadcrumb = property(_get_breadcrumb)
 
-    def default_highlight_name(self):
-        try:
-            return self.img_listdir().next()
-        except:
-            return ''
-
     def img_listdir(self):
-        for entry in sorted(os.listdir(config.ALBUMS_DIR + self.path)):
+        paths = os.listdir(config.ALBUMS_DIR + self.path)
+        if self.path == '/':
+            paths = album_sort[config.SORT_ROOT] (paths)
+        else:
+            paths = album_sort[config.SORT_NONROOT] (paths)
+
+        for entry in paths:
             if entry.startswith('.'): continue
             if entry == 'lost+found': continue
             yield entry

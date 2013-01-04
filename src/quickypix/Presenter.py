@@ -1,10 +1,8 @@
-#!/usr/bin/python2.3
+# $Id: Presenter.py 325 2006-01-21 02:25:11Z quarl $
 
-# $Id: quickypix.py 227 2005-11-30 03:14:39Z quarl $
-
-## Copyright (C) 2005 Demian Neidetcher
-## Copyright (C) 2005 Karl Chen
+## Copyright (C) 2005, 2006 Karl Chen
 ## Copyright (C) 2005 Hollis Blanchard
+## Copyright (C) 2005 Demian Neidetcher
 
 ## This file is part of QuickyPix.
 
@@ -62,7 +60,7 @@ HELP_RUN_SYNTAX = '''\
 
 If you are testing from the command-line, you can test like this:
 
-PATH_INFO=/dir/file.jpg ./quickypix.py
+PATH_INFO=/dir/file.jpg ./quickypix.cgi
 
 For example, with PATH_INFO=/ , you should get the HTML index page.
 
@@ -134,8 +132,14 @@ class Presenter:
         # ?dl=1 adds the content-disposition header
         config.download_flag = bool(self.form.getfirst('dl'))
 
-        if input_path == '/style.css':
-            util.cat(config.STYLE_FILE)
+        m = re.match('/skin/(.*)', input_path)
+        if m:
+            p = m.group(1)
+            util.skin_path_validate(p)
+            try:
+                util.cat(os.path.join(config.SKIN_PATH, p))
+            except OSError:
+                util.not_found()
             raise SystemExit
         if not input_path.startswith('/'):
             raise SystemExit
@@ -211,7 +215,7 @@ class Presenter:
     def present(self):
         print 'Content-type:text/html\n'
 
-        data = open(config.TEMPLATES_FILE).read()
+        data = open(config.TEMPLATE_FILE).read()
 
         data = re.compile('<!-- --\\s.*?\\s-- -->\\s*', re.DOTALL).\
             sub('', data)
@@ -241,6 +245,18 @@ class Presenter:
     def formatTitle(self):
         return ' | '.join([obj.title for obj in self.pic_path])
 
+    def resolve_highlight(self, album):
+        img_url = [album.m_rel_path()]
+        highlight = album.highlight
+        while not isinstance(highlight,Pic):
+            if not highlight:
+                return None, None
+            img_url.append(highlight.rel_path)
+            highlight = highlight.highlight
+        img_url.append(highlight.img_rel_path(config.ALBUM_THUMB_SIZE))
+        img_url = os.path.join(*img_url)
+        return img_url, highlight
+
     def formatAlbums(self):
         albums = self.album.albums
 
@@ -250,24 +266,15 @@ class Presenter:
         ret = []
         ret.append('<h2>Albums (%d)</h2>'%len(albums))
 
-        # top level album has reversed order
-        if self.album.path == '/':
-            albums.reverse()
-
         for album in albums:
             highlight = album.highlight
-            if highlight:
+            img_url, resolved_highlight = self.resolve_highlight(album)
+            if highlight and resolved_highlight:
                 if isinstance(highlight,Pic):
                     href = os.path.join(album.rel_path, highlight.rel_path)
                 else:
                     # "highlight" is really an album
                     href = os.path.join(album.rel_path, '')
-                img_url = [album.rel_path]
-                while not isinstance(highlight,Pic):
-                    img_url.append(highlight.rel_path)
-                    highlight = highlight.highlight
-                img_url.append(highlight.img_rel_path(config.ALBUM_THUMB_SIZE))
-                img_url = os.path.join(*img_url)
                 ret.append(''.join(
                         [
                             '<dl>',
@@ -275,7 +282,7 @@ class Presenter:
                                 href,
                                 album.title),
                             '<img alt="%s" src="%s" />' %(
-                                highlight.title,
+                                resolved_highlight.title,
                                 img_url
                                 ),
                             '</a></dt>',
@@ -297,7 +304,8 @@ class Presenter:
     def image_link(self, target_url, img_src, img_alt,
                    selected=False, img_title=None ):
         if selected:
-            imgid = ' id="selected-pic"'
+            # imgid = ' id="selected-pic"'
+            imgid = ' class="selected-pic"'
         else:
             imgid = ''
         if config.editing:
@@ -332,7 +340,7 @@ class Presenter:
             ret.append('<dt>')
             ret.append(
                 self.image_link(target_url = pic.rel_path,
-                                img_src    = pic.img_rel_path(config.THUMB_SIZE),
+                                img_src    = pic.m_img_rel_path(config.THUMB_SIZE),
                                 img_alt    = "thumbnail for %s",
                                 img_title  = util.escHtml(pic.comment),
                                 selected   = (pic == self.pic)))
@@ -375,8 +383,8 @@ class Presenter:
             ret.append(self.formatEditButtons())
 
         ret.append(
-            self.image_link(target_url = self.pic.img_rel_path((-1,-1)),
-                            img_src    = self.pic.img_rel_path(config.WEB_SIZE),
+            self.image_link(target_url = self.pic.m_img_rel_path((-1,-1)),
+                            img_src    = self.pic.m_img_rel_path(config.WEB_SIZE),
                             img_alt    = "picture - %s",
                             img_title  = "View full size %s"%self.pic.rel_path))
         return ''.join(ret)
@@ -461,7 +469,7 @@ class Presenter:
     def formatPicDl(self):
         # if admin mode is on, then show a [dl] link.
         if config.admin:
-            url = self.pic.img_rel_path((-1,-1)) + '?dl=1'
+            url = self.pic.m_img_rel_path((-1,-1)) + '?dl=1'
             return '<a href="%s">[dl]</a>'%url
         else:
             return ''
@@ -577,10 +585,3 @@ class Presenter:
         filename = self.form.getfirst('filename')
         if self.pic and filename:
             self.pic.rel_path = filename
-
-if __name__=='__main__':
-    try:
-        Presenter(os.environ)
-    except util.AccessError, e:
-        e.print_exit()
-

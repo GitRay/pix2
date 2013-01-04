@@ -1,0 +1,13 @@
+-*- text -*-
+
+quickypix/src/client/skin: static files that the client should download
+                           directly.
+
+    To have QuickyPix serve these files, specify the path using SKIN_PATH in
+    config.py.
+
+    You can also Alias this directory in your Apache config file (more
+    efficient delivery).
+
+quickypix/src/client/templates: template files that are only needed by
+                                QuickyPix; no need for Apache to see them.

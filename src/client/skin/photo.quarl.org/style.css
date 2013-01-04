@@ -1,0 +1,9 @@
+/* $Id: style.css 113 2005-09-27 23:28:33Z quarl $ */
+
+/* quickypix style for photo.quarl.org */
+
+h2 {
+    background-color: rgb(37,84,122) !important;
+    color: white !important;
+    padding: 4px !important;
+}

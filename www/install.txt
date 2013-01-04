@@ -52,6 +52,12 @@ If you use admin mode, you need to set::
 CGI
 ---
 
+CGI or SCGI operation are fairly easy to setup assuming you have experience
+with this kind of thing.  SCGI has better performance, though you might choose
+CGI because it doesn't require a separate application, or if you are
+developing (i.e. changing the source often).
+
+
 Apache CGI sample configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ::
@@ -62,8 +68,8 @@ Apache CGI sample configuration
         Allow from all
     </Directory>
 
-    # Note: the trailing slash after quickypix.py is significant!
-    ScriptAlias / /home/quarl/proj/quickypix/src/quickypix/quickypix.py/
+    # Note: the trailing slash after quickypix.cgi is significant!
+    ScriptAlias / /home/quarl/proj/quickypix/src/quickypix/quickypix.cgi/
 
 
 Lighttpd_ CGI sample configuration
@@ -72,9 +78,9 @@ Lighttpd_ CGI sample configuration
 - ``lighttpd.conf``::
 
     cgi.assign = ( ".py" => "/usr/bin/python" )
-    url.rewrite = ( "^/(.*)$" => "/quickypix.py/$1" )
+    url.rewrite = ( "^/(.*)$" => "/quickypix.cgi/$1" )
 
-- Create a symlink to ``quickypix.py`` from the
+- Create a symlink to ``quickypix.cgi`` from the
   ``server.document-root`` directory.
 
 - lighttpd has a problem where the CGI ``SCRIPT_NAME`` environment
@@ -142,6 +148,29 @@ You can edit these manually, or through the web interface.
 The included script ``convert_descript_ion`` converts 4DOS/ACDSee
 ``descript.ion`` files to QuickyPix comment format.
 
+Permissions Configuration
+-------------------------
+
+If you use EDIT mode, the following setup is recommended, for security.
+
+Run normal-mode quickypix under a userid (e.g. ``photo-data-read``) that can
+only:
+
+- Read the photo directory
+- Read and write to the cache directory
+
+Run edit-mode quickypix under a different userid (e.g. ``photo-data``)
+that can only:
+
+- Read and write to the photo directory
+- Set ``config.ALWAYS_USE_PUBLIC_FOR_PHOTOS=True`` so you don't need access to
+  the cache directory
+
+The ``init.d/quickypix-scgi`` script runs the scgi process under a given user
+id.
+
+A small wrapper, ``src/wrapper/quickypix.cgi.su``, is provided for running the
+cgi process under a user id different from httpd.
 
 Dependencies
 ------------

@@ -1,12 +1,12 @@
-# $Id: image_util.py 256 2005-12-07 00:18:21Z quarl $
+# $Id: image_util.py 339 2006-01-25 21:52:26Z quarl $
 
-## Copyright (C) 2005 Karl Chen
+## Copyright (C) 2005, 2006 Karl Chen
 
 ## This file is part of QuickyPix.
 
 ## QuickyPix is free software; you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free
-## Software Foundation; either version 2, or (at your option) any later
+## Softfixed;ware Foundation; either version 2, or (at your option) any later
 ## version.
 
 ## QuickyPix is distributed in the hope that it will be useful, but WITHOUT
@@ -27,6 +27,8 @@ import commands
 import exif
 import util
 import config
+
+# TODO: exif.py doesn't seem to get the EXIF ImageDescription field. Why?
 
 # use PIL if available
 try:
@@ -62,6 +64,7 @@ class image_info:
         self.aperture = None
         self.iso = None
         self.exposure = None
+        self.description = None
         if util.path_ext(fpath).lower() in ['jpg', 'jpeg']:
             self.process_exif(fpath)
         else:
@@ -79,6 +82,7 @@ class image_info:
             self.aperture = d.get('EXIF ApertureValue')
             self.iso = d.get('EXIF ISOSpeedRatings')
             self.exposure = d.get('EXIF ExposureTime')
+            self.description = d.get('EXIF ImageDescription')
 
     def process_tcprobe(self, fpath):
         cmd = config.PATH_TCPROBE + ' -i' + commands.mkarg(fpath)
@@ -133,6 +137,9 @@ class image_info:
     def describe_exposure(self):
         if self.exposure:
             return 'Exposure', self.exposure
+    def describe_description(self):
+        if self.description:
+            return 'Description', self.description
     def describe_iso(self):
         if self.iso:
             return 'ISO', self.iso

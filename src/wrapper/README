@@ -1,0 +1,13 @@
+
+quickypix.cgi.su is a small C program that is intended to be setuid/setgid.
+All it does is run quickypix.cgi.  However, it first checks authorizes only
+www-data to run it and cleans the environment.
+
+It is based on the suexec program from apache 2.0.54.
+
+To use:
+
+- set the Makefile variables (required)
+- run `make'
+- substitute quickypix.cgi.su for quickypix.cgi
+

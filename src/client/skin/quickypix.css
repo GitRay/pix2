@@ -1,44 +1,14 @@
-/* $Id: style.css 113 2005-09-27 23:28:33Z quarl $ */
+/* $Id: quickypix.css 335 2006-01-21 04:02:18Z quarl $ */
 
-/* quickypix style for photo.quarl.org */
+/* Basic definitions needed by any QuickyPix installation */
 
-/* body, h1, h2 { */
-/*     font-size:        14px; */
-/*     font-family:      Arial, Verdana, sans-serif; */
-/*     background-color: #dfe0e5; */
-/*     color:            #333333; */
-/* } */
+/* This file caters to two kinds of layout:
+     * quickypix-tables (using table for master layout)
+     * quickypix-float (using floating div for master layout)
+*/
 
-/* h1 { */
-/*     background-color: #99abb5; */
-/*     border:           1px solid #333333; */
-/*     color:            #990000; */
-/* } */
 
-h2 {
-    background-color: rgb(37,84,122) !important;
-    color: white !important;
-    /* border:           1px solid #333333; */
-    /* margin-top:       0; */
-    padding: 4px !important;
-    /* font-size:  */
-}
-
-/* body { */
-/*     margin:        20px; */
-/*     font-style:    normal; */
-/* } */
-
-/* a:link, a:active, a:visited { */
-/*     color:           #993333; */
-/*     text-decoration: none; */
-/* } */
-
-/* a:hover { */
-/*     color: #333333; */
-/* } */
-
-/* apparently MSIE doesn't render correctly if we combine these two  '*/
+/* apparently MSIE doesn't render correctly if we combine these two */
 
 img {
     border: 1px solid #333333;
@@ -46,14 +16,6 @@ img {
 
 input[type="image"] {
     border: 1px solid #333333;
-}
-
-.albums dl {
-    width: 104px;
-}
-
-.albums dt {
-    height: 83px;
 }
 
 .albums img {
@@ -64,7 +26,7 @@ input[type="image"] {
     border: 2px outset #333333;
 }
 
-#selected-pic {
+.selected-pic {
     border: 1px solid #ff4455;
 }
 
@@ -73,18 +35,18 @@ input[type="image"] {
     margin-bottom: 0.5ex;
 }
 
-table {
+table.ftable {
     border:          0px ;
     width:           100%;
     border-spacing:  0px;
     border-collapse: collapse;
 }
 
-td {
+table.ftable td {
     vertical-align: top;
 }
 
-td.filler {
+table.ftable td.filler {
     padding: 0;
     margin:  0;
 }
@@ -93,6 +55,22 @@ td.filler {
     margin:      0;
     padding:     0;
     margin-left: 10px;
+}
+
+.quickypix-float .pic {
+    /* float: right; */
+    
+    /* border: 2px solid black; */
+    width: 515px;
+    
+    /* position: absolute; */
+    /* position: fixed; */
+    right: 30px; 
+    top: 70px;
+}
+
+.quickypix-float .nav {
+    /* float: right; */
 }
 
 .pic img, .pic input[type="image"] {
@@ -106,7 +84,15 @@ td.filler {
     border:     1px dashed #333333;
     width:      260px;
     font-size:  10px;
+}
+
+.quickypix-tables .info {
     float:      right;
+}
+
+.quickypix-float .info {
+    /* position: relative; */
+    /* left: 240px; */
 }
 
 .info td:first-child {
@@ -126,8 +112,11 @@ td.filler {
     /* font-size: 80%; */
 }
 
-.nav div {
+.quickypix-tables .nav div {
     clear: both;
+}
+
+.quickypix-float .nav div {
 }
 
 .nav dl {
@@ -136,12 +125,17 @@ td.filler {
     text-align: center;
 }
 
+.nav .albums dt {
+    height: 83px;
+}
+
 .nav .albums dl {
     width: 120px;
 }
 
 .nav .pictures dl {
-    width: 75px;
+    width: 80px;
+    height: 60px;
 }
 
 .editing .nav .pictures dl {
@@ -163,13 +157,8 @@ td.filler {
     height:  35px;
 }
 
-/* .footer { */
-/*     clear:        both; */
-/*     text-align:   right; */
-/*     font-size:    10px; */
-/*     /\* border-top:   1px solid #333333; *\/ */
-/*     margin-top:   1em; */
-/* } */
+.footer {
+}
 
 br {
     clear: both;

@@ -1,3 +1,4 @@
+-*-text-*-
 
 general
 -------
@@ -5,7 +6,43 @@ general
 - better error reporting, e.g. explain to stderr when can't write to cache dir
   or log file
 
-- .deb
+- packaging:
+    - distutils setup.py
+    - .deb
+
+- send stderr of external programs through Exception, on error.  use backported subprocess.py.
+
+- load config from /etc/quickypix
+
+- importing from new ACDSee new XML format
+
+- Hide albums with recursively no pictures
+
+- Add next/previous links
+
+Style stuff
+-----------
+
+- Highlight selected pic better
+
+    - Make non-selected preview pics shaded lighter
+
+- Fix pic vertical position (when scrolling)
+    - "Position:fixed" only works in firefox -- use Javascript?
+
+- Ajax stuff
+
+    - URL: "album/#pic"
+
+    - Javascript parses it and displays appropriate pic.
+
+    - Should be compatible if with non Javascript.
+
+    - Add "permalink"
+
+
+    - Grant Brown likes:
+      http://www.sendphotos.com/products/explorerplus/Slideshow.aspx
 
 SCGI daemon
 -----------
@@ -13,8 +50,3 @@ SCGI daemon
 - encapsulate state, so we don't need preforking
 
 - runit/daemontools script
-
-
-
-
-- send stderr of external programs through Exception, on error.  use backported subprocess.py.

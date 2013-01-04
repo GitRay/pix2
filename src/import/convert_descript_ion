@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# $Id: convert_descript_ion 264 2005-12-14 19:51:04Z quarl $
+# $Id: convert_descript_ion 276 2005-12-16 23:11:52Z quarl $
 
 # description_convert: convert 4DOS/ACDSee "descript.ion" files to QuickyPix
 # comment format.
