@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# $Id: movie-rotate 246 2005-12-06 04:28:01Z quarl $
+
+# rotate a movie
+
+# syntax: rotate_movie input_file output_file 90|270
+
+die() { echo "$@" >&2; exit 1; }
+
+test $# = 3 || die "syntax: rotate_movie input.avi output.avi 90|270"
+test -f "$1" || die "movie-rotate: $1 doesn't exist"
+
+case $3 in
+    90) r=1 ;;
+    270) r=2 ;;
+    *) die "syntax: rotate_movie input.avi output.avi 90|270" ;;
+esac
+
+mencoder -quiet -oac copy "$1" -ovc lavc  \
+    -lavcopts vcodec=mpeg4 -vf rotate=$r -o "$2" >/dev/null 2>/dev/null

@@ -1,0 +1,42 @@
+#!/bin/sh
+# $Id: movie2jpg 246 2005-12-06 04:28:01Z quarl $
+
+# movie2jpg - convert a movie to jpeg.
+
+# quarl 2005-01-15 initial version
+
+# 'convert' (from ImageMagick) works for old codecs, but not DivX.  This uses
+# mplayer, which works for pretty much everything.  Raison d'etre is
+# quickypix.
+
+# syntax: movie2jpg input.avi output.jpg
+
+# need to tell mplayer to decode a couple frames
+DECODE_FRAMES=5
+
+die() { echo "$@" >&2; exit 1; }
+
+test $# = 2 || die "syntax: movie2jpg input.avi output.jpg"
+test -f "$1" || die "movie2jpg: $1 doesn't exist"
+# test -f "$2" && die "movie2jpg: $2 already exists"
+
+tmpdir=/tmp/movie2jpg.$$
+
+(
+    mkdir -p $tmpdir &&
+    test -d $tmpdir &&
+    test -w $tmpdir) ||
+die "movie2jpg: couldn't make $tmpdir"
+
+mplayer -quiet -nosound -vo jpeg:outdir=$tmpdir -frames $DECODE_FRAMES "$1" >/dev/null 2>/dev/null ||
+die "movie2jpg: mplayer failed"
+
+# mplayer writes N+1 frames if you want N frames, but 0 frames if you want 0.
+# So we have to get two.  Might as well use the second one, then.
+
+f=`ls -1 $tmpdir/000000*.jpg 2>/dev/null | head -1`
+
+(test -n "$f" && test -f $f && cp $f "$2") || \
+    die "movie2jpg: no output file trying to convert $1.  Not deleting $tmpdir"
+
+rm -rf $tmpdir || die "movie2jpg: couldn't remove $tmpdir"

@@ -1,4 +1,4 @@
-# $Id: image_util.py 189 2005-10-21 08:52:06Z quarl $
+# $Id: image_util.py 256 2005-12-07 00:18:21Z quarl $
 
 ## Copyright (C) 2005 Karl Chen
 
@@ -26,10 +26,14 @@ import re
 import commands
 import exif
 import util
+import config
 
 # use PIL if available
 try:
-    import image_pil as image_ops
+    if config.USE_PIL:
+        import image_pil as image_ops
+    else:
+        raise ImportError
 except ImportError:
     #util.log("Python Imaging Library (http://www.pythonware.com/products/pil/) not available\n")
     import image_im as image_ops
@@ -77,7 +81,7 @@ class image_info:
             self.exposure = d.get('EXIF ExposureTime')
 
     def process_tcprobe(self, fpath):
-        cmd = 'tcprobe -i' + commands.mkarg(fpath)
+        cmd = config.PATH_TCPROBE + ' -i' + commands.mkarg(fpath)
         output = commands.getoutput(cmd)
         m = re.search('frame size: -g ([0-9]+)x([0-9]+) ', output)
         if m:
@@ -137,7 +141,7 @@ def do_convert_to_image(source_file, target_file):
     # TODO: add filmstrip border or something to show it's a movie
     # if os.spawnlp(os.P_WAIT, 'convert', 'convert', source_file, target_file):
     #     raise "Couldn't convert %s"%source_file
-    if os.spawnlp(os.P_WAIT, '/home/quarl/bin/movie2jpg', 'movie2jpg', source_file, target_file):
+    if os.spawnlp(os.P_WAIT, config.PATH_MOVIE2JPG, 'movie2jpg', source_file, target_file):
         raise "Couldn't convert %s"%source_file
 
 def convert_to_image(movie_file, image_file):
@@ -150,18 +154,18 @@ def reencode(file):
     # re-encode a file (hopefully using a better codec and/or encoder - for
     # avi files the mencoder DivX4 encoder shrinks the file by more than 50%)
     if util.path_ext(file) in config.MOVIE_TYPES:
-        cmd = ['mencoder', '-quiet', '-oac', 'copy', file, '-ovc', 'lavc',
+        cmd = [ config.PATH_MENCODER, '-quiet', '-oac', 'copy', file, '-ovc', 'lavc',
                '-lavcopts', 'vcodec=mpeg4', '-o', tmp]
     else:
-        cmd = ['convert', file, tmp]
+        cmd = [ config.PATH_CONVERT, file, tmp]
 
 def rotate_image(file, degrees):
     tmp = file+'.tmp'
     ext = util.path_ext(file)
     if ext.lower() in config.MOVIE_TYPES:
-        cmd = ['/home/quarl/bin/movie-rotate', file, tmp, str(degrees)]
+        cmd = [ config.PATH_MOVIE_ROTATE, file, tmp, str(degrees)]
     elif ext.lower() in config.IMAGE_TYPES:
-        cmd = ['convert', '-rotate', str(degrees), file, tmp]
+        cmd = [ config.PATH_CONVERT, '-rotate', str(degrees), file, tmp]
     else:
         raise Exception("Invalid file type - not movie or image: '%s'"%file)
     if os.spawnlp(os.P_WAIT, cmd[0], *cmd):

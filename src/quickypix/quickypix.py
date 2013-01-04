@@ -1,6 +1,6 @@
 #!/usr/bin/python2.3
 
-# $Id: quickypix.py 196 2005-11-02 01:43:24Z quarl $
+# $Id: quickypix.py 227 2005-11-30 03:14:39Z quarl $
 
 ## Copyright (C) 2005 Demian Neidetcher
 ## Copyright (C) 2005 Karl Chen
@@ -57,12 +57,34 @@ def cls_recent(obj):
     else:
         return ''
 
+HELP_RUN_SYNTAX = '''\
+500 QuickyPix invocation error: no PATH_INFO set
+
+If you are testing from the command-line, you can test like this:
+
+PATH_INFO=/dir/file.jpg ./quickypix.py
+
+For example, with PATH_INFO=/ , you should get the HTML index page.
+
+Other optional environment variables:
+  SCRIPT_NAME: document root to use
+
+  REQUEST_URI: normally includes PATH_INFO and 'GET' arguments; only used
+               for queries and error messages
+'''
+
 class Presenter:
     def __init__(self, environ):
+        if 'PATH_INFO' not in environ:
+            raise SystemExit(HELP_RUN_SYNTAX)
+
+        # $PATH_INFO could be '' (but not None) if QuickyPix is ScriptAliased
+        # to /foo, and the client requested /foo instead of /foo/; the
+        # canonicalization should redirect to /foo/
         config.input_path = input_path = environ.get('PATH_INFO') or '/'
-        # see config.py for setting of config.root, which is by default
-        # $SCRIPT_NAME
-        config.request_uri = environ.get('REQUEST_URI')
+        assert(config.input_path.startswith('/'))
+        config.root = config.ROOT or environ.get('SCRIPT_NAME','')
+        config.request_uri = environ.get('REQUEST_URI','')
         config.authenticated = False
         config.editing = False
         self.remote_user = environ.get('REMOTE_USER')
@@ -119,7 +141,7 @@ class Presenter:
             raise SystemExit
         input_path = input_path[1:].split('/')
         if '..' in input_path:
-            util.error_forbidden()
+            util.error_forbidden('2249ce85-5143-4b44-bcca-2b4c0bc820a9')
         if '' in input_path:
             input_path.remove('')
 

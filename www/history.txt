@@ -1,0 +1,15 @@
+QuickyPix: History
+==================
+
+Yet ANOTHER photo gallery system?
+---------------------------------
+
+I've tried various photo gallery software and was dissatisfied with all of
+them.  There are a *lot* of these around; apparently everyone wants different
+features and a different "look".  Finally I bit the bullet and developed my
+own.  Demian Neidetcher had created Pix_, a simple gallery system that is
+easily customizable.  I forked development to add the features I wanted.
+Eventually it had changed enough that I decided to call it something other
+than "Pix with quarl's additions", while still crediting Pix.
+
+.. _Pix: http://pix.sourceforge.net/

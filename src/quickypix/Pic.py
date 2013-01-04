@@ -1,4 +1,4 @@
-# $Id: Pic.py 189 2005-10-21 08:52:06Z quarl $
+# $Id: Pic.py 257 2005-12-07 00:18:29Z quarl $
 
 ## Copyright (C) 2005 Demian Neidetcher
 ## Copyright (C) 2005 Karl Chen
@@ -57,7 +57,7 @@ class Pic(object):
         if not os.path.exists(config.ALBUMS_DIR+path):
             raise ValueError("Nonexistent Pic '%s'"%self.path)
         if not util.is_media(path):
-            util.error_forbidden()
+            util.error_forbidden('4530a078-0275-4241-8dc1-6143ead506e1')
 
     def __eq__(self, otherpic):
         return otherpic and self.fullpath == otherpic.fullpath
@@ -107,10 +107,10 @@ class Pic(object):
             return "%s/%s" %(self.path, util.sized(size))
 
     def is_image(self):
-        return (self.pathext in config.IMAGE_TYPES)
+        return (self.pathext.lower() in config.IMAGE_TYPES)
 
     def is_movie(self):
-        return (self.pathext in config.MOVIE_TYPES)
+        return (self.pathext.lower() in config.MOVIE_TYPES)
 
     # send jpg data to user
     def show(self, size):
@@ -131,10 +131,11 @@ class Pic(object):
             raise Exception("Invalid file type")
     def show_image(self, fpath, rpath, size, movie=False):
         # Note: the resized path should keep the same extension
+        assert(not rpath.startswith('/'))
         resized_fpath = os.path.join(
-            config.CACHE_DIR, "%s/%s,%s" %(os.path.dirname(rpath),
-                                            util.sized(size),
-                                            os.path.basename(rpath)))
+            config.CACHE_DIR,
+            os.path.dirname(rpath),
+            "%s,%s" %(util.sized(size), os.path.basename(rpath)))
         util.cat(image_util.resize_image(fpath, resized_fpath, size, movie))
         raise SystemExit
 

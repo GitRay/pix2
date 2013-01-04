@@ -1,4 +1,4 @@
-# $Id: Album.py 190 2005-10-21 08:57:34Z quarl $
+# $Id: Album.py 228 2005-11-30 03:23:04Z quarl $
 
 ## Copyright (C) 2005 Demian Neidetcher
 ## Copyright (C) 2005 Karl Chen
@@ -19,6 +19,11 @@
 ## with QuickyPix; see the file COPYING.  If not, write to the Free Software
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
 ## USA.
+
+# Add support for 'yield' in Python2.2
+# (in Python2.3, this statement is not needed.  Python < 2.2 is not
+# supported.)
+from __future__ import generators
 
 import sys, os, string
 from Pic import Pic, findPic

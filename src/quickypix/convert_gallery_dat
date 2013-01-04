@@ -1,0 +1,111 @@
+#!/usr/bin/env php
+<?php
+
+// $Id: _q_gallery_convert 7519 2005-01-13 08:41:57Z quarl $
+
+// convert_gallery_dat: convert Gallery (http://gallery.sf.net) php-style
+// album.dat, photo.dat to QuickyPix format.
+
+// quarl 2005-01-12 initial version
+
+// usage: run in a directory containing photos.
+
+class Album {
+	var $fields;
+	var $photos;
+	var $dir;
+	var $version;
+}
+
+class AlbumItem {
+        var $image;
+        var $thumbnail;
+        var $preview;
+        var $caption;
+        var $hidden;
+        var $highlight;
+        var $highlightImage;
+        var $isAlbumName;
+        var $clicks;
+        var $keywords;
+        var $comments;          // array of comment objects
+        var $uploadDate;        // date the item was uploaded
+        var $itemCaptureDate;   // associative array of date the item was captured
+                                // not in EPOCH so we can support dates < 1970
+        var $exifData;
+        var $owner;             // UID of item owner.
+        var $extraFields;
+        var $rank;
+        var $version;
+        var $emailMe;
+}
+class Image {
+	var $name;
+	var $type;
+	var $width;
+	var $height;
+	var $resizedName;
+	var $thumb_x;
+	var $thumb_y;
+	var $thumb_width;
+	var $thumb_height;
+	var $raw_width;
+	var $raw_height;
+	var $version;
+}
+
+function getFile($fname) {
+        $tmp = "";
+
+        if ($fd = fopen($fname, "rb")) {
+                while (!feof($fd)) {
+                        $tmp .= fread($fd, 65536);
+                }
+                fclose($fd);
+        }
+        return $tmp;
+}
+
+function writeFile($fname, $x) {
+    $fd = fopen($fname, "w");
+    fwrite($fd, $x);
+    fclose($fd);
+}
+
+
+
+$s = unserialize(getFile("album.dat"));
+
+$title = $s->fields["title"];
+$descr = $s->fields["description"];
+
+echo ".title: $title\n";
+writeFile(".title", "$title\n");
+
+if ($descr) {
+    echo ".comment: $descr\n";
+    writeFile(".comment", "$descr\n");
+}
+
+$s = unserialize(getFile("photos.dat"));
+
+foreach ($s as $k => $v) {
+    $imgname = $v->image->name;
+    $cap = $v->caption;
+    $descr = $v->extraFields["Description"];
+    $d = $cap;
+    $highlight = $v->highlight;
+    if ($descr) { $d = "$d - $descr"; }
+
+    if ($d) {
+        echo "$imgname.jpg.comment: $d\n";
+        writeFile("$imgname.jpg.comment", "$d\n");
+    }
+
+    if ($highlight) {
+        echo ".highlight: $imgname.jpg\n";
+        writeFile(".highlight", "$imgname.jpg\n");
+    }
+}
+
+?>

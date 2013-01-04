@@ -1,0 +1,79 @@
+#!/usr/bin/env python
+
+# $Id: convert_descript_ion 264 2005-12-14 19:51:04Z quarl $
+
+# description_convert: convert 4DOS/ACDSee "descript.ion" files to QuickyPix
+# comment format.
+
+# syntax: convert_descript_ion [files/directories...]
+
+## quarl 2005-12-04 initial version
+
+from __future__ import generators
+
+import sys
+import os
+
+def descript_ion_files_from_args(args):
+    for arg in args:
+        if os.path.isfile(arg):
+            yield arg
+        elif os.path.isdir(arg):
+            for file in descript_ion_files_in_dir(arg): yield file
+        else:
+            raise SystemExit("%s: Invalid argument '%s'" %(sys.argv[0],arg))
+
+def descript_ion_files_in_dir(dir):
+    for file in os.listdir(dir):
+        path = os.path.join(dir,file)
+        if os.path.isfile(path):
+            if file.lower() == 'descript.ion':
+                yield path
+        elif os.path.isdir(path):
+            for file in descript_ion_files_in_dir(path): yield file
+        else:
+            print >>sys.stderr, "%s: unknown object '%s'" %(sys.argv[0], arg)
+
+class BadDescriptionLine(Exception):
+    pass
+
+def must_be_two_items(x):
+    if len(x) != 2:
+        raise BadDescriptionLine()
+    return x
+
+def parse_quoted_first_word(line):
+    if line.startswith("'") or line.startswith('"'):
+        i = line.find(line[0], 1)
+        if i == -1:
+            raise BadDescriptionLine
+        return line[1:i], line[i+1:].strip()
+    else:
+        return must_be_two_items(line.split(None,1))
+
+def save_quickypix_metadata(pic_filename, description):
+    if not os.path.exists(pic_filename):
+        print >>sys.stderr, "%s: warning: no file '%s' found; writing description anyway" %(sys.argv[0], pic_filename)
+
+    descr_filename = pic_filename + '.comment'
+
+    if os.path.exists(descr_filename):
+        print >>sys.stderr, "%s: comment file '%s' already exists; skipping" %(sys.argv[0], descr_filename)
+
+    print "%s: writing '%s'" %(sys.argv[0],descr_filename)
+
+    open(descr_filename,'w').write(description)
+
+def convert_descript_ion(pathname):
+    assert (os.path.exists(pathname))
+
+    dir = os.path.dirname(pathname)
+    for line in open(pathname):
+        try:
+            pic_filename, description = parse_quoted_first_word(line.strip())
+            save_quickypix_metadata(os.path.join(dir,pic_filename), description)
+        except BadDescriptionLine:
+            raise SystemExit("%s: invalid descript.ion file '%s' line '%s'" %(sys.argv[0],pathname,line))
+
+for file in descript_ion_files_from_args(sys.argv[1:] or ['.']):
+    convert_descript_ion(file)

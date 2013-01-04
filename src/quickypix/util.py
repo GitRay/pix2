@@ -1,4 +1,4 @@
-# $Id: util.py 187 2005-10-21 08:32:34Z quarl $
+# $Id: util.py 262 2005-12-07 21:29:43Z quarl $
 
 ## Copyright (C) 2005 Karl Chen
 ## Copyright (C) 2005 Hollis Blanchard
@@ -102,10 +102,10 @@ def cat(path, save_filename=None):
         sys.stdout.write(d)
 
 
-def error_forbidden():
+def error_forbidden(data=''):
     print 'Status: 403 Forbidden'
     print 'Content-type: text/html\n'
-    print '<h1>Forbidden :(</h1>'
+    print '<h1>Forbidden :( %s</h1>'%data
     raise SystemExit
 
 def not_found():
@@ -183,7 +183,7 @@ class AccessError(Exception):
         self.filename = filename
 
     def print_exit(self):
-        print "Status: 401 access denied"
+        print "Status: 403 forbidden"
         print "Content-Type: text/html"
         print
         print "<h1>Forbidden: %s</h1>" %self.filename
@@ -192,7 +192,7 @@ class AccessError(Exception):
 def write_file(filename, data):
     try:
         open(filename,'w').write(data)
-    except:
+    except Exception, e:
         raise AccessError(filename)
 
 
@@ -212,7 +212,7 @@ class MetadataProperty:
         if self.cname in obj.__dict__:
             return obj.__dict__[self.cname]
 
-        fn = config.ALBUMS_DIR + obj.path + self.filename
+        fn = config.ALBUMS_DIR + obj.fullpath + self.filename
         v = StrWithStat(read_file(fn))
         v.stat = xstat(fn)
         v.recent = recent(v.stat)
@@ -223,8 +223,9 @@ class MetadataProperty:
         value = value and value.strip() or ''
         old_value = self.get(obj)
         if old_value == value: return
-        fn = config.ALBUMS_DIR + obj.path + self.filename
-        if not obj.path.startswith('/') or '/' in self.filename or '../' in fn:
+        path = obj.fullpath
+        fn = config.ALBUMS_DIR + path + self.filename
+        if not path.startswith('/') or '/' in self.filename or '../' in fn:
             raise ValueError
         #del obj.__dict__[self.cname]
         value = StrWithStat(value)
@@ -247,7 +248,7 @@ def name_validate(rel_name):
     if (not rel_name or
         re.search(badchars,rel_name) or
         rel_name.startswith('.')):
-        error_forbidden()
+        error_forbidden('16bbc225-e04e-47de-b074-99aad21831ac')
 
 def ensure_dir(fpath):
     dir = os.path.dirname(fpath)
@@ -259,7 +260,7 @@ def newer_than(f1, f2):
     return os.stat(f1).st_mtime > os.stat(f2).st_mtime
 
 def tdel(fpath):
-    if os.spawnlp(os.P_WAIT, config.TDEL_PATH, 'tdel', '-d',
+    if os.spawnlp(os.P_WAIT, config.PATH_TDEL, 'tdel', '-d',
                   fpath):
         raise "Couldn't tdel %s"%fpath
 
@@ -276,4 +277,4 @@ def path_nonext(path):
         return path
 
 def is_media(path):
-    return (path_ext(path) in config.MEDIA_TYPES)
+    return (path_ext(path).lower() in config.MEDIA_TYPES)

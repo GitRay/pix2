@@ -1,0 +1,10 @@
+#!/bin/sh -e
+
+# $Id: admin-update 246 2005-12-06 04:28:01Z quarl $
+
+## synchronize quickypix versions with those from quarl/bin
+
+SRC=/home/quarl/bin
+DST=`dirname $0`/bin
+
+cp -av $SRC/{tdel,movie2jpg,movie-rotate} $DST/

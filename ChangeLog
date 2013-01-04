@@ -1,5 +1,59 @@
+2005-12-15  Karl Chen  <quarl@quarl.org>
+    * Release v1.3.0
+
+2005-12-14  Karl Chen  <quarl@quarl.org>
+    * Added convert_gallery_dat (which was written 2005-01-12 and
+      previously in the 'quarl' repository)
+
+2005-12-07  Karl Chen  <quarl@quarl.org>
+    * Make path configuration more robust
+
+    * By default auto-detect the src/helpers/bin directory instead of
+      requiring configuring it manually
+
+    * Support older versions of ImageMagick that don't have '-thumbnail'
+      option, via configuration parameter USE_IMAGEMAGICK_THUMBNAIL_OPTION
+
+2005-12-06  Karl Chen  <quarl@quarl.org>
+    * Fixed bug with caching thumbnails at root of image repository.  Bug
+      reported by Grant Brown <grant@marstechnologies.com>.
+
+2005-12-05  Karl Chen  <quarl@quarl.org>
+    * Add tdel, movie2jpg, movie-rotate helpers to QuickyPix repository
+      under quickypix/src/helpers/bin [originally at
+      http://svn.quarl.org/repos/quarl/trunk/bin]
+    * Add configuration options to set the location of various helper
+      programs (the newly distributed ones as well as ImageMagick,
+      Mplayer, Transcode). 
+      
+2005-12-05  Karl Chen  <quarl@quarl.org>
+    * By default prefer ImageMagick to PIL (set USE_PIL=True to change).
+    * PIL support: enable anti-aliasing and set JPEG quality 90.  TODO:
+      adaptively set the JPEG quality based on input quality, the way
+      ImageMagick does.
+    * Fixed bug where comments were read and saved from 'name.comment'
+      instead of 'name.jpg.comment'.  (Not really a bug, but inconsistent
+      with the documentation; 'name.comment' behavior was accidentally
+      introduced with the drop of extensions in URLs.)  Bug reported by
+      Grant Brown <grant@marstechnologies.com>.
+
+2005-12-04  Karl Chen  <quarl@quarl.org>
+    * Added convert_descript_ion script for converting from 4DOS/ACDSee
+      descript.ion files
+
+2005-12-01  Karl Chen  <quarl@quarl.org>
+    * Allow non-lowercase extensions for *.jpeg, etc.
+
+2005-11-29  Karl Chen  <quarl@quarl.org>
+    * Add helpful message when invoking quickypix.py on command-line
+    * Reorganized some config setup
+    * Now compatible with python2.2
+      
+2005-11-28  Karl Chen  <quarl@quarl.org>
+    * Installation documentation additions; README for src/html
+
 2005-11-02  Karl Chen  <quarl@quarl.org>
-    * Release v1.2.2.
+    * Release v1.2.2
 
     * Use PRAT [http://www.quarl.org/projects/prat/]
 

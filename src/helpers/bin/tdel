@@ -1,0 +1,162 @@
+#!/usr/bin/env python
+
+# $Id: tdel 246 2005-12-06 04:28:01Z quarl $
+# tdel - <b>move files to .TRASH/</b>
+
+# Copyright (C) 2002-2005 Karl Chen <quarl@nospam.quarl.org>
+
+# quarl 2002       initial version
+# quarl 2003-12    improvements
+# quarl 2004       improvements
+# quarl 2004-12-28 changed to using .TRASH
+
+import sys, os, getopt
+
+trash = '.TRASH'
+trash_fallback = '_TO_DELETE'
+
+class Options: pass
+options = Options
+
+options.quiet = 0
+options.tdel_in_dir = 1
+options.rename_first_poss = 0
+
+def syntax(msg=None):
+    if msg: print msg
+    print """
+Syntax: %s [-c | -d] files...
+
+Moves files to .TRASH/.  Use in conjunction with cron deljunk for maximum
+effect.  If _TO_DELETE is found, move it to .TRASH first.
+
+   -q             Quiet
+   -c             TDelete files from current directory
+   -d   [default] TDelete files from each file's directory
+
+""" % (sys.argv[0])
+    raise SystemExit
+
+errors = 0
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], 'cdq')
+except getopt.GetoptError,e:
+    syntax(e)
+for opt,v in opts:
+    if opt == '-c':
+        options.tdel_in_dir = 0
+    elif opt == '-d':
+        options.tdel_in_dir = 1
+    elif opt == '-q':
+        options.quiet = 1
+    else:
+        raise SystemExit('internal error: unknown option %s'%opt)
+if not args: syntax()
+
+# delete current directory? (must be single argument)
+if args == ['.']:
+    print >>sys.stderr, "TDeleting current directory; manually `cd ..'"
+    args = [os.path.split(os.getcwd())[1]]
+    os.chdir(os.pardir)
+
+def xexists(path):
+    return os.path.exists(path) or os.path.islink(path)
+
+def rename(file, try_target_base, try_target_rest):
+    try_target = os.path.join(try_target_base, *try_target_rest)
+    if not options.quiet:
+        print file.rjust(maxlen) + ' -> ' + try_target
+    try:
+        if try_target_rest:
+            b = try_target_base
+            for dir in try_target_rest[0].split(os.sep):
+                os.mkdir(b)
+                b = os.path.join(b, dir)
+        os.rename(file, try_target)
+    except OSError, s:
+        print >>sys.stderr, '    ', s
+        global errors
+        errors += 1
+
+def ensure_trash_exists():
+    if os.path.isdir(trash):
+        return
+
+    if os.path.isdir(trash_fallback):
+        os.rename(trash_fallback, trash)
+    else:
+        os.mkdir(trash)
+        # Set mode of new _TO_DELETE to same as parent.  This is important in
+        # directories like /tmp that are set rwxrwxrwt. (Note: os.chmod is not
+        # the same what we would get by passing a mode= parameter in os.mkdir)
+        os.chmod(trash, os.stat('.')[0])
+
+def change_prefix_slash_to_underscore(path):
+    if path.startswith(os.sep): return '_' + path[1:]
+    return path
+
+def get_file_num_if_match(tfile, file):
+    """
+    If tfile == file, return 0
+    If tfile == 'file.###', return ###
+    Else return -1
+    """
+    if tfile == file: return 0
+    if tfile.startswith(file+'.'):
+        try:
+            return int(tfile[len(file)+1:])
+        except:
+            return -1
+    return -1
+
+def tdel(msg_pfx, file):
+    '''Move `file` to _TO_DELETE (under current directory)'''
+    # normpath removes extra "./", trailing slashes, etc.
+    file = os.path.normpath(file)
+    if not xexists(file):
+        print >> sys.stderr, msg_pfx, "%s: not found" %file
+        return
+    if not options.quiet:
+        print msg_pfx,
+    if not file: return
+    target_file = change_prefix_slash_to_underscore(file)
+    fsplit = target_file.split(os.sep, 1)
+    # note: can't do direct tuple assignment because fsplit might only have
+    # one element
+    file_base, file_rest = fsplit[0], fsplit[1:]
+    target_base = os.path.join(trash, file_base)
+    ensure_trash_exists()
+    if options.rename_first_poss:
+        try_target_base = target_base
+        try_number = 0
+        while xexists(try_target_base):
+            try_number += 1
+            try_target_base = '%s.%d' % (target_base, try_number)
+    else:
+        maxnum = -1
+        for trashfile in os.listdir(trash):
+            maxnum = max(maxnum, get_file_num_if_match(trashfile, file_base))
+        if maxnum == -1:
+            try_target_base = target_base
+        else:
+            try_target_base = "%s.%d" % (target_base, (maxnum+1))
+    rename(file, try_target_base, file_rest)
+
+if options.tdel_in_dir:
+    # tdel files from their directories
+    orig_dir = os.getcwd()
+    maxlen = max(map(lambda p: len(os.path.split(p)[1]), args))
+    maxlen_dir = max(map(lambda p: len(os.path.split(p)[0]), args))
+    for path in args:
+        path = os.path.normpath(path)
+        dir, file = os.path.split(path)
+        os.chdir(os.path.join(orig_dir, dir))
+        tdel('tdel: %s:' %(dir.ljust(maxlen_dir)), file)
+else:
+    # tdel files from current directory
+    maxlen = max( map(len, args) )
+    for path in args:
+        tdel('tdel:', path)
+
+raise SystemExit(errors)

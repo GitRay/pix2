@@ -31,6 +31,34 @@ you want</li>
 </ul>
 </li>
 </ul>
+<div class="section" id="configuration">
+<h1><a name="configuration">Configuration</a></h1>
+<p>Edit <tt class="docutils literal"><span class="pre">config.py</span></tt>, setting at least these settings:</p>
+<pre class="literal-block">
+# Directory tree containing pictures
+ALBUMS_DIR = '/path/to/pictures'
+
+# Directory to write cache files, must be writable by Apache CGI/SCGI user
+CACHE_DIR = '/path/to/cache'
+
+# File to write log data, must be writable by Apache CGI/SCGI user
+#   One way to do this as root: 
+#      touch /var/log/quickypix.log; chown www-data /var/log/quickypix.log
+LOG_PATH = '/path/to/logfile'
+
+# An example is in html/template.html
+TEMPLATES_FILE = '/path/to/template.html'
+
+# An example is in html/style.css
+STYLE_FILE = '/path/to/style.css'
+</pre>
+<p>If you use admin mode, you need to set:</p>
+<pre class="literal-block">
+EDIT_ROOT = 'https://private.photo.site.example.com/'
+
+PUBLIC_ROOT = 'http://public.photo.site.example.com/'
+</pre>
+</div>
 <div class="section" id="cgi">
 <h1><a name="cgi">CGI</a></h1>
 <div class="section" id="apache-cgi-sample-configuration">
@@ -42,6 +70,7 @@ you want</li>
     Allow from all
 &lt;/Directory&gt;
 
+# Note: the trailing slash after quickypix.py is significant!
 ScriptAlias / /home/quarl/proj/quickypix/src/quickypix/quickypix.py/
 </pre>
 </div>
@@ -124,11 +153,13 @@ root = '/photos'
 </tr>
 </tbody>
 </table>
+<p>The included script <tt class="docutils literal"><span class="pre">convert_descript_ion</span></tt> converts 4DOS/ACDSee
+<tt class="docutils literal"><span class="pre">descript.ion</span></tt> files to QuickyPix comment format.</p>
 </div>
 <div class="section" id="dependencies">
 <h1><a name="dependencies">Dependencies</a></h1>
 <ul class="simple">
-<li>Python2.3</li>
+<li>Python2.2+</li>
 <li>PIL and/or ImageMagick (optional)<ul>
 <li>QuickyPix uses PIL or ImageMagick (convert, identify) to get image
 information and resize images</li>
@@ -150,7 +181,7 @@ information and resize images</li>
 <div class="footer">
 <hr class="footer" />
 <p>Karl Chen &lt;<a id="email" href="mailto:&#113;&#117;&#097;&#114;&#108;&#064;&#110;&#111;&#115;&#112;&#097;&#109;&#046;&#113;&#117;&#097;&#114;&#108;&#046;&#111;&#114;&#103;">&#113;&#117;&#097;&#114;&#108;<img src="" alt="&#064;" border="0"/>&#113;&#117;&#097;&#114;&#108;&#046;&#111;&#114;&#103;</a>&gt;<script type="text/javascript">addr = "q"+"u"+"a"+"r"+"l"+"@"+"q"+"u"+"a"+"r"+"l"+"."+"o"+"r"+"g";document.getElementById('email').innerHTML=addr;document.getElementById('email').href="mailto:"+addr;</script></p>
-<p>Last modified 2005-10-21.</p>
+<p>Last modified 2005-12-05.</p>
 
 </div>
 </body>

@@ -20,6 +20,35 @@ QuickyPix has three modes:
     - You can set up whatever authentication and/or encryption (e.g. SSL)
       you want
 
+Configuration
+-------------
+
+Edit ``config.py``, setting at least these settings::
+
+    # Directory tree containing pictures
+    ALBUMS_DIR = '/path/to/pictures'
+
+    # Directory to write cache files, must be writable by Apache CGI/SCGI user
+    CACHE_DIR = '/path/to/cache'
+
+    # File to write log data, must be writable by Apache CGI/SCGI user
+    #   One way to do this as root: 
+    #      touch /var/log/quickypix.log; chown www-data /var/log/quickypix.log
+    LOG_PATH = '/path/to/logfile'
+
+    # An example is in html/template.html
+    TEMPLATES_FILE = '/path/to/template.html'
+
+    # An example is in html/style.css
+    STYLE_FILE = '/path/to/style.css'
+
+If you use admin mode, you need to set::
+
+    EDIT_ROOT = 'https://private.photo.site.example.com/'
+
+    PUBLIC_ROOT = 'http://public.photo.site.example.com/'
+
+
 CGI
 ---
 
@@ -33,6 +62,7 @@ Apache CGI sample configuration
         Allow from all
     </Directory>
 
+    # Note: the trailing slash after quickypix.py is significant!
     ScriptAlias / /home/quarl/proj/quickypix/src/quickypix/quickypix.py/
 
 
@@ -109,11 +139,14 @@ You can edit these manually, or through the web interface.
     * - ``album/pic.comment``
       - picture comment
 
+The included script ``convert_descript_ion`` converts 4DOS/ACDSee
+``descript.ion`` files to QuickyPix comment format.
+
 
 Dependencies
 ------------
 
-- Python2.3
+- Python2.2+
 
 - PIL and/or ImageMagick (optional)
 
@@ -129,6 +162,7 @@ Dependencies
 - Transcode (optional)
 
   - QuickyPix uses tcprobe for getting movie information
+
 
 .. SCGI_: http://www.mems-exchange.org/software/scgi/
 

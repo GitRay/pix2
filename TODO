@@ -2,7 +2,8 @@
 general
 -------
 
-- ?admin=0 doesn't work - cookie problem?
+- better error reporting, e.g. explain to stderr when can't write to cache dir
+  or log file
 
 - .deb
 
@@ -15,3 +16,5 @@ SCGI daemon
 
 
 
+
+- send stderr of external programs through Exception, on error.  use backported subprocess.py.

@@ -1,4 +1,4 @@
-# $Id: image_im.py 180 2005-10-15 22:25:14Z quarl $
+# $Id: image_im.py 258 2005-12-07 21:06:57Z quarl $
 
 # Support for image operations using ImageMagick, when PIL is not available
 # (and for things PIL can't handle).
@@ -26,10 +26,15 @@
 import os
 import re
 import commands
+import config
 
 def resize(fpath, resized_fpath, (new_width, new_height), movie):
-    cmd = ['convert', '-thumbnail', '%dx%d' %(new_width, new_height)]
-    # print >>open('/tmp/pix.log','a'), cmd
+    if config.USE_IMAGEMAGICK_THUMBNAIL_OPTION:
+        param = '-thumbnail'
+    else:
+        param = '-resize'
+    cmd = [ config.PATH_CONVERT, param, '%dx%d' %(new_width, new_height)]
+
     # if it was originally a movie, then add a label saying so
     if movie:
         if new_width > 80:
@@ -46,7 +51,7 @@ def resize(fpath, resized_fpath, (new_width, new_height), movie):
         raise "Couldn't resize picture"
 
 def get_size(fpath):
-    cmd = 'identify' + commands.mkarg(fpath)
+    cmd = config.PATH_IDENTIFY + commands.mkarg(fpath)
     m = re.search(' (?:PNG|JPEG|GIF) ([0-9]+)x([0-9]+) ', commands.getoutput(cmd))
     if m:
         return int(m.group(1)), int(m.group(2))

@@ -1,4 +1,4 @@
-# $Id: image_pil.py 180 2005-10-15 22:25:14Z quarl $
+# $Id: image_pil.py 244 2005-12-05 10:39:30Z quarl $
 
 # Support for image operations using PIL.
 
@@ -30,10 +30,12 @@ def resize(fpath, resized_fpath, (new_width, new_height), movie):
         import image_im
         return image_im.resize(fpath, resized_fpath, (new_width, new_height), movie)
 
-    # TODO add "movie" text with ImageDraw.text()
+    # TODO: add "movie" text with ImageDraw.text()
     originalImage = Image.open(fpath)
-    newImage = originalImage.resize((new_width, new_height))
-    newImage.save(resized_fpath)
+    newImage = originalImage.resize((new_width, new_height), Image.ANTIALIAS)
+    # TODO: adaptively use the input image's JPEG quality, like ImageMagick
+    # does.  otherwise at least use a configuration parameter.
+    newImage.save(resized_fpath, quality=90)
 
 def get_size(fpath):
     image = Image.open(fpath)
