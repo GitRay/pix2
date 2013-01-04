@@ -1,0 +1,123 @@
+<!-- $Id: template.html 2 2005-09-27 23:34:40Z quarl $ -->
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>QuickyPix
+    </title>
+  </head>
+
+  <body>
+
+    <h1>QuickyPix</h1>
+
+    <p>
+      <b>QuickyPix</b> is an instant thumbnail web photo gallery software in
+      Python.
+    </p>
+
+    <h3>Yet ANOTHER photo gallery system?</h3>
+    <p>
+      I've used a bunch of photo galleries and before QuickyPix was
+      using <a href="http://gallery.menalto.com">Gallery</a> (which I
+      recommend if you just want a kitchen sink that you can control through a
+      browser).  I researched looking for something that fit my needs exactly
+      but found none.  Demian Neidetcher, the author of Pix correctly noticed
+      that everyone wants to customize their photo gallery.  Pix is a great
+      base for writing the gallery system of your dreams.  So I forked it and
+      created my own.  Eventually I added enough things that I wanted to call
+      it something other than "Pix with quarl's additions", but I still wanted
+      to credit Pix.  If you want to create your own custom one you might
+      start with QuickyPix, or start with Pix and cherry-pick some features
+      from QuickyPix.  This project stealthily only had a Subversion
+      repository until I started getting patches and feedback for it.
+    </p>
+
+    <h3>Download</h3>
+    <pre>
+      <a href="http://subversion.tigris.org/">svn</a> co <a href="http://svn.quarl.org/repos/quickypix/trunk/quickypix/">http://svn.quarl.org/repos/quickypix/trunk/quickypix/</a>
+    </pre>
+
+    <h3>Screenshot</h3>
+    <img alt="[Screenshot of QuickyPix in a browser]" src="quickypix-screenshot.png"/>
+
+    <h3>Demo</h3>
+    My personal photo website is <a href="http://photo.quarl.org/">photo.quarl.org</a>.
+
+    <h3>Features</h3>
+    <ul>
+
+      <li>Thumbnails
+        <ul>
+          <li>Album highlight with outset border.</li>
+          <li>Movie thumbnails, with distinctive "movie" label.</li>
+        </ul>
+      </li>
+
+      <li>"Instant-on"
+        <ul>
+          <li>No import needed</li>
+          <li>Cached on-demand image resizing</li>
+        </ul>
+      </li>
+
+      <li>Meaningful URLs
+        <ul>
+          <li>Web hierarchy reflects file system hierarchy</li>
+          <li>Add pictures simply by copying to the photo directory</li>
+        </ul>
+      </li>
+
+      <li>The photo tree is untouched (except when editing metadata)
+        <ul>
+          <li>Cache data goes in a separate tree /var/cache/pix.</li>
+          <li>Thus, you can easily backup the entire photo tree</li>
+        </ul>
+      </li>
+
+      <li>Supported formats: jpg, png, gif, etc.; avi, mpg</li>
+
+      <li>Picture info
+        <ul>
+          <li>Image dimensions, picture-taken timestamp, movie length, codec, etc.</li>
+        </ul>
+      </li>
+
+      <li>Metadata: album title, album comment, picture comment, album highlight</li>
+
+      <li>Admin mode
+        <ul>
+          <li>Resizing, deleting, editing captions, changing highlight</li>
+        </ul>
+      </li>
+
+      <li>Template engine using XHTML and CSS
+        <ul>
+          <li>Fluid-yet-aligned thumbnail arrangement (no tables)</li>
+          <li>Validated XHTML 1.0 Strict, CSS</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3>License</h3>
+    <p>
+      QuickyPix is licensed under the <a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>.
+    </p>
+
+
+    <hr/>
+    <address>
+      Karl Chen &lt;<a id="email" href="mailto:&#113;&#117;&#097;&#114;&#108;&#064;&#110;&#111;&#115;&#112;&#097;&#109;&#046;&#113;&#117;&#097;&#114;&#108;&#046;&#111;&#114;&#103;">&#113;&#117;&#097;&#114;&#108;<img src="" alt="&#064;" border="0"/>&#113;&#117;&#097;&#114;&#108;&#046;&#111;&#114;&#103;</a>&gt;
+
+      2005-09-27
+    </address>
+
+    <script type="text/javascript">
+      addr = "q"+"u"+"a"+"r"+"l"+"@"+"q"+"u"+"a"+"r"+"l"+"."+"o"+"r"+"g";
+      document.getElementById('email').innerHTML=addr;
+      document.getElementById('email').href="mailto:"+addr;
+    </script>
+
+  </body>
+
+</html>

@@ -1,0 +1,60 @@
+<!-- -- $Id: template.html 116 2005-09-27 23:30:59Z quarl $ -- -->
+<!-- -- This kind of comment gets deleted by QuickyPix -- -->
+
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <meta name="generator" content="QuickyPix" />
+    <title>@title@</title>
+    <style type="text/css">@import url(@root@/style.css);</style>
+  </head>
+  <body class="@bodyclass@">
+    @login@
+    <h1>@breadcrumb@</h1>
+    <div class="comment">@comment@</div>
+    <table>
+      <!-- @BEGINPIC@ -->
+      <tr>
+        <!-- --
+             This rowspan trick allows us to put .pic earlier in the file even
+             though it's to the right of .nav.  Floating works in Moz but not
+             IE.
+             -- -->
+        <td class="filler"></td>
+        <td rowspan="2" width="1%">
+          <div class="pic">
+            @pic@
+            @pic-info@
+            @pic-comment@
+            @pic-dl@
+          </div>
+        </td>
+      </tr>
+      <!-- @ENDPIC@ -->
+      <tr>
+        <td class="nav">
+          <div class="dummy"></div>
+          <div class="albums">
+	    @albums@
+          </div>
+          <div class="pictures">
+	    @pics@
+          </div>
+        </td>
+      </tr>
+    </table>
+    @endlogin@
+
+    <div class="footer">
+      <a href="http://www.quarl.org/">Karl Chen</a> &lt;<a id="email" href="mailto:&#113;&#117;&#097;&#114;&#108;&#064;&#110;&#111;&#115;&#112;&#097;&#109;&#046;&#113;&#117;&#097;&#114;&#108;&#046;&#111;&#114;&#103;">&#113;&#117;&#097;&#114;&#108;<img src="" alt="&#064;" border="0"/>&#113;&#117;&#097;&#114;&#108;&#046;&#111;&#114;&#103;</a>&gt;
+
+      <script type="text/javascript">
+        addr = "q"+"u"+"a"+"r"+"l"+"@"+"q"+"u"+"a"+"r"+"l"+"."+"o"+"r"+"g";
+        document.getElementById('email').innerHTML=addr;
+        document.getElementById('email').href="mailto:"+addr;
+      </script>
+    </div>
+  </body>
+</html>

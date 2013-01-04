@@ -1,165 +1,110 @@
-*** summary
-pix is a minimalist gallery system.  less than 400 lines of code allow you to
-organize all your photos, we traverse a directory structure and as-needed
-generate thumb-nails and web optimized versions of your images.  thru a simple
-'.meta' file in each directory you can assign comments to each image.
+-*-text-*-
+;; $Id: README 117 2005-09-28 02:52:07Z quarl $
 
-pix doesn't try to do what other programs do well.  in true unix style pix
-does one thing and does it well in a very transparent manner. 
-- no image cropping or rotating; irfanview, gimp, etc.. all do a better job and 
-  are more flexible.
-- no album management; the filesystem is a familiar and intuitive way 
-  to manage your images.
-- no uploads; if you have an account on a box and are running cgi/ php scripts,
-  you should have a firm grasp on ftp or scp.
+QuickyPix
+=========
 
+v1.1 2005-09-26
 
-*** install instructions
-- make sure python image library is installed
-  on debian you can do: apt-get install python-imaging
-  or find PIL and extract it in the same directory as pix
-- create a directory pix/album
-- chmod -R 777 pix/album
+Copyright (C) 2005 Karl Chen <quarl@quarl.org>.
+Copyright (C) 2005 Demian Neidetcher.
 
+QuickyPix is an instant thumbnail photo gallery system in Python.
 
-*** album setup and guidelines
-- your directory structure will dictate the hierarhcy for albums and picture
-  placement
-- to hide a picture rename it with .<picture name> just like you'd hide
-  a file in unix
-- use underscores in album names and picture names
-  for example: 'new_years_eve_2004'
-  or: 'demian_posing_with_elvis.jpg'
+Why another one?  It's the same old story - I wanted a photo gallery exactly
+the way I wanted it.  The best one I found was "Pix" by Demian Neidetcher
+<http://pix.sf.net>, so I wrote one based on Pix, with the exact set of
+features I wanted.  I owe Demian Neidetcher a lot for a great do-it-yourself
+framework.
 
+Demo: http://photo.quarl.org/
 
-*** anatomy of a .meta file
-  - in each directory optionally create a .meta file, the format for the 
-    picture comments are
-    <pic file name> = <comment>
-  - it's not necessary to have every file in there.  in vim do: ':r!ls' to get a
-    complete listing of the files in this directory.  then just slap a 
-    '= <comment>' on each line you want to provide a comment.
-  - the comment for a picture can only be on 1 line!
-  - to add a description for the current album create 2 lines at the top,
-    literally <album description> and </album description>.  between these
-    lines put the description.
-  - to control the thumbnail order, add a '=' after the file name wether or
-    not the picture has a comment associated with it and put them in the
-    order you want in the .meta file.
-    pictures with no '=' and pictures not in the .meta file will be put at
-    the end of the thumbnails in no particular order.
-  - here is a sample .meta file (in between the snip tags!)
-    so in the example below demian_and_leo.jpg would go first, then 
-    dawn_demian_bobbi.jpg and lastly mom.jpg.  mom.jpg would go last since
-    it has no '='
-<snip>
-<album description>
-here are some pictures of my family.  these
-were taken at family reunions and stuff.
-</album description>
-demian_and_leo.jpg = this is me and my cousin leo
-mom.jpg
-dawn_demian_bobbi.jpg =
-</snip>
+Features
+--------
 
+* Thumbnails
+    * Album highlight with outset border.
+    * Movie thumbnails, with distinctive "movie" label.
 
-*** style sheets
-- some extra style sheets are in pix/extra_styles.  the easiest way to use them
-  is to just "cp pix/extra_styles/red_pill.css pix/style.css".
+* "Instant-on"
+    * No import needed
+    * Cached on-demand image resizing
 
-*** anatomy of the template file
-the template file is 'pix/template.html' it's just a simple html document,  
-you can pretty much do with it what you want, you place the tokens for the 
-generated elements into your html.
-- @title@
- shows you the current directory with a pipe in front of it (the assumption
- is that you will have a string before the pipe, like the name of your site
-- @breadcrumb@
- a pipe "|" delimited string that shows you where you are at in the directory
- hierarchy inside the albums.  it gives you links to go to what ever level
- you want
-- @albums@
- if there are no sub-directories in the current directory this returns an
- empty string.
- if there are sub-directories this gives you the string '<h2>albums</h1>'
- followed by an unordered list of albums.
-- @pics@
- this returns thumbnail images of all the pictures in the current directory.
- the thumbnails dictate what the web sized pic will be
-- @album-description@
- if there is no currently selected web-pic we print the album description, 
- this is found in the '.meta' file.  all lines between the "album
- description" tags will be displayed as the album description.
-- @web-pic@
- when the user selects a thumbnail or picture from the list, the web pic is
- displayed.  the web pic is resized for typical web viewing.  if the user
- wants to see the original image (assuming it's larger than the web-pic)
- they can click on the web version to be directed to the actual original.
-- @comment@
- this is where the comment (if any) associated with the picture is placed.
+* Meaningful URLs
+    * Web hierarchy reflects file system hierarchy
+    * Add pictures simply by copying to the photo directory
+
+* The photo tree is untouched (except when editing metadata)
+    * Cache data goes in a separate tree /var/cache/pix.
+    * Thus, you can easily backup the entire photo tree
+
+* Supported formats: jpg, png, gif, etc.; avi, mpg
+
+* Picture info
+    * Image dimensions, picture-taken timestamp, movie length, codec, etc.
+
+* Metadata: album title, album comment, picture comment, album highlight
+
+* Admin mode
+    * Resizing, deleting, editing captions, changing highlight
+
+* Template engine using XHTML and CSS
+    * Fluid-yet-aligned thumbnail arrangement (no tables)
+    * Validated XHTML 1.0 Strict, CSS
+
+Usage
+-----
+
+Example setup with apache:
+
+    <Directory /home/quarl/proj/quickypix>
+        Options ExecCGI
+        Order allow,deny
+        Allow from all
+    </Directory>
+
+    ScriptAlias / /home/quarl/proj/quickypix/src/quickypix/quickypix.py/
 
 
-*** administration
-- to delete the cache recursively from your current album append this
-  to the url '&admin=clean'.  for example:
-  http://localhost/~demian/pix/?album=/demian&admin=clean
-  this deletes every thumbnail and web-image recursively from the 
-  demian album on down.
+ADMIN MODE: only adds a link to edit mode.
+
+  - Authentication: none.
+  - To enter admin mode: append ?admin=1 to URL.  This will set a cookie.
+
+EDIT MODE: allows editing album comment, album name, pic comment; rename pic;
+delete pic (with tdel).
+
+  - Authentication: apache. I.e., authenticated if REMOTE_USER is set.
+        - You can set up whatever authentication and/or encryption (e.g. SSL)
+          you want
 
 
-*** trouble shooting
-- are there files in the album directory that are not images?
-- is the permission of the album directory 777?
-- if [Errno 13] Permission denied
-  pix (running under the web-server) needs to be able to write to all the 
-  directories so that it can create thumbnails.  you can "chmod -R 777 ./album".
+Metadata files:
+    album/.title      - album title
+    album/.comment    - album comment
+    album/.highlight  - highlighted picture (for album icon)
+    album/pic.comment - pic comment
+
+Dependencies:
+- ImageMagick (convert, identify) for getting image information, resizing
+  images, rotating images, adding "movie" label
+- MPlayer (mencoder) for rotating movies, making thumbnails
+- Transcode (tcprobe) for getting movie information
 
 
-*** change log
-- 1.3.1 from 1.3.0
-  - fixed a long time 'double slash' problem that actually caused trouble under
-    aplus.net hosting services, dunno if it's a freebsd thing or what.
 
-- 1.3.0 from 1.2.2
-  - removed reference to the defunct Video object
-  - added support for ImageMagick, flip global switch in Pic.py to toggle
-    between PIL and ImageMagick.  Note that my implementation seems to have
-    trouble with image file names that have spaces in them, underscores are
-    preferred.
+License: GPL
+------------
 
+QuickyPix is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
 
-- 1.2.2 from 1.2.1
-  - add an 'r' link that gives access to the README file, not sure about that
-    one.
-  - add an 'm' link that brings up the .meta file for the current directory.
-    only displayed when there is a .meta file for the current directory.
-  - add a 'polaroid' style sheet
-  - add a set of controls so you can navigate within your current album, we give
-    a first, previous, next and last button.  
+QuickyPix is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-
-- 1.2.1 from 1.2.0
-  - improved the processing performance, i was doing a ton of 
-    un-necessary processing for each line wether or not it was needed.
-  - pictures can now be ordered in the .meta file.  pictures with no '=' 
-    after them or pictures not included in the .meta file will be 
-    forgivingly dumped at the end of the sorted thumbnails.
-  - nicely handle non-image files in albums; they're just ignored.
-
-- 1.2.0 from 1.1.3
-stole lots of great stuff form the quickypix project (http://quarl.org)
-  - minor defect fixes
-  - 'alt' text for thumbnail images so when users mouse-over they
-    can see the name of the picture.  
-  - 'alt' text for the web image to hint users to the fact that they
-    can click on it to see the original image.
-  - an all-encompassing except so that you never get a white screen
-    and the user can see the raised exception.
-  - the selected thumbnail will have a style sheet id so that it's 
-    presentation can be altered, in my style sheet i change the border
-    color to red instead of black.
-  - add an admin function to clean by appending &admin=clean to the url
-  - removed the 'list' form of displaying the pictures, the thumbnails
-    are much more useful and it simplifies the code
-  - display the numbers of sub-albums and pictures in the current album
-  - included a handful of optional style sheets that are easy to use
+You should have received a copy of the GNU General Public License along with
+QuickyPix; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place, Suite 330, Boston, MA 02111-1307 USA

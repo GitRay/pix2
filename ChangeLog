@@ -1,0 +1,62 @@
+2005-09-xx  Karl Chen  <quarl@quarl.org>
+	Release version 1.1
+
+2005-09-27  Karl Chen  <quarl@quarl.org>
+	Directory structure reorg
+
+2005-09-26  Hollis Blanchard <hollis@penguinppc.org>
+	Ensure that the default settings (title, highlight) are used, even
+	if the filesystem isn't writable.
+
+2005-09-18  Karl Chen <quarl@quarl.org>
+
+	Remove extensions from URLs.  Canonicalize extensionless URLs.
+	Photos must be unambiguous without extension.
+
+2005-06-09  Karl Chen <quarl@quarl.org> 
+	Use 'fullsize' instead of 'original'
+	
+	Add download button (appears only in admin mode) and implement
+	download using content-disposition filename
+
+2005-06-07  Karl Chen <quarl@quarl.org>
+	Don't die on permission errors
+	
+2005-02-21  Karl Chen <quarl@quarl.org>
+	Renamed pix -> quickypix
+
+	Use exif.py, imagemagick, instead of PIL
+
+2005-02-06  Karl Chen <quarl@quarl.org> 
+	* style.css: Add explicit album thumbnail height/width
+	  in case of weird-aspect photos.
+
+	* Album.py: fixed bug with missing highlight
+
+2005-01-15  Karl Chen <quarl@quarl.org>
+	Restructuring/refactoring; moved stuff to image_util.py
+	Support MPEGs
+
+	Movie rotation, resizing, labeling - everything working!
+
+2005-01-15  Karl Chen <quarl@quarl.org> 
+	Get movie info
+
+	Video rotating; use mplayer for video->image conversion also.
+
+	Implemented rotation
+
+	Implemented deletion
+	
+	Edit mode, quick edit buttons, better caching.
+
+2005-01-13  Karl Chen <quarl@quarl.org> 
+	template: Get rid of tables; use floating div for
+	@pic@. Now we can put it before the nav pics so that the browser
+	loads it first.
+
+2005-01-12  Karl Chen <quarl@quarl.org>
+	Totally cool rewrite.
+
+2005-01-13  Karl Chen <quarl@quarl.org>
+	initial import from pix.sf.net
