@@ -1,137 +1,142 @@
 #!/usr/bin/python
 
-import sys, os, string
+import sys, os, string, urllib
 
 from Pic import Pic
+import Setup
 
 class Album:
 
-	def __init__(self, albumDir, recurse = 1):
-		self.albumDir = albumDir
+  def __init__(self, albumDir, recurse = 1):
+    self.albumDir = albumDir
+    
+    self.albums = []
+    self.pics   = []
+    
+    if not recurse:
+      return
 
-		self.albums = []
-		self.pics   = []
-
-		if not recurse:
-			return
-
-		for entry in os.listdir(albumDir):
-			if (entry[0] != '.'):
-				pathAndEntry = '%s%s%s' % (albumDir, os.sep, entry)
-				if os.path.isdir(pathAndEntry):
-					self.albums.append(Album(pathAndEntry, 0))
-				elif os.path.isfile(pathAndEntry):
-					try:
-						self.pics.append(Pic(pathAndEntry))
-					except: 
-						print '<!-- not a picture: %s -->' % (pathAndEntry)
-
-
-	def getAlbums(self):
-		return self.albums
+    for entry in os.listdir(albumDir):
+      if (entry[0] != '.'):
+        # skip files that start with a dot
+        #pathAndEntry = '%s%s%s' % (albumDir, os.sep, entry)
+        pathAndEntry = os.path.join(albumDir,entry)
+        if os.path.isdir(pathAndEntry):
+          self.albums.append(Album(pathAndEntry, False))
+        elif os.path.isfile(pathAndEntry):
+          try:
+            self.pics.append(Pic(pathAndEntry))
+          except: 
+            print '<!-- not a picture: %s -->' % (pathAndEntry)
 
 
-	def getNumPics(self):
-		return len(self.pics)
+  def getAlbums(self):
+    return self.albums
 
 
-	def getFirstPic(self):
-		return self.getPics()[0].getFileName()
+  def getNumPics(self):
+    return len(self.pics)
 
 
-	def getLastPic(self):
-		return self.getPics()[-1].getFileName()
+  def getFirstPic(self):
+    return self.getPics()[0].getFileName()
 
 
-	def getPreviousPic(self, picName):
-		return self.getPics()[self.findIndex(picName) - 1].getFileName()
+  def getLastPic(self):
+    return self.getPics()[-1].getFileName()
 
 
-	def getNextPic(self, picName):
-		if (picName == ''):
-			nextIndex = 0
-		else:
-			nextIndex = self.findIndex(picName) + 1
-			if (nextIndex >= len(self.getPics())):
-				nextIndex = 0
-
-		return self.getPics()[nextIndex].getFileName()
-
-	
-	def findIndex(self, picName):
-		currNum = 0
-		for pic in self.getPics():
-			if (picName == pic.getFileName()):
-				return currNum
-			currNum = currNum + 1
-		return 0
+  def getPreviousPic(self, picName):
+    return self.getPics()[self.findIndex(picName) - 1].getFileName()
 
 
-	def getPics(self):
-		try:
-			metaFile = open('%s%s.meta' % (self.albumDir, os.sep))
-		except:
-			return self.pics
+  def getNextPic(self, picName):
+    if (picName == ''):
+      nextIndex = 0
+    else:
+      nextIndex = self.findIndex(picName) + 1
+      if (nextIndex >= len(self.getPics())):
+        nextIndex = 0
 
-		copyOfPics = []
-		copyOfPics = copyOfPics + self.pics
+    return self.getPics()[nextIndex].getFileName()
 
-		displayPics = []
-		for metaLine in metaFile:
-			if string.find(metaLine, '=') != -1:
-				splitMetaLine = string.split(metaLine, '=')
-				currMetaImage = string.strip(splitMetaLine[0])
-				for currPic in copyOfPics:
-					if (currMetaImage == currPic.getFileName()):
-						displayPics.append(currPic)
-						copyOfPics.remove( currPic)
-
-		# we got the ordered ones, now get the rest
-		displayPics.extend(copyOfPics)
-		return displayPics
+  
+  def findIndex(self, picName):
+    currNum = 0
+    for pic in self.getPics():
+      if (picName == pic.getFileName()):
+        return currNum
+      currNum = currNum + 1
+    return 0
 
 
-	def getName(self):
-		sepLoc = string.rfind(self.albumDir, os.sep) + 1
-		return string.replace(self.albumDir[sepLoc:], '_', ' ')
+  def getPics(self):
+    try:
+      metaFile = open('%s%s.meta' % (self.albumDir, os.sep))
+    except:
+      return self.pics
+
+    copyOfPics = []
+    copyOfPics = copyOfPics + self.pics
+
+    displayPics = []
+    for metaLine in metaFile:
+      if string.find(metaLine, '=') != -1:
+        splitMetaLine = string.split(metaLine, '=')
+        currMetaImage = string.strip(splitMetaLine[0])
+        for currPic in copyOfPics:
+          if (currMetaImage == currPic.getFileName()):
+            displayPics.append(currPic)
+            copyOfPics.remove( currPic)
+
+    # we got the ordered ones, now get the rest
+    displayPics.extend(copyOfPics)
+    return displayPics
 
 
-	def getLinkPath(self):
-		fullPath = self.albumDir
-		loc = string.find(fullPath, os.sep) + 1
-		return fullPath[loc:]
+  def getName(self):
+    [head,tail] = os.path.split(self.albumDir)
+    return tail
 
 
-	def getBreadCrumb(self):
-		linkPath = self.getLinkPath()
-		breadCrumb   = ''
-		runningCrumb = ''
+  def getLinkPath(self):
+    #path should be relative to pics directory
+    path = os.path.relpath(self.albumDir, Setup.albumLoc)
+    
+    return path
 
-		if linkPath != '':
-			for crumb in string.split(linkPath, os.sep):
-				runningCrumb = '%s%s%s' % (runningCrumb, os.sep, crumb)
-				displayCrumb = string.replace(crumb, '_', ' ')
-				breadCrumb = '%s | <a href="?album=%s">%s</a>' % (
-					breadCrumb, 
-					runningCrumb[1:],
-					displayCrumb)
 
-		return breadCrumb[3:]
+  def getBreadCrumb(self):
+    linkPath = self.getLinkPath()
+    breadCrumb   = []
+    runningCrumb = ''
 
-	def getDescription(self):
-		try:
-			metaFile = open('%s%s.meta' % (self.albumDir, os.sep))
-		except:
-			return ''
+    while linkPath != '' and linkPath != '.':
+      [head,tail] = os.path.split(linkPath)
+      runningCrumb = head
+      breadCrumb.append( '<a href="?album=%s">%s</a>' % ( \
+        urllib.quote_plus(linkPath), \
+        tail \
+      ))
+      linkPath = head
 
-		description = [] 
-		startReading = 0
-		for metaLine in metaFile:
-			if string.find(metaLine, '<album description>') == 0:
-				startReading = 1
-			elif string.find(metaLine, '</album description>') == 0:
-				startReading = 0 
 
-			if startReading:
-				description.append(metaLine)
-		return string.join(description[1:])
+    return breadCrumb
+  
+  def getDescription(self):
+    try:
+      metaFile = open('%s%s.meta' % (self.albumDir, os.sep))
+    except:
+      return ''
+
+    description = [] 
+    startReading = 0
+    for metaLine in metaFile:
+      if string.find(metaLine, '<album description>') == 0:
+        startReading = 1
+      elif string.find(metaLine, '</album description>') == 0:
+        startReading = 0 
+
+      if startReading:
+        description.append(metaLine)
+    return string.join(description[1:])
