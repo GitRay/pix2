@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/c/Python27/python
 
 ## Copyright (C) 2013 Ray Cathcart (Pix2)
 ## Copyright (C) 2005, 2006 Karl Chen (QuickyPix)
@@ -26,6 +26,7 @@ import cgi
 import os
 import sys
 import urllib
+import posixpath
 from Album import Album
 from Pic   import Pic
 import Setup
@@ -54,7 +55,9 @@ class Presenter:
     self.printMetaData(currDir, pic, control)
 
     line = ''.join(templateLines)
-    line = line.replace('@path@',       os.path.relpath(Setup.pathToTemplate,Setup.pathToCGI)+os.path.sep )
+    line = line.replace('@path@',       webifyPath( \
+     os.path.relpath(Setup.pathToTemplate,Setup.pathToCGI)+os.path.sep \
+    ))
     line = line.replace('@breadcrumb@', self.formatBreadCrumb(album, pic )) 
     line = line.replace('@title@',      self.formatTitle(     album, pic ))
     line = line.replace('@albums@',     self.formatAlbums(    album      ))
@@ -131,7 +134,9 @@ class Presenter:
         selected, \
         currPic.getName(), \
         currPic.getName(), \
-        urllib.quote(os.path.relpath(currPic.getThumb(),Setup.pathToCGI)) \
+        urllib.quote(webifyPath( \
+          os.path.relpath(currPic.getThumb(),Setup.pathToCGI) \
+        )) \
       )) 
     return '\n'.join(outLines)
 
@@ -202,7 +207,11 @@ class Presenter:
     #     'click here to view the original image',
     #     pic.getWeb())
 
-    return '<img align="right" src="%s"/>' % urllib.quote(os.path.relpath(pic.getWeb(),Setup.pathToCGI))
+    return '<img align="right" src="%s"/>' % urllib.quote( \
+      webifyPath( \
+        os.path.relpath(pic.getWeb(),Setup.pathToCGI) \
+      ) \
+    )
 
 
 def getArg(aForm, aKey):
@@ -228,7 +237,16 @@ def doAdminFunction(action, album, pic):
         print 'deleted <i>%s</i>' % (pathAndEntry)
   print '</pre>'
 
-
+def webifyPath(path):
+  # Windows likes backslashes. The web does not.
+  remaining_path = path
+  split_path = []
+  while remaining_path != '':
+    [head,tail] = os.path.split(remaining_path)
+    remaining_path = head
+    split_path = [tail] + split_path
+  return posixpath.join(*split_path)
+  
 if __name__=='__main__': 
 
   sys.stderr == sys.stdout 
