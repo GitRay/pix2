@@ -1,11 +1,31 @@
 #!/usr/bin/python
 
+## Copyright (C) 2013 Ray Cathcart (Pix2)
+## Copyright (C) 2005, 2006 Karl Chen (QuickyPix)
+## Copyright (C) 2005 Hollis Blanchard (QuickyPix)
+## Copyright (C) 2005 Demian Neidetcher (Pix)
+
+## This file is part of Pix2.
+
+## Pix2 is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free
+## Software Foundation; either version 2, or (at your option) any later
+## version.
+
+## Pix2 is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+## more details.
+
+## You should have received a copy of the GNU General Public License along
+## with Pix2; see the file COPYING.  If not, write to the Free Software
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+## USA.
+
 import cgi 
 import os
 import sys
-import string
 import urllib
-
 from Album import Album
 from Pic   import Pic
 import Setup
@@ -33,22 +53,20 @@ class Presenter:
 
     self.printMetaData(currDir, pic, control)
 
-    line = string.join(templateLines, '')
-    line = string.replace(line, '@path@',       os.path.relpath(Setup.pathToTemplate,Setup.pathToCGI)+os.path.sep )
-    line = string.replace(line, '@breadcrumb@', self.formatBreadCrumb(album, pic )) 
-    line = string.replace(line, '@title@',      self.formatTitle(     album, pic ))
-    line = string.replace(line, '@albums@',     self.formatAlbums(    album      ))
-    line = string.replace(line, '@pics@',       self.formatPics(      album, pic ))
-    line = string.replace(line, '@meta@',       self.formatMeta(      album      ))
-    line = string.replace(line, '@control@',    self.formatControl(   album, pic ))
+    line = ''.join(templateLines)
+    line = line.replace('@path@',       os.path.relpath(Setup.pathToTemplate,Setup.pathToCGI)+os.path.sep )
+    line = line.replace('@breadcrumb@', self.formatBreadCrumb(album, pic )) 
+    line = line.replace('@title@',      self.formatTitle(     album, pic ))
+    line = line.replace('@albums@',     self.formatAlbums(    album      ))
+    line = line.replace('@pics@',       self.formatPics(      album, pic ))
+    line = line.replace('@meta@',       self.formatMeta(      album      ))
+    line = line.replace('@control@',    self.formatControl(   album, pic ))
     line = self.formatContent(line, album, currDir, pic)
     print line,
 
 
   def printMetaData(self, currDir, pic, control):
     print '<!--'
-    print 'path     : %s' % os.path.abspath(os.curdir)
-    print 'albumLoc : %s' % Setup.albumLoc
     print 'subAlbum : %s' % currDir
     print 'pic      : %s' % pic
     print 'control  : %s' % control
@@ -64,7 +82,7 @@ class Presenter:
       [head, tail] = os.path.split(pic.picPath)
       outLines.append(tail)
     if len(outLines) > 0:
-      outLines[0] = ' | ' + outLines[0]
+      outLines[0] = ' ' + Setup.seperator + ' ' + outLines[0]
     return (' ' + Setup.seperator + ' ').join(outLines) 
 
 
@@ -92,7 +110,7 @@ class Presenter:
       outLines.append('<a href="?album=%s">%s</a><br>' % (
         urllib.quote_plus(album.getLinkPath()), 
         album.getName()))
-    return string.join(outLines, '\n')
+    return '\n'.join(outLines)
 
 
   def formatPics(self, album, pic):
@@ -115,7 +133,7 @@ class Presenter:
         currPic.getName(), \
         urllib.quote(os.path.relpath(currPic.getThumb(),Setup.pathToCGI)) \
       )) 
-    return string.join(outLines, '\n')
+    return '\n'.join(outLines)
 
 
   def formatMeta(self, album):
@@ -144,18 +162,18 @@ class Presenter:
 
 
   def formatContent(self, line, album, currDir,  pic):
-    albumDescription = string.strip(album.getDescription())
+    albumDescription = album.getDescription().strip()
 
     # TODO: this can be done better
     if pic.getOriginal() != '':
-      line = string.replace(line, '@album-description@', '')
-      line = string.replace(line, '@web-pic@',           self.formatWebPic(pic))
-      line = string.replace(line, '@comment@',           pic.getComment())
+      line = line.replace('@album-description@', '')
+      line = line.replace('@web-pic@',           self.formatWebPic(pic))
+      line = line.replace('@comment@',           pic.getComment())
 
     elif albumDescription != '': 
-      line = string.replace(line, '@album-description@', albumDescription)
-      line = string.replace(line, '@web-pic@',           '')
-      line = string.replace(line, '@comment@',           '')
+      line = line.replace('@album-description@', albumDescription)
+      line = line.replace('@web-pic@',           '')
+      line = line.replace('@comment@',           '')
 
     else:
       if album.getNumPics() > 0:
@@ -164,9 +182,9 @@ class Presenter:
       else:
         pic = Pic('')
 
-      line = string.replace(line, '@album-description@', '')
-      line = string.replace(line, '@web-pic@', self.formatWebPic(pic))
-      line = string.replace(line, '@comment@', pic.getComment())
+      line = line.replace('@album-description@', '')
+      line = line.replace('@web-pic@', self.formatWebPic(pic))
+      line = line.replace('@comment@', pic.getComment())
 
     return line
 
@@ -204,7 +222,7 @@ def doAdminFunction(action, album, pic):
   albumToClean = '%s%s' % (Setup.albumLoc, album)
   for root, dirs, files in os.walk(albumToClean):
     for file in files:
-      if string.find(file, '.web_') == 0 or string.find(file, '.thumb_') == 0:
+      if file.find('.web_') == 0 or file.find('.thumb_') == 0:
         pathAndEntry = '%s%s%s' % (root, os.sep, file)
         os.remove(pathAndEntry)
         print 'deleted <i>%s</i>' % (pathAndEntry)
