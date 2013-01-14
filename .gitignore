@@ -1,0 +1,16 @@
+#project specific
+pic_cache/*
+
+#python specific
+*.pyc
+
+## generic files to ignore
+*~
+*.lock
+*.DS_Store
+*.swp
+*.out
+
+## eclipse
+.project
+.pydevproject
