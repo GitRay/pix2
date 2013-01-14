@@ -20,6 +20,9 @@ pathToTemplate = os.path.join(pathToCGI,'..')
 # Absolute path to the web root - the base web server directory
 pathToWebRoot = os.path.join(pathToCGI,'..')
 
+# Absolute path to the picture cache folder
+pathToPicCache = os.path.join(pathToCGI,'..','pic_cache')
+
 # if this is false we try to use ImageMagick
 # if you set it to true we try to import and use PIL
 USE_PIL = True

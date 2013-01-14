@@ -1,4 +1,4 @@
-#!/c/Python27/python
+#!/usr/bin/python
 
 ## Copyright (C) 2013 Ray Cathcart (Pix2)
 ## Copyright (C) 2005, 2006 Karl Chen (QuickyPix)
@@ -81,7 +81,7 @@ class Presenter:
     outLines = []
     outLines = outLines + album.getBreadCrumb()
     outLines.reverse()
-    if (pic.getName() != ''):
+    if pic.isPic:
       [head, tail] = os.path.split(pic.picPath)
       outLines.append(tail)
     if len(outLines) > 0:
@@ -124,20 +124,30 @@ class Presenter:
     outLines = ['<h2>%s pictures </h2>' % (len(pics))]
 
     for currPic in pics:
+      if not currPic.isPic:
+        continue
       selected = ''
+      [pic_fname_safe, pic_relpic_safe, pic_name_safe, pic_relweb_safe, pic_width, pic_height] = \
+        currPic.getResizedLink('thumb')
       if (currPic.getName() == pic.getName()):
         selected = 'id="selected-pic"'
 
-      outLines.append('<a href="?album=%s&pic=%s"><img %s alt="%s" title="%s" src="%s"/></a>' % ( \
-        urllib.quote_plus(album.getLinkPath()), \
-        urllib.quote_plus(currPic.getFileName()), \
-        selected, \
-        currPic.getName(), \
-        currPic.getName(), \
-        urllib.quote(webifyPath( \
-          os.path.relpath(currPic.getThumb(),Setup.pathToCGI) \
-        )) \
-      )) 
+      #[thumb_name,width,height] = currPic.getThumb()
+      #if thumb_name != '':
+      outLines.append( \
+        '<a href="?album=%s&pic=%s"><img %s alt="%s" title="%s" src="%s" width="%s" height="%s"/></a>' \
+        % ( \
+          urllib.quote_plus(album.getLinkPath()), \
+          pic_fname_safe, \
+          selected, \
+          pic_name_safe, \
+          pic_name_safe, \
+          pic_relweb_safe, \
+          pic_width, \
+          pic_height \
+        ) \
+      ) 
+
     return '\n'.join(outLines)
 
 
@@ -195,9 +205,6 @@ class Presenter:
 
 
   def formatWebPic(self, pic):
-    if pic.getOriginal() == '':
-      return ''
-
     # use this return so that the users can click on the web-sized image and
     # then see the original image.  of course sometimes the originals are huge
     # so using the alternate return will keep your bandwidth usage down.
@@ -206,36 +213,19 @@ class Presenter:
     #     'click here to view the original image',
     #     'click here to view the original image',
     #     pic.getWeb())
-
-    return '<img align="right" src="%s"/>' % urllib.quote( \
-      webifyPath( \
-        os.path.relpath(pic.getWeb(),Setup.pathToCGI) \
-      ) \
-    )
+    if not pic.isPic:
+      return ''
+    [pic_fname_safe, pic_relpic_safe, pic_name_safe, pic_relweb_safe, pic_width, pic_height] = \
+      pic.getResizedLink('web')
+    
+    return '<img align="right" src="%s" width="%s" height="%s" />' % (pic_relweb_safe, pic_width, pic_height)
 
 
 def getArg(aForm, aKey):
   if aForm.has_key(aKey): 
-    print '<!-- %s: %s -->' % (aKey, aForm[aKey].value)
-    return aForm[aKey].value 
+    #print '<!-- %s: %s -->' % (aKey, aForm[aKey].value)
+    return urllib.unquote(aForm[aKey].value) 
   return ''
-
-
-def doAdminFunction(action, album, pic):
-  # TODO: 
-  # presumablye in the future if there were any other admin functions
-  # besides clean there would be some if statements here
-  print '<pre>'
-  print 'cleaning cache recursively from %s%s' % (Setup.albumLoc, album)
-
-  albumToClean = '%s%s' % (Setup.albumLoc, album)
-  for root, dirs, files in os.walk(albumToClean):
-    for file in files:
-      if file.find('.web_') == 0 or file.find('.thumb_') == 0:
-        pathAndEntry = '%s%s%s' % (root, os.sep, file)
-        os.remove(pathAndEntry)
-        print 'deleted <i>%s</i>' % (pathAndEntry)
-  print '</pre>'
 
 def webifyPath(path):
   # Windows likes backslashes. The web does not.
@@ -250,20 +240,30 @@ def webifyPath(path):
 if __name__=='__main__': 
 
   sys.stderr == sys.stdout 
-  print 'Content-type:text/html\n' 
-  print '<?-- path     : %s -->' % os.path.abspath(os.curdir)
-  print '<?-- argv[0]  : %s -->' % os.path.dirname(sys.argv[0])
   try:
-    iForm       = cgi.FieldStorage() 
+    iForm = cgi.FieldStorage() 
     album       = getArg(iForm, 'album')
     pic         = getArg(iForm, 'pic')
     control     = getArg(iForm, 'control')
     adminAction = getArg(iForm, 'admin')
-    if (adminAction != ''):
-      doAdminFunction(adminAction, album, pic)
+
+    pict_creator = getArg(iForm, 'pict_creator')
+    if pict_creator != '':
+      # make a picture
+      pict_path = getArg(iForm, 'pict_path')
+      pic_obj = Pic(os.path.join(Setup.albumLoc, pict_path))
+      pic_obj.spitOutResizedImage(pict_creator)
+      
     else:
+      # make the web page
+      print 'Content-type:text/html\n' 
+      print '<!-- path     : %s -->' % os.path.abspath(os.curdir)
+      print '<!-- argv[0]  : %s -->' % os.path.dirname(sys.argv[0])
+
       Presenter(album, pic, control)
+ 
   except Exception, exceptionData:
+    # raise
     print '''
       <pre><h1>pix broke, you get to keep both pieces</h1>%s</pre>
     ''' % exceptionData
