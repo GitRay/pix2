@@ -16,7 +16,7 @@ class Album:
     if not recurse:
       return
 
-    for entry in os.listdir(albumDir):
+    for entry in reversed(sorted(os.listdir(albumDir))):
       if (entry[0] != '.'):
         # skip files that start with a dot
         #pathAndEntry = '%s%s%s' % (albumDir, os.sep, entry)
@@ -71,27 +71,36 @@ class Album:
 
 
   def getPics(self):
+    process_meta = True
     try:
       metaFile = open('%s%s.meta' % (self.albumDir, os.sep))
-    except:
-      return self.pics
-
-    copyOfPics = []
-    copyOfPics = copyOfPics + self.pics
+    except IOError:
+      process_meta = False
 
     displayPics = []
-    for metaLine in metaFile:
-      if string.find(metaLine, '=') != -1:
-        splitMetaLine = string.split(metaLine, '=')
-        currMetaImage = string.strip(splitMetaLine[0])
-        for currPic in copyOfPics:
-          if (currMetaImage == currPic.getFileName()):
-            displayPics.append(currPic)
-            copyOfPics.remove( currPic)
+    copyOfPics = self.pics[:]
+    if process_meta:
+      displayPics = []
+      for metaLine in metaFile:
+        if string.find(metaLine, '=') != -1:
+          splitMetaLine = string.split(metaLine, '=')
+          currMetaImage = string.strip(splitMetaLine[0])
+          for currPic in copyOfPics:
+            if (currMetaImage == currPic.getFileName()):
+              displayPics.append(currPic)
+              copyOfPics.remove( currPic)
 
     # we got the ordered ones, now get the rest
     displayPics.extend(copyOfPics)
-    return displayPics
+    
+    # rifle through pics and eliminate any that don't exist
+    pics_to_return = []
+    for this_pic in displayPics:
+      if this_pic.isPic:
+        pics_to_return.append(this_pic)
+    pics_to_return.sort()
+    
+    return pics_to_return
 
 
   def getName(self):
