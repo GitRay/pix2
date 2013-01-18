@@ -14,7 +14,7 @@ if (Setup.USE_PIL):
 class Pic:
 
   def __init__(self, aPicPath = ''):
-    self.isPic = True
+    self.isPic = False
     self.picPath = os.path.abspath(aPicPath)
     self.picDim = [0,0]      # width, height
     self.picOrientation = 1
@@ -36,8 +36,9 @@ class Pic:
     # if the aPicPath is filled in, just look up the dimensions and some EXIF info
     if aPicPath != '':
       self.updatePicInfo()
-      # update the thumbnail paths
-      self.updateResizedImages()
+      if self.isPic:
+        # update the thumbnail paths
+        self.updateResizedImages()
     else:
       self.isPic = False
   
@@ -56,7 +57,8 @@ class Pic:
     pic_height = self.resizedDict[this_name]['height']
     if self.resizedDict[this_name]['exists']:
       # path relative to the web server
-      pic_relweb = os.path.relpath(pic_path,Setup.pathToCGI)
+      pic_relweb = os.path.relpath(pic_path,Setup.pathToPicCache)
+      pic_relweb = os.path.join(Setup.webPathToPicCache,pic_relweb)
       # un-windows the path and make it safe for the web
       pic_relweb_safe = urllib.quote(self.webifyPath(pic_relweb))
     else:
@@ -85,27 +87,62 @@ class Pic:
     split_path = [abs_path] + split_path
     return posixpath.join(*split_path)
 
+  def getPicDimsWithPIL(self):
+    this_image = Image.open(self.picPath)
+    [self.picDim[0], self.picDim[1]] = this_image.size
+    # get the rotation
+    try:
+      this_exif = this_image._getexif()
+    except (AttributeError,IOError):
+      # this file has no EXIF data (might be a TIFF) or data could be missing or corrupt
+      this_exif = {}
+    if this_exif:
+      # I got the number for the EXIF "Orientation" field (274) from PIL.ExifTags.TAGS
+      self.picOrientation = this_exif.get(274,1)
+    else:
+      self.picOrientation = 1
+
+  def getPicDimsWithIM(self):
+    text = subprocess.check_output([Setup.pathToIdentify, '-format', '%w %h %[exif:orientation]', self.picPath])
+    picDim = text.split()
+    self.picDim[0] = int(picDim[0])
+    self.picDim[1] = int(picDim[1])
+    if len(picDim) > 2:
+      self.picOrientation = int(picDim[2])
+    else:
+      self.picOrientation = 1
+
+    
   def updatePicInfo(self):
+    self.isPic = False
     if Setup.USE_PIL:
       # Look up the picture dimensions.
-      this_image = Image.open(self.picPath)
-      [self.picDim[0], self.picDim[1]] = this_image.size
-      # get the rotation
-      this_exif = this_image._getexif()
-      if this_exif:
-        # I got the number for the EXIF "Orientation" field (274) from PIL.ExifTags.TAGS
-        self.picOrientation = this_exif.get(274,1)
-      else:
-        self.picOrientation = 1
-    else:
-      text = subprocess.check_output([Setup.pathToIdentify, '-format', '%h %w %[exif:orientation]', self.picPath])
       try:
-        [self.picDim[0], self.picDim[1], self.picOrientation] = text.split()
-      except ValueError:
-        # must not be any orientation data
-        [self.picDim[0], self.picDim[1]] = text.split()
-        self.picOrientation = 1
-        
+        self.getPicDimsWithPIL()
+      except IOError:
+        # PIL can't deal with this file type
+        # retry with imagemagick
+        try:
+          self.getPicDimsWithIM()
+        except subprocess.CalledProcessError:
+          # imagemagic can't do it
+          self.isPic = False
+          return
+    else:
+      # fall back on imagemagick
+      try:
+        self.getPicDimsWithIM()
+      except subprocess.CalledProcessError:
+        # imagemagic can't do it
+        self.isPic = False
+        return      
+    if self.picOrientation == 6 or self.picOrientation == 8:
+      # Rotation 270 (6) or Rotation 90 (8)
+      # swap width and height
+      [self.picDim[1],self.picDim[0]] = self.picDim
+    
+    self.isPic = True
+    
     
   def getComment(self):
     if self.getOriginal() == '':
@@ -151,33 +188,60 @@ class Pic:
       [this_image['width'], this_image['height']] = \
         self.resizeCalcs(this_image['width'],this_image['height'],*self.picDim)
       [pic_path, pic_name] = os.path.split(self.picPath)
+      [head,tail] = os.path.splitext(pic_name)
       this_image['path'] =  os.path.join( \
         Setup.pathToPicCache, \
         os.path.relpath(pic_path,Setup.albumLoc), \
-        '%sx%s.%s' % (this_image['width'], this_image['height'], pic_name) \
+        '%sx%s.%s.%s' % (this_image['width'], this_image['height'], head, 'jpg') \
       )
       
-      
       # We have the filename, now update the status flag if it exists
-      this_image['exists'] = False
-      if Setup.USE_PIL:
-        try:
-          # opening with Image might be slower than just checking for existence
-          this_resized = Image.open(this_image['path'])
-          this_image['exists'] = True
-        except IOError:
-          # thumbnail does not exist
-          this_image['exists'] = False
+      if os.path.isfile(this_image['path']):
+        this_image['exists'] = True
       else:
-        # use imagemagick
-        try:
-          # opening with identify is certainly slower than just checking for existence.
-          text = subprocess.check_output([Setup.pathToIdentify, '-format', '%h %w', self.picPath])
-          this_image['exists'] = True
-        except CalledProcessError:
-          # identify could not process the file
-          this_image['exists'] = False
-  
+        this_image['exists'] = False
+        
+        
+  def resizeWithPIL(self,this_image):
+      originalImage = Image.open(self.picPath)
+      if self.picOrientation == 3:
+        # Rotation 180
+        originalImage.draft("RGB",tuple(self.picDim))
+        newImage = originalImage.transpose(Image.ROTATE_180)
+      elif self.picOrientation == 6:
+        # Rotation 270
+        originalImage.draft("RGB",tuple(self.picDim[::-1]))
+        newImage = originalImage.transpose(Image.ROTATE_270)
+      elif self.picOrientation == 8:
+        # Rotation 90
+        originalImage.draft("RGB",tuple(self.picDim[::-1]))
+        newImage = originalImage.transpose(Image.ROTATE_90)
+      else:
+        # Leave it alone
+        originalImage.draft("RGB",tuple(self.picDim))
+        newImage = originalImage
+      
+      newImage = newImage.resize((this_image['width'], this_image['height']),Image.ANTIALIAS)
+      newImage = newImage.convert("RGB")
+      newImage.save(this_image['path'])
+
+  def resizeWithIM(self, this_image):
+      arguments = ['-resize','%sx%s' \
+        % (this_image['width'],this_image['height']), this_image['path'] \
+      ]
+      if self.picOrientation == 3:
+        # Rotation 180
+        arguments = arguments + ['-rotate','180']
+      elif self.picOrientation == 6:
+        # Rotation 270
+        arguments = arguments + ['-rotate','270']
+      elif self.picOrientation == 8:
+        # Rotation 90
+        arguments = arguments + ['-rotate','90']
+
+      subprocess.call([Setup.pathToConvert, self.picPath] + arguments)
+
+
   def spitOutResizedImage(self, resize_type):
     this_image = self.resizedDict[resize_type]
     # make sure the path to the resized file exists
@@ -190,15 +254,16 @@ class Pic:
     print "Content-Type: image/jpeg"
     print
     if Setup.USE_PIL:
-      originalImage = Image.open(self.picPath)
-      newImage  = originalImage.resize((this_image['width'], this_image['height']))
-      newImage.save(this_image['path'])
+      try:
+        self.resizeWithPIL(this_image)
+      except IOError as this_exception:
+        if this_exception.message == 'cannot identify image file':
+          # PIL has failed us, try with imagemagick
+          self.resizeWithIM(this_image)
     else:
       # use imagemagick
-      subprocess.call([Setup.pathToConvert, self.picPath, '-sample', '%sx%s' \
-        % (this_image['width'],this_image['height']), this_image['path']] \
-      )
-    
+      self.resizeWithIM(this_image)
+          
     with open(this_image['path'], "r") as f:
       shutil.copyfileobj(f, sys.stdout)
 
