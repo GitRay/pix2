@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/local/bin/python  # freebsd
+#!/usr/bin/python        # on mac
 
 ## Copyright (C) 2013 Ray Cathcart (Pix2)
 ## Copyright (C) 2005, 2006 Karl Chen (QuickyPix)
@@ -55,9 +56,7 @@ class Presenter:
     self.printMetaData(currDir, pic, control)
 
     line = ''.join(templateLines)
-    line = line.replace('@path@',       webifyPath( \
-     os.path.relpath(Setup.pathToTemplate,Setup.pathToCGI)+os.path.sep \
-    ))
+    line = line.replace('@path@',       Setup.webPathToTemplate)
     line = line.replace('@breadcrumb@', self.formatBreadCrumb(album, pic )) 
     line = line.replace('@title@',      self.formatTitle(     album, pic ))
     line = line.replace('@albums@',     self.formatAlbums(    album      ))
@@ -263,7 +262,6 @@ if __name__=='__main__':
       Presenter(album, pic, control)
  
   except Exception, exceptionData:
-    # raise
     print '''
       <pre><h1>pix broke, you get to keep both pieces</h1>%s</pre>
     ''' % exceptionData
