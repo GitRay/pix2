@@ -16,7 +16,7 @@ class Album:
     if not recurse:
       return
 
-    for entry in reversed(sorted(os.listdir(albumDir))):
+    for entry in sorted(os.listdir(albumDir),reverse=True):
       if (entry[0] != '.'):
         # skip files that start with a dot
         #pathAndEntry = '%s%s%s' % (albumDir, os.sep, entry)
@@ -24,10 +24,15 @@ class Album:
         if os.path.isdir(pathAndEntry):
           self.albums.append(Album(pathAndEntry, False))
         elif os.path.isfile(pathAndEntry):
+          # for performance, try to load pickled version
           try:
-            self.pics.append(Pic(pathAndEntry))
-          except: 
-            print '<!-- not a picture: %s -->' % (pathAndEntry)
+            self.pics.append(Pic.loadPickledVersion(pathAndEntry))
+          except IOError:
+            # load from scratch
+            try:
+              self.pics.append(Pic(pathAndEntry))
+            except: 
+              print '<!-- not a picture: %s -->' % (pathAndEntry)
 
 
   def getAlbums(self):
