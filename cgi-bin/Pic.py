@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, os, string, subprocess, urllib, shutil, cgi, posixpath, errno
+import sys, os, string, subprocess, urllib, shutil, cgi, posixpath, errno, cPickle
 
 import Setup
 
@@ -17,6 +17,7 @@ class Pic:
     self.isPic = False
     self.picPath = os.path.abspath(aPicPath)
     self.picDim = [0,0]      # width, height
+    self.picFormat = ''
     self.picOrientation = 1
     self.resizedDict = { \
       'thumb': { \
@@ -39,9 +40,42 @@ class Pic:
       if self.isPic:
         # update the thumbnail paths
         self.updateResizedImages()
+        # save the pickled version to disk so we don't have to open the file again
+        self.savePickledVersion()
     else:
       self.isPic = False
   
+  @staticmethod
+  def getPicklePath(pic_path):
+    pic_relpic = os.path.relpath(pic_path, Setup.albumLoc)
+    pic_cache = os.path.join(Setup.pathToPicCache, pic_relpic)
+    [head, tail] = os.path.split(pic_cache)
+    pickle_path = os.path.join( \
+      head, \
+      '.pickle_' + tail + '_' + str(os.path.getmtime(pic_path)) + "_" + str(os.path.getsize(pic_path)) \
+    )
+    return pickle_path
+
+  
+  def savePickledVersion(self):
+    pickle_path = self.getPicklePath(self.picPath)
+    [head, tail] = os.path.split(pickle_path)
+    try:
+      os.makedirs(head)
+    except OSError as exception:
+      if exception.errno != errno.EEXIST:
+        raise
+    cPickle.dump( \
+      self, \
+      open(pickle_path, 'wb') \
+    )
+
+  @staticmethod
+  def loadPickledVersion(pic_path):
+    pickle_path = Pic.getPicklePath(pic_path)
+    return cPickle.load( open( pickle_path, "r" ) )
+
+
   def getResizedLink(self,this_name):
     # return a path to either an existing thumbnail or to the script that makes thumbs
     # path relative to pics directory
@@ -90,6 +124,7 @@ class Pic:
   def getPicDimsWithPIL(self):
     this_image = Image.open(self.picPath)
     [self.picDim[0], self.picDim[1]] = this_image.size
+    self.picFormat = this_image.format
     # get the rotation
     try:
       this_exif = this_image._getexif()
@@ -103,12 +138,13 @@ class Pic:
       self.picOrientation = 1
 
   def getPicDimsWithIM(self):
-    text = subprocess.check_output([Setup.pathToIdentify, '-format', '%w %h %[exif:orientation]', self.picPath])
+    text = subprocess.check_output([Setup.pathToIdentify, '-format', '%w %h %m %[exif:orientation]', self.picPath])
     picDim = text.split()
     self.picDim[0] = int(picDim[0])
     self.picDim[1] = int(picDim[1])
-    if len(picDim) > 2:
-      self.picOrientation = int(picDim[2])
+    self.picFormat = picDim[2]
+    if len(picDim) > 3:
+      self.picOrientation = int(picDim[3])
     else:
       self.picOrientation = 1
 
@@ -268,6 +304,25 @@ class Pic:
       shutil.copyfileobj(f, sys.stdout)
 
 
+  def downloadImage(self, format):
+    if format.lower() == self.picFormat.lower():
+      # directly output the file
+      print "Content-Type: image/jpeg"
+      print
+      with open(self.picPath, "r") as f:
+        shutil.copyfileobj(f, sys.stdout)
+      return
+    
+    # convert the file.
+    self.resizedDict['original'] = { \
+      'exists': False, \
+      'path': '', \
+      'width': self.picDim[0], \
+      'height': self.picDim[1] \
+    }
+    self.updateResizedImages()
+    self.spitOutResizedImage('original')
+    
   def getOriginal(self):
     return self.picPath
 
@@ -294,5 +349,13 @@ class Pic:
     return tail 
 
 
+  def __str__(self):
+    return self.getName()
+
+
   def __repr__(self):
-    return self.getName() 
+    return "Pic(%r)" % self.picPath
+
+
+  def __cmp__(self,other):
+    return cmp(self.getName(),other.getName())
