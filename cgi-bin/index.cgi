@@ -1,4 +1,4 @@
-#!/usr/local/bin/python  # freebsd
+#!/usr/local/bin/python
 #!/usr/bin/python        # on mac
 
 ## Copyright (C) 2013 Ray Cathcart (Pix2)
@@ -28,6 +28,7 @@ import os
 import sys
 import urllib
 import posixpath
+import traceback
 from Album import Album
 from Pic   import Pic
 import Setup
@@ -47,7 +48,7 @@ class Presenter:
       if (control == 'first'):
       	pic = Pic(os.path.join(currDir,album.getFirstPic()))
       if (control == 'previous'):
-      	pic = Pic(os.path.join(currDir,album.getPreviousPic(picnName)))
+      	pic = Pic(os.path.join(currDir,album.getPreviousPic(picName)))
       if (control == 'next'):
       	pic = Pic(os.path.join(currDir,album.getNextPic(picName)))
       if (control == 'last'):
@@ -204,20 +205,20 @@ class Presenter:
 
 
   def formatWebPic(self, pic):
-    # use this return so that the users can click on the web-sized image and
-    # then see the original image.  of course sometimes the originals are huge
-    # so using the alternate return will keep your bandwidth usage down.
-    # return '<a href="%s"><img align="right" alt="%s" title="%s" src="%s"/></a>' % (
-    #     pic.getOriginal(), 
-    #     'click here to view the original image',
-    #     'click here to view the original image',
-    #     pic.getWeb())
     if not pic.isPic:
       return ''
     [pic_fname_safe, pic_relpic_safe, pic_name_safe, pic_relweb_safe, pic_width, pic_height] = \
       pic.getResizedLink('web')
     
-    return '<img align="right" src="%s" width="%s" height="%s" />' % (pic_relweb_safe, pic_width, pic_height)
+    #return '<img align="right" src="%s" width="%s" height="%s" />' % (pic_relweb_safe, pic_width, pic_height)
+    return '<a href="%s"><img align="right" alt="%s" title="%s" src="%s" width="%s" height="%s" /></a>' % ( \
+      Setup.webPathToCGI + '/index.cgi?pict_path=' + pic_relpic_safe + '&download=jpeg', \
+      'click here to download the original image', \
+      'click here to download the original image', \
+      pic_relweb_safe, \
+      pic_width, \
+      pic_height \
+    )
 
 
 def getArg(aForm, aKey):
@@ -247,12 +248,18 @@ if __name__=='__main__':
     adminAction = getArg(iForm, 'admin')
 
     pict_creator = getArg(iForm, 'pict_creator')
+    download = getArg(iForm, 'download')
     if pict_creator != '':
       # make a picture
       pict_path = getArg(iForm, 'pict_path')
       pic_obj = Pic(os.path.join(Setup.albumLoc, pict_path))
       pic_obj.spitOutResizedImage(pict_creator)
-      
+    
+    elif download == 'jpeg':
+      # download the picture, converted to jpeg if necessary
+      pict_path = getArg(iForm, 'pict_path')
+      pic_obj = Pic(os.path.join(Setup.albumLoc, pict_path))
+      pic_obj.downloadImage(download)
     else:
       # make the web page
       print 'Content-type:text/html\n' 
@@ -261,7 +268,9 @@ if __name__=='__main__':
 
       Presenter(album, pic, control)
  
-  except Exception, exceptionData:
+  except:
     print '''
-      <pre><h1>pix broke, you get to keep both pieces</h1>%s</pre>
-    ''' % exceptionData
+      <pre><h1>pix broke, you get to keep both pieces</h1>
+      Traceback has been logged.</pre>
+    '''
+    traceback.print_exc()
