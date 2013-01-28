@@ -128,7 +128,7 @@ class Presenter:
       #[thumb_name,width,height] = currPic.getThumb()
       #if thumb_name != '':
       outLines.append( \
-        '<a href="?album=%s&pic=%s"><img %s alt="%s" title="%s" src="%s" width="%s" height="%s"/></a>' \
+        '<a href="?album=%s&pic=%s"><img class="thumb" %s alt="%s" title="%s" src="%s" width="%s" height="%s"/></a>' \
         % ( \
           urllib.quote_plus(album.getLinkPath()), \
           pic_fname_safe, \
@@ -204,7 +204,7 @@ class Presenter:
       pic.getResizedLink('web')
     
     #return '<img align="right" src="%s" width="%s" height="%s" />' % (pic_relweb_safe, pic_width, pic_height)
-    return '<a href="%s"><img align="right" alt="%s" title="%s" src="%s" width="%s" height="%s" /></a>' % ( \
+    return '<a href="%s"><img class="picture" alt="%s" title="%s" src="%s" width="%s" height="%s" /></a>' % ( \
       Setup.webPathToCGI + '/index.cgi?pict_path=' + pic_relpic_safe + '&download=jpeg', \
       'click here to download the original image', \
       'click here to download the original image', \

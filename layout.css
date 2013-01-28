@@ -1,0 +1,14 @@
+#albums {
+  float:left
+}
+
+#main {
+  float:right;
+  width:500px;
+  padding: 0
+}
+
+#footer {
+  width: 100%;
+  clear: both
+}
