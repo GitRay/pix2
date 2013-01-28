@@ -138,7 +138,12 @@ class Pic:
       self.picOrientation = 1
 
   def getPicDimsWithIM(self):
-    text = subprocess.check_output([Setup.pathToIdentify, '-format', '%w %h %m %[exif:orientation]', self.picPath])
+    # add "[0]" to picture path so that imagemagick only looks at the first frame of the file,
+    # just in case it is a big video
+    this_path = self.picPath + '[0]'
+    text = subprocess.check_output( \
+      [Setup.pathToIdentify, '-format', '%w %h %m %[exif:orientation]', this_path] \
+    )
     picDim = text.split()
     self.picDim[0] = int(picDim[0])
     self.picDim[1] = int(picDim[1])
@@ -262,20 +267,23 @@ class Pic:
       newImage.save(this_image['path'])
 
   def resizeWithIM(self, this_image):
-      arguments = ['-resize','%sx%s' \
-        % (this_image['width'],this_image['height']), this_image['path'] \
-      ]
-      if self.picOrientation == 3:
-        # Rotation 180
-        arguments = arguments + ['-rotate','180']
-      elif self.picOrientation == 6:
-        # Rotation 270
-        arguments = arguments + ['-rotate','270']
-      elif self.picOrientation == 8:
-        # Rotation 90
-        arguments = arguments + ['-rotate','90']
+    # add "[0]" to picture path so that imagemagick only looks at the first frame of the file,
+    # just in case it is a big video
+    this_path = self.picPath + '[0]'
+    arguments = ['-resize','%sx%s' \
+      % (this_image['width'],this_image['height']), this_image['path'] \
+    ]
+    if self.picOrientation == 3:
+      # Rotation 180
+      arguments = arguments + ['-rotate','180']
+    elif self.picOrientation == 6:
+      # Rotation 270
+      arguments = arguments + ['-rotate','270']
+    elif self.picOrientation == 8:
+      # Rotation 90
+      arguments = arguments + ['-rotate','90']
 
-      subprocess.call([Setup.pathToConvert, self.picPath] + arguments)
+    subprocess.call([Setup.pathToConvert, this_path] + arguments)
 
 
   def spitOutResizedImage(self, resize_type):
