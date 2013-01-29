@@ -116,7 +116,8 @@ class Album:
   def getLinkPath(self):
     #path should be relative to pics directory
     path = os.path.relpath(self.albumDir, Setup.albumLoc)
-    
+    # make it safe for url
+    path = urllib.quote_plus(path)
     return path
 
 

@@ -1,29 +1,36 @@
 <!DOCTYPE html> 
 <html>
-	<head>
-		<title>pix @title@</title>
-		<link rel="stylesheet" href="@path@style.css" type="text/css"/>
-		<link rel="stylesheet" href="@path@layout.css" type="text/css" />
-	</head>
-	<body>
-	    <div id="header">
-	      <h1><a href="index.cgi">pix2</a> @breadcrumb@</h1>
-	    </div>
-	    <div id="main">
-	      <div id="controls">@control@</div>
-	      <div id="picture">@web-pic@</div>
-	      <div id="comment">@comment@</div>
-	      <div id="album_desc">@album-description@</div>
-	    </div>
-	    <div id="albums">
-	      @albums@
-		  @pics@
-	    </div>
-	    <div id="footer" class="footer">
-	   	  <a target="_new" href="@path@help.html">help</a> | 
-		  <a target="_new" href="@path@README">r</a>       |
-		  @meta@
-		  powered by <a href="http://github.com/GitRay/pix2">pix2</a>
-	    </div>
-	</body>
+  <head>
+    <meta charset="UTF-8">
+    <title>pix @title@</title>
+    <link rel="stylesheet" href="@path@style.css" type="text/css"/>
+    <link rel="stylesheet" href="@path@layout.css" type="text/css" />
+  </head>
+  <body>
+    <div id="header">
+      <h1><a href="index.cgi">pix2</a> @breadcrumb@</h1>
+    </div>
+    <div class="colmask">
+      <div class="colleft">
+        <div class="col1wrap">
+          <div class="albums">
+            @albums@
+            @pics@
+          </div>
+        </div> <!-- col1wrap -->
+        <div class="main">
+          <div id="controls">@control@</div>
+          <div id="picture">@web-pic@</div>
+          <div id="comment">@comment@</div>
+          <div id="album_desc">@album-description@</div>
+        </div>
+      </div> <!-- colleft -->
+    </div> <!-- colmask -->
+    <div id="footer" class="footer">
+      <a target="_blank" href="@path@help.html">help</a> | 
+      <a target="_blank" href="@path@README">r</a>       |
+      @meta@
+      powered by <a href="http://github.com/GitRay/pix2">pix2</a>
+    </div>
+  </body>
 </html>

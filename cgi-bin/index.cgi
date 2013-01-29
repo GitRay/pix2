@@ -64,7 +64,7 @@ if __name__=='__main__':
       pic_obj.downloadImage(download)
     else:
       # make the web page
-      print 'Content-type:text/html\n' 
+      print 'Content-type: text/html; charset=utf-8\n' 
       #print '<!-- path     : %s -->' % os.path.abspath(os.curdir)
       #print '<!-- argv[0]  : %s -->' % os.path.dirname(sys.argv[0])
 

@@ -47,7 +47,7 @@ class Presenter:
       if (control == 'last'):
       	pic = Pic(os.path.join(currDir,album.getLastPic()))
 
-    self.printMetaData(currDir, pic, control)
+    #self.printMetaData(currDir, pic, control)
 
     line = ''.join(templateLines)
     line = line.replace('@path@',       Setup.webPathToTemplate)
@@ -128,9 +128,9 @@ class Presenter:
       #[thumb_name,width,height] = currPic.getThumb()
       #if thumb_name != '':
       outLines.append( \
-        '<a href="?album=%s&pic=%s"><img class="thumb" %s alt="%s" title="%s" src="%s" width="%s" height="%s"/></a>' \
+        '<a href="?album=%s&amp;pic=%s"><img class="thumb" %s alt="%s" title="%s" src="%s" width="%s" height="%s"/></a>' \
         % ( \
-          urllib.quote_plus(album.getLinkPath()), \
+          album.getLinkPath(), \
           pic_fname_safe, \
           selected, \
           pic_name_safe, \
@@ -157,14 +157,14 @@ class Presenter:
     if (len(album.getPics()) < 4):
       return ''
 
-    control   = '&nbsp; <a href="?album=%s&pic=%s&control=%s">%s</a> &nbsp; '
+    control   = '&nbsp; <a href="?album=%s&amp;pic=%s&amp;control=%s">%s</a> &nbsp; '
     albumPath = album.getLinkPath()
     picFile   = pic.getFileName()
 
-    firstLink    = control % (albumPath, picFile, 'first',    '|<')
-    previousLink = control % (albumPath, picFile, 'previous', '<<')
-    nextLink     = control % (albumPath, picFile, 'next',     '>>')
-    lastLink     = control % (albumPath, picFile, 'last',     '>|')
+    firstLink    = control % (albumPath, picFile, 'first',    '|&lt;')
+    previousLink = control % (albumPath, picFile, 'previous', '&gt;&gt;')
+    nextLink     = control % (albumPath, picFile, 'next',     '&lt;&lt;')
+    lastLink     = control % (albumPath, picFile, 'last',     '&gt;|')
 
     return '%s %s %s %s' % (firstLink, previousLink, nextLink, lastLink) 
 
@@ -205,7 +205,7 @@ class Presenter:
     
     #return '<img align="right" src="%s" width="%s" height="%s" />' % (pic_relweb_safe, pic_width, pic_height)
     return '<a href="%s"><img class="picture" alt="%s" title="%s" src="%s" width="%s" height="%s" /></a>' % ( \
-      Setup.webPathToCGI + '/index.cgi?pict_path=' + pic_relpic_safe + '&download=jpeg', \
+      Setup.webPathToCGI + '/index.cgi?pict_path=' + pic_relpic_safe + '&amp;download=jpeg', \
       'click here to download the original image', \
       'click here to download the original image', \
       pic_relweb_safe, \
