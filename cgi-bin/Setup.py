@@ -34,3 +34,7 @@ USE_PIL = True
 #pathToConvert = '/opt/local/bin/convert'
 pathToIdentify = '/usr/local/bin/identify'  # FreeBSD using ports
 pathToConvert = '/usr/local/bin/convert'
+
+# list the image formats you want to include in the album
+image_formats = ['JPG', 'JPEG', 'TIF', 'TIFF', 'PICT', 'GIF', 'BMP', 'PSD', 'PNG', 'PCT']
+video_formats = ['MP4', 'M4A', 'M4P', 'M4B', 'M4R', 'M4V', 'MPG', 'MPEG', 'M2P', 'PS', 'TS', 'MOV', 'QT', 'AVI', '3GP', '3P2', 'SWF']
