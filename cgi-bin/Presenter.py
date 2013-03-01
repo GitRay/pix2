@@ -55,7 +55,8 @@ class Presenter:
     line = line.replace('@title@',      self.formatTitle(     album, pic ))
     line = line.replace('@albums@',     self.formatAlbums(    album      ))
     line = line.replace('@pics@',       self.formatPics(      album, pic ))
-    line = line.replace('@meta@',       self.formatMeta(      album      ))
+    line = line.replace('@meta@', '')
+#    line = line.replace('@meta@',       self.formatMeta(      album      ))
     line = line.replace('@control@',    self.formatControl(   album, pic ))
     line = self.formatContent(line, album, currDir, pic)
     print line,
@@ -104,7 +105,7 @@ class Presenter:
     outLines = ['<h2>%s albums</h2>' % (len(albums))]
     for album in albums:
       outLines.append('<a href="?album=%s">%s</a><br>' % (
-        urllib.quote_plus(album.getLinkPath()), 
+        album.getLinkPath(), 
         album.getName()))
     return '\n'.join(outLines)
 
@@ -146,7 +147,7 @@ class Presenter:
 
   def formatMeta(self, album):
     try:
-      metaFileName = '%s%s%s.meta' % (Setup.albumLoc, album.getLinkPath(), os.sep)
+      metaFileName = '%s%s%s.meta' % (Setup.albumLoc, album.getLinkPathRaw(), os.sep)
       metaFile = open(metaFileName)
     except:
       return ''
@@ -154,7 +155,7 @@ class Presenter:
 
 
   def formatControl(self, album, pic):
-    if (len(album.getPics()) < 4):
+    if (len(album.getPics()) < 4) or not pic.isPic:
       return ''
 
     control   = '&nbsp; <a href="?album=%s&amp;pic=%s&amp;control=%s">%s</a> &nbsp; '
@@ -162,8 +163,8 @@ class Presenter:
     picFile   = pic.getFileName()
 
     firstLink    = control % (albumPath, picFile, 'first',    '|&lt;')
-    previousLink = control % (albumPath, picFile, 'previous', '&gt;&gt;')
-    nextLink     = control % (albumPath, picFile, 'next',     '&lt;&lt;')
+    previousLink = control % (albumPath, picFile, 'previous', '&lt;&lt;')
+    nextLink     = control % (albumPath, picFile, 'next',     '&gt;&gt;')
     lastLink     = control % (albumPath, picFile, 'last',     '&gt;|')
 
     return '%s %s %s %s' % (firstLink, previousLink, nextLink, lastLink) 
