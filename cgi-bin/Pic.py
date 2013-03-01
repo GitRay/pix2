@@ -156,6 +156,10 @@ class Pic:
     
   def updatePicInfo(self):
     self.isPic = False
+    tail = os.path.splitext(self.picPath)[1][1:].strip().upper()
+    if not tail in Setup.image_formats:
+      print 'Not supported extension:', tail
+      return
     if Setup.USE_PIL:
       # Look up the picture dimensions.
       try:
@@ -195,15 +199,22 @@ class Pic:
     [dir, fileName] = os.path.split(pathAndName)
 
     try:
+      # This is the pix-style meta file
       metaFile = open('%s%s.meta' % (dir, os.sep))
+      meta_separator = '='
     except:
-      return ''
+      try:
+        # This is the yappa-style meta file 
+        metaFile = open(os.path.join(dir,'captions.txt'))
+        meta_separator = '|'
+      except:
+        return ''
 
     #fileName = pathAndName[nameBegin + 1:]
 
     for metaLine in metaFile:
-      if string.find(metaLine, '=') != -1:
-        splitMetaLine = string.split(metaLine, '=')
+      if string.find(metaLine, meta_separator) != -1:
+        splitMetaLine = string.split(metaLine, meta_separator)
         imageName = string.strip(splitMetaLine[0])
         if (imageName == fileName):
           return string.strip(splitMetaLine[1])
