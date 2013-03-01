@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, os, string, urllib
+import sys, os, string, urllib, cgi
 
 from Pic import Pic
 import Setup
@@ -110,19 +110,23 @@ class Album:
 
   def getName(self):
     [head,tail] = os.path.split(self.albumDir)
-    return tail
+    return cgi.escape(tail,True).encode('ascii','xmlcharrefreplace')
 
 
-  def getLinkPath(self):
+  def getLinkPathRaw(self):
     #path should be relative to pics directory
     path = os.path.relpath(self.albumDir, Setup.albumLoc)
+    return path
+        
+  def getLinkPath(self):
+    path = self.getLinkPathRaw()
     # make it safe for url
     path = urllib.quote_plus(path)
     return path
 
 
   def getBreadCrumb(self):
-    linkPath = self.getLinkPath()
+    linkPath = self.getLinkPathRaw()
     breadCrumb   = []
     runningCrumb = ''
 
@@ -131,7 +135,7 @@ class Album:
       runningCrumb = head
       breadCrumb.append( '<a href="?album=%s">%s</a>' % ( \
         urllib.quote_plus(linkPath), \
-        tail \
+        cgi.escape(tail,True).encode('ascii','xmlcharrefreplace') \
       ))
       linkPath = head
 
