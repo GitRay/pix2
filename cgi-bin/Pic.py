@@ -1,6 +1,20 @@
 #!/usr/bin/python
+from __future__ import print_function
 
-import sys, os, string, subprocess, urllib, shutil, cgi, posixpath, errno, cPickle
+import sys, os, string, subprocess, shutil, cgi, posixpath, errno, copy, wsgiref
+# python3 has different urllib paths
+try:
+    from urllib import quote_plus, quote, urlencode
+except:
+    from urllib.parse import quote_plus, quote, urlencode
+
+# Python 3 does not have a separate "cPickle"
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
+
 
 import Setup
 
@@ -8,12 +22,13 @@ if (Setup.USE_PIL):
   try:
     from PIL import Image
   except ImportError:
-    print "get PIL at http://www.pythonware.com/products/pil"
+    print("You specify PIL in Setup.py, but you do not have PIL installed.\nGet PIL at http://www.pythonware.com/products/pil",file=sys.stderr)
     Setup.USE_PIL = False
 
 class Pic:
 
-  def __init__(self, aPicPath = ''):
+  def __init__(self, start_response,aPicPath = ''):
+    self.start_response = start_response
     self.isPic = False
     self.picPath = os.path.abspath(aPicPath)
     self.picDim = [0,0]      # width, height
@@ -65,15 +80,23 @@ class Pic:
     except OSError as exception:
       if exception.errno != errno.EEXIST:
         raise
-    cPickle.dump( \
-      self, \
-      open(pickle_path, 'wb') \
-    )
+    with open(pickle_path, 'wb') as f:
+      # cannot pickle the start_response object, temporarily delete it
+      start_response = self.start_response
+      del(self.start_response)
+      pickle.dump( self, f )
+      # restore start_response object
+      self.start_response = start_response
+
 
   @staticmethod
-  def loadPickledVersion(pic_path):
+  def loadPickledVersion(start_response, pic_path):
     pickle_path = Pic.getPicklePath(pic_path)
-    return cPickle.load( open( pickle_path, "r" ) )
+    with open(pickle_path,"rb") as f:
+      new_obj = pickle.load( f )
+    # restore start_response (needed to delete to pickle)
+    new_obj.start_response = start_response
+    return new_obj
 
 
   def getResizedLink(self,this_name):
@@ -82,11 +105,11 @@ class Pic:
     pic_path = self.resizedDict[this_name]['path']
     pic_relpic = os.path.relpath(self.picPath,Setup.albumLoc)
     # make it url-friendly
-    pic_relpic_safe = urllib.quote_plus(pic_relpic)
+    pic_relpic_safe = quote_plus(pic_relpic)
     # picture name
     [head, pic_fname] = os.path.split(self.picPath)
     pic_name_safe = self.getName()
-    pic_fname_safe = urllib.quote(pic_fname)
+    pic_fname_safe = quote(pic_fname)
     pic_width = self.resizedDict[this_name]['width']
     pic_height = self.resizedDict[this_name]['height']
     if self.resizedDict[this_name]['exists']:
@@ -94,14 +117,14 @@ class Pic:
       pic_relweb = os.path.relpath(pic_path,Setup.pathToPicCache)
       pic_relweb = os.path.join(Setup.webPathToPicCache,pic_relweb)
       # un-windows the path and make it safe for the web
-      pic_relweb_safe = urllib.quote(self.webifyPath(pic_relweb))
+      pic_relweb_safe = quote(self.webifyPath(pic_relweb))
     else:
       # path to the picture making script
       script_path = os.path.join(Setup.pathToCGI,'index.cgi')
       script_relweb = os.path.relpath(script_path,Setup.pathToCGI)
-      script_relweb_safe = urllib.quote(self.webifyPath(script_relweb))
+      script_relweb_safe = quote(self.webifyPath(script_relweb))
       pict_args = { 'pict_creator': this_name, 'pict_path': pic_relpic }
-      pic_relweb_safe = script_relweb_safe + "?" + urllib.urlencode(pict_args)
+      pic_relweb_safe = script_relweb_safe + "?" + urlencode(pict_args)
       
     # Return web-friendly information about the photo
     return pic_fname_safe, pic_relpic_safe, pic_name_safe, pic_relweb_safe, pic_width, pic_height
@@ -136,6 +159,7 @@ class Pic:
       self.picOrientation = this_exif.get(274,1)
     else:
       self.picOrientation = 1
+    this_image.close()
 
   def getPicDimsWithIM(self):
     # add "[0]" to picture path so that imagemagick only looks at the first frame of the file,
@@ -147,7 +171,7 @@ class Pic:
     picDim = text.split()
     self.picDim[0] = int(picDim[0])
     self.picDim[1] = int(picDim[1])
-    self.picFormat = picDim[2]
+    self.picFormat = picDim[2].decode()
     if len(picDim) > 3:
       self.picOrientation = int(picDim[3])
     else:
@@ -158,7 +182,7 @@ class Pic:
     self.isPic = False
     tail = os.path.splitext(self.picPath)[1][1:].strip().upper()
     if not tail in Setup.image_formats:
-      print 'Not supported extension:', tail
+      print('Not supported extension: {}'.format(tail),file=sys.stderr)
       return
     if Setup.USE_PIL:
       # Look up the picture dimensions.
@@ -213,11 +237,17 @@ class Pic:
     #fileName = pathAndName[nameBegin + 1:]
 
     for metaLine in metaFile:
-      if string.find(metaLine, meta_separator) != -1:
-        splitMetaLine = string.split(metaLine, meta_separator)
-        imageName = string.strip(splitMetaLine[0])
+      if meta_separator in metaLine:
+      #if string.find(metaLine, meta_separator) != -1:
+        splitMetaLine = metaLine.split(meta_separator)
+        #splitMetaLine = string.split(metaLine, meta_separator)
+        imageName = splitMetaLine[0].strip()
+        #imageName = string.strip(splitMetaLine[0])
         if (imageName == fileName):
-          return string.strip(splitMetaLine[1])
+          metaFile.close()
+          return splitMetaLine[1].strip()
+          #return string.strip(splitMetaLine[1])
+    metaFile.close()
     return ''
 
   def resizeCalcs(self, max_width, max_height, orig_width, orig_height):
@@ -306,8 +336,15 @@ class Pic:
     except OSError as exception:
       if exception.errno != errno.EEXIST:
           raise
-    print "Content-Type: image/jpeg"
-    print
+    [_, tail] = os.path.split(self.picPath)
+    [f_name, f_ext] = os.path.splitext(tail)
+    writer = self.start_response(
+      '200 OK',
+      [
+        ("Content-Type","image/jpeg"),
+        ("Content-Disposition",'attachment; filename="{}".jpeg'.format(f_name,))
+      ]
+    )
     if Setup.USE_PIL:
       try:
         self.resizeWithPIL(this_image)
@@ -318,19 +355,24 @@ class Pic:
     else:
       # use imagemagick
       self.resizeWithIM(this_image)
-          
-    with open(this_image['path'], "r") as f:
-      shutil.copyfileobj(f, sys.stdout)
+    f = open(this_image['path'],'rb')
+    return wsgiref.util.FileWrapper(f, blksize=131072)
 
 
   def downloadImage(self, format):
     if format.lower() == self.picFormat.lower():
       # directly output the file
-      print "Content-Type: image/jpeg"
-      print
-      with open(self.picPath, "r") as f:
-        shutil.copyfileobj(f, sys.stdout)
-      return
+      [_, tail] = os.path.split(self.picPath)
+      [f_name, f_ext] = os.path.splitext(tail)
+      writer = self.start_response(
+        '200 OK',
+        [
+          ("Content-Type","image/jpeg"),
+          ("Content-Disposition",'attachment; filename="{}.{}"'.format(f_name,format.lower()))
+        ]
+      )
+      f = open(self.picPath,'rb')
+      return wsgiref.util.FileWrapper(f, blksize=131072)
     
     # convert the file.
     self.resizedDict['original'] = { \
@@ -340,7 +382,7 @@ class Pic:
       'height': self.picDim[1] \
     }
     self.updateResizedImages()
-    self.spitOutResizedImage('original')
+    return self.spitOutResizedImage('original')
     
   def getOriginal(self):
     return self.picPath
@@ -360,7 +402,7 @@ class Pic:
     [pic_name, _] = os.path.splitext(tail)
     # make it html-friendly
     pic_name_safe = cgi.escape(pic_name,True).encode('ascii','xmlcharrefreplace')
-    return pic_name_safe
+    return pic_name_safe.decode()
 
 
   def getFileName(self):
@@ -376,5 +418,10 @@ class Pic:
     return "Pic(%r)" % self.picPath
 
 
+  # Python 3 does not support __cmp__ or the cmp function. Need to add __lt__
   def __cmp__(self,other):
     return cmp(self.getName(),other.getName())
+
+  # Python 3 needs a less than method to support sorting.
+  def __lt__(self, other):
+    return self.getName() < other.getName()

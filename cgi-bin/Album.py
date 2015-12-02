@@ -1,15 +1,18 @@
-#!/usr/bin/python
-
-import sys, os, string, urllib, cgi
+from __future__ import print_function
+try:
+  from urllib import quote_plus
+except:
+  from urllib.parse import quote_plus
+  
+import sys, os, string, cgi
 
 from Pic import Pic
 import Setup
 
 class Album:
 
-  def __init__(self, albumDir, recurse = 1):
+  def __init__(self, albumDir, start_response, recurse = 1):
     self.albumDir = albumDir
-    
     self.albums = []
     self.pics   = []
     
@@ -26,13 +29,14 @@ class Album:
         elif os.path.isfile(pathAndEntry):
           # for performance, try to load pickled version
           try:
-            self.pics.append(Pic.loadPickledVersion(pathAndEntry))
-          except IOError:
+            self.pics.append(Pic.loadPickledVersion(start_response,pathAndEntry))
+          except (IOError, EOFError):
             # load from scratch
             try:
-              self.pics.append(Pic(pathAndEntry))
+              #remove faulty pickled version
+              self.pics.append(Pic(start_response,pathAndEntry))
             except: 
-              print '<!-- not a picture: %s -->' % (pathAndEntry)
+              print('file in picture folder is not a picture: %s\n  reason: %s' % (pathAndEntry,sys.exc_info()[0]), file=sys.stderr)
 
 
   def getAlbums(self):
@@ -87,9 +91,12 @@ class Album:
     if process_meta:
       displayPics = []
       for metaLine in metaFile:
-        if string.find(metaLine, '=') != -1:
-          splitMetaLine = string.split(metaLine, '=')
-          currMetaImage = string.strip(splitMetaLine[0])
+        if not '=' in metaLine:
+        #if string.find(metaLine, '=') != -1:
+          #splitMetaLine = string.split(metaLine, '=')
+          splitMetaLine = metaLine.split('=')
+          #currMetaImage = string.strip(splitMetaLine[0])
+          currMetaImage = splitMetaLine[0].strip()
           for currPic in copyOfPics:
             if (currMetaImage == currPic.getFileName()):
               displayPics.append(currPic)
@@ -121,7 +128,7 @@ class Album:
   def getLinkPath(self):
     path = self.getLinkPathRaw()
     # make it safe for url
-    path = urllib.quote_plus(path)
+    path = quote_plus(path)
     return path
 
 
@@ -134,8 +141,8 @@ class Album:
       [head,tail] = os.path.split(linkPath)
       runningCrumb = head
       breadCrumb.append( '<a href="?album=%s">%s</a>' % ( \
-        urllib.quote_plus(linkPath), \
-        cgi.escape(tail,True).encode('ascii','xmlcharrefreplace') \
+        quote_plus(linkPath), \
+        cgi.escape(tail,True).encode('ascii','xmlcharrefreplace').decode('ascii') \
       ))
       linkPath = head
 
@@ -151,11 +158,14 @@ class Album:
     description = [] 
     startReading = 0
     for metaLine in metaFile:
-      if string.find(metaLine, '<album description>') == 0:
+      #if string.find(metaLine, '<album description>') == 0:
+      if metaLine.find('<album description>') == 0:
         startReading = 1
-      elif string.find(metaLine, '</album description>') == 0:
+      #elif string.find(metaLine, '</album description>') == 0:
+      elif metaLine.find('</album description>') == 0:
         startReading = 0 
 
       if startReading:
         description.append(metaLine)
-    return string.join(description[1:])
+    #return string.join(description[1:])
+    return ''.join(description[1:])

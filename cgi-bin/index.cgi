@@ -23,56 +23,41 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
 ## USA.
 
-import cgi 
 import os
 import sys
-import urllib
-import traceback
-from Pic   import Pic
-from Presenter import Presenter
-import Setup
+from Application import Application
+import wsgiref
 
-def getArg(aForm, aKey):
-  if aForm.has_key(aKey): 
-    #print '<!-- %s: %s -->' % (aKey, aForm[aKey].value)
-    return urllib.unquote(aForm[aKey].value) 
-  return ''
+def start_response(self, status, headers,exc_info=None):
+    """'start_response()' callable as specified by PEP 333"""
+    assert type(status) is StringType,"Status must be a string"
+    assert len(status)>=4,"Status must be at least 4 characters"
+    assert int(status[:3]),"Status message must begin w/3-digit code"
+    assert status[3]==" ", "Status message must have a space after code"
+    
+    print("Status: {}".format(status))
+    for x in headers:
+      print("{}: {}".format(x[0],x[1]))
+      
+    return sys.stdout.write
 
   
 if __name__=='__main__': 
 
-  sys.stderr == sys.stdout 
-  try:
-    iForm = cgi.FieldStorage() 
-    album       = getArg(iForm, 'album')
-    pic         = getArg(iForm, 'pic')
-    control     = getArg(iForm, 'control')
-    adminAction = getArg(iForm, 'admin')
-
-    pict_creator = getArg(iForm, 'pict_creator')
-    download = getArg(iForm, 'download')
-    if pict_creator != '':
-      # make a picture
-      pict_path = getArg(iForm, 'pict_path')
-      pic_obj = Pic(os.path.join(Setup.albumLoc, pict_path))
-      pic_obj.spitOutResizedImage(pict_creator)
-    
-    elif download == 'jpeg':
-      # download the picture, converted to jpeg if necessary
-      pict_path = getArg(iForm, 'pict_path')
-      pic_obj = Pic(os.path.join(Setup.albumLoc, pict_path))
-      pic_obj.downloadImage(download)
-    else:
-      # make the web page
-      print 'Content-type: text/html; charset=utf-8\n' 
-      #print '<!-- path     : %s -->' % os.path.abspath(os.curdir)
-      #print '<!-- argv[0]  : %s -->' % os.path.dirname(sys.argv[0])
-
-      Presenter(album, pic, control)
- 
-  except:
-    print '''
-      <pre><h1>pix broke, you get to keep both pieces</h1>
-      Traceback has been logged.</pre>
-    '''
-    traceback.print_exc()
+  sys.stderr == sys.stdout
+  # This application is designed to be run from a wsgi server, so this cgi script
+  # will just re-use the Application object.
+  
+  # construct a wsgi-compliant environ dictionary
+  environ = dict(os.environ.items())
+  environ["wsgi.version"] = (1,0)
+  environ["wsgi.scheme"] = wsgiref.guess_scheme(environ)
+  environ["wsgi.input"] = sys.stdin
+  environ['wsgi.errors'] = sys.stderr
+  environ['wsgi.multithread'] = True
+  environ['wsgi.multiprocess'] = True
+  environ['wsgi.run_once'] = True
+  
+  app = Application()
+  app(environ, start_response)
+  

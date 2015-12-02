@@ -20,6 +20,7 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
 ## USA.
 
+from __future__ import print_function
 import os
 import urllib
 from Album import Album
@@ -27,25 +28,27 @@ from Pic   import Pic
 import Setup
 
 class Presenter: 
-  def __init__(self, subAlbum, picName, control):
+  def __init__(self, subAlbum, picName, control, start_response):
     templateLines = open(os.path.join(Setup.pathToTemplate,'template.html'))
-
+    writer = start_response('200 OK',[('Content-type','text/html; charset=utf-8')])
+    self.writer = writer
+    self.start_response = start_response
     currDir = os.path.join(Setup.albumLoc,subAlbum)
-    album = Album(currDir)
+    album = Album(currDir,start_response)
     if (control == ''):
       if (picName != ''):
-        pic = Pic(os.path.join(currDir,picName))
+        pic = Pic(start_response,os.path.join(currDir,picName))
       else:
-        pic = Pic('')
+        pic = Pic(start_response,'')
     else:
       if (control == 'first'):
-      	pic = Pic(os.path.join(currDir,album.getFirstPic()))
+      	pic = Pic(start_response,os.path.join(currDir,album.getFirstPic()))
       if (control == 'previous'):
-      	pic = Pic(os.path.join(currDir,album.getPreviousPic(picName)))
+      	pic = Pic(start_response,os.path.join(currDir,album.getPreviousPic(picName)))
       if (control == 'next'):
-      	pic = Pic(os.path.join(currDir,album.getNextPic(picName)))
+      	pic = Pic(start,response,os.path.join(currDir,album.getNextPic(picName)))
       if (control == 'last'):
-      	pic = Pic(os.path.join(currDir,album.getLastPic()))
+      	pic = Pic(start_response,os.path.join(currDir,album.getLastPic()))
 
     #self.printMetaData(currDir, pic, control)
 
@@ -59,16 +62,20 @@ class Presenter:
 #    line = line.replace('@meta@',       self.formatMeta(      album      ))
     line = line.replace('@control@',    self.formatControl(   album, pic ))
     line = self.formatContent(line, album, currDir, pic)
-    print line,
+    self.content = line.encode('utf-8')
 
 
   def printMetaData(self, currDir, pic, control):
-    print '<!--'
-    print 'subAlbum : %s' % currDir
-    print 'pic      : %s' % pic
-    print 'control  : %s' % control
-    print 'pix ver  : %s' % Setup.pixVersion
-    print '-->'
+    output = [
+      '<!--\n',
+      'subAlbum : %s\n' % currDir,
+      'pic      : %s\n' % pic,
+      'control  : %s\n' % control,
+      'pix ver  : %s\n' % Setup.pixVersion,
+      '-->\n'
+    ]
+    for x in output:
+      self.writer(x.encode('utf-8'))
 
 
   def formatBreadCrumb(self, album, pic):
@@ -93,7 +100,7 @@ class Presenter:
     if (pic.getName() == ''):
       picSep = ''
 
-    return "%s%s%s%s" % (albumSep, album.getName(), picSep, pic)
+    return "%s%s%s%s" % (albumSep, album.getName().decode(), picSep, pic)
 
 
   def formatAlbums(self, album):
@@ -106,7 +113,7 @@ class Presenter:
     for album in albums:
       outLines.append('<a href="?album=%s">%s</a><br>' % (
         album.getLinkPath(), 
-        album.getName()))
+        album.getName().decode()))
     return '\n'.join(outLines)
 
 
@@ -187,9 +194,9 @@ class Presenter:
     else:
       if album.getNumPics() > 0:
         firstPic = album.getPics()[0].getFileName()
-        pic = Pic('%s%s%s' % (currDir, os.sep, firstPic))
+        pic = Pic(self.start_response,'%s%s%s' % (currDir, os.sep, firstPic))
       else:
-        pic = Pic('')
+        pic = Pic(self.start_response,'')
 
       line = line.replace('@album-description@', '')
       line = line.replace('@web-pic@', self.formatWebPic(pic))
@@ -206,7 +213,7 @@ class Presenter:
     
     #return '<img align="right" src="%s" width="%s" height="%s" />' % (pic_relweb_safe, pic_width, pic_height)
     return '<a href="%s"><img class="picture" alt="%s" title="%s" src="%s" width="%s" height="%s" /></a>' % ( \
-      Setup.webPathToCGI + '/index.cgi?pict_path=' + pic_relpic_safe + '&amp;download=jpeg', \
+      '?pict_path=' + pic_relpic_safe + '&amp;download=jpeg', \
       'click here to download the original image', \
       'click here to download the original image', \
       pic_relweb_safe, \
