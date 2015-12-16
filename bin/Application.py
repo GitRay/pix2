@@ -2,9 +2,9 @@ from __future__ import print_function
 import cgi, os, sys, traceback, posixpath, mimetypes, wsgiref
 # python3 has different urllib paths
 try:
-    from urllib import unquote
+    from urllib import unquote_plus
 except:
-    from urllib.parse import unquote
+    from urllib.parse import unquote_plus
 from Presenter import Presenter
 from Pic import Pic
 import Setup
@@ -44,15 +44,22 @@ class Application():
         
             pict_creator = self._getArg(iForm, 'pict_creator')
             download = self._getArg(iForm, 'download')
-            if not environ['PATH_INFO'][:7] == '/index.':
+            # assume that the application is invoked with either a blank path "/"
+            # or something that starts with "index." (html, cgi, etc...)
+            if not environ['PATH_INFO'][:7] == '/index.' and not environ['PATH_INFO'] == '/':
+                if not Setup.serveStaticFiles:
+                    # throw a 404 page
+                    start_response('404 NOT FOUND', [('Content-Type', 'text/plain')])
+                    return [b'Not Configure to Serve Static Pages']
+                    
                 # Assume this is a static file. This should really be handled by
                 # the web server, but we'll handle it here gracefully for poorly
                 # configured servers or for testing with wsgiref
-                print('Warning! Static file was served: {}'.format(environ['PATH_INFO']),file=sys.stderr)
+                print('Warning! Static file was served: {}'.format(os.path.normpath(environ['PATH_INFO'])),file=sys.stderr)
                 # get path to file
                 requested = os.path.join(
-                    os.path.normpath(Setup.pathToTemplate),
-                    os.path.normpath(os.path.relpath(environ['PATH_INFO'],Setup.webPathToTemplate))
+                    os.path.normpath(Setup.pathToStatic),
+                    os.path.normpath(os.path.relpath(environ['PATH_INFO'],Setup.webPathToStatic))
                 )
                 print('File served: {}'.format(requested),file=sys.stderr)
                 if not os.path.isfile(requested):
@@ -98,7 +105,7 @@ class Application():
     def _getArg(self, aForm, aKey):
         if aKey in aForm: 
             #print '<!-- %s: %s -->' % (aKey, aForm[aKey].value)
-            return unquote(aForm[aKey].value) 
+            return unquote_plus(aForm[aKey].value) 
         return ''
     
     # setup known mimetypes for serving static files

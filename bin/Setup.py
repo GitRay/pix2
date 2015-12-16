@@ -2,32 +2,47 @@
 ## While Pix2 is licensed under the GNU General Public License, 
 ## this particular file is released into the public domain by its
 ## sole author, Ray Cathcart.
+
+# You will need to change these entries to reflect your local setup. The default
+# values support running the tests and starting a test wsgi server via the
+# "start_wsgi_server.py" script in the top level directory.
+
 import os, sys
 
 seperator  = '&raquo;'
-pixVersion = '2.0.0'
+pixVersion = '2.1.0'
 
-# Absolute path to the CGI directory on your webserver
-pathToCGI = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])),'cgi-bin')
-#pathToCGI = '/usr/local/www/apache22/cgi-bin'
-webPathToCGI = '/cgi-bin'
+# Set to False if you don't want the wsgi application to serve static files.
+# A properly configured server will serve the static files separately and only
+# request dynamic files from the wsgi application. The test server serves both,
+# but makes a note in the log. It's almost certainly a security issue.
+serveStaticFiles = True
+
+# Absolute path to the bin directory on your webserver
+pathToCGI = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])),'bin')
 
 # Absolute path to the photo album on the webserver
 albumLoc = os.path.join(pathToCGI,os.pardir,'test_album')
 
-# Absolute path to the other web resources (including template.html)
-pathToTemplate = os.path.join(pathToCGI,os.pardir)
-#pathToTemplate = '/usr/local/www/apache22/data'
-webPathToTemplate = '/'
+# Absolute path to template.html
+pathToTemplate = os.path.join(pathToCGI,'template.html')
+
+# Absolute path to static web files (layout.css, style.css, etc.)
+pathToStatic = os.path.join(pathToCGI,os.pardir,'static')
+webPathToStatic = '/'
 
 # Path that appears in url when at your webserver's root location
 pathToWebRoot = '/'
 
-# Absolute path to the picture cache folder
+# Absolute path to the picture cache folder. This folder contains the resized
+# pictures, which need to be accessable as static images by the web server.
 #pathToPicCache = '/usr/local/www/apache22/data/pic_cache'
-pathToPicCache = os.path.join(pathToCGI,os.pardir,'pic_cache')
+pathToPicCache = os.path.join(pathToStatic,'pic_cache')
 webPathToPicCache = '/pic_cache'
 
+# PIL or pillow are the Python Image Library. Performance will be better with
+# one of these installed. ImageMagick is also supported, but each operation
+# spawns a new process, so performance is worse in most cases.
 # if this is false we try to use ImageMagick
 # if you set it to true we try to import and use PIL
 USE_PIL = True

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from __future__ import print_function
 
-import sys, os, string, subprocess, shutil, cgi, posixpath, errno, copy, wsgiref
+import sys, os, string, subprocess, shutil, cgi, posixpath, errno, copy, wsgiref, posixpath
 # python3 has different urllib paths
 try:
     from urllib import quote_plus, quote, urlencode
@@ -30,7 +30,7 @@ class Pic:
   def __init__(self, start_response,aPicPath = ''):
     self.start_response = start_response
     self.isPic = False
-    self.picPath = os.path.abspath(aPicPath)
+    self.picPath = os.path.normpath(os.path.abspath(aPicPath))
     self.picDim = [0,0]      # width, height
     self.picFormat = ''
     self.picOrientation = 1
@@ -69,7 +69,7 @@ class Pic:
       head, \
       '.pickle_' + tail + '_' + str(os.path.getmtime(pic_path)) + "_" + str(os.path.getsize(pic_path)) \
     )
-    return pickle_path
+    return os.path.normpath(pickle_path)
 
   
   def savePickledVersion(self):
@@ -103,26 +103,27 @@ class Pic:
     # return a path to either an existing thumbnail or to the script that makes thumbs
     # path relative to pics directory
     pic_path = self.resizedDict[this_name]['path']
-    pic_relpic = os.path.relpath(self.picPath,Setup.albumLoc)
+    pic_relpic = os.path.normpath(os.path.relpath(self.picPath,Setup.albumLoc))
     # make it url-friendly
-    pic_relpic_safe = quote_plus(pic_relpic)
+    
+    pic_relpic_safe = self.makePathUrlFriendly(pic_relpic)
     # picture name
     [head, pic_fname] = os.path.split(self.picPath)
     pic_name_safe = self.getName()
-    pic_fname_safe = quote(pic_fname)
+    pic_fname_safe = self.makePathUrlFriendly(pic_fname, use_quote_plus=True)
     pic_width = self.resizedDict[this_name]['width']
     pic_height = self.resizedDict[this_name]['height']
     if self.resizedDict[this_name]['exists']:
       # path relative to the web server
       pic_relweb = os.path.relpath(pic_path,Setup.pathToPicCache)
-      pic_relweb = os.path.join(Setup.webPathToPicCache,pic_relweb)
+      pic_relweb = os.path.normpath(os.path.join(Setup.webPathToPicCache,pic_relweb))
       # un-windows the path and make it safe for the web
-      pic_relweb_safe = quote(self.webifyPath(pic_relweb))
+      pic_relweb_safe = self.makePathUrlFriendly(self.webifyPath(pic_relweb))
     else:
       # path to the picture making script
       script_path = os.path.join(Setup.pathToCGI,'index.cgi')
-      script_relweb = os.path.relpath(script_path,Setup.pathToCGI)
-      script_relweb_safe = quote(self.webifyPath(script_relweb))
+      script_relweb = os.path.normpath(os.path.relpath(script_path,Setup.pathToCGI))
+      script_relweb_safe = self.makePathUrlFriendly(self.webifyPath(script_relweb),use_quote_plus=True)
       pict_args = { 'pict_creator': this_name, 'pict_path': pic_relpic }
       pic_relweb_safe = script_relweb_safe + "?" + urlencode(pict_args)
       
@@ -393,7 +394,7 @@ class Pic:
     cache_path = os.path.join(Setup.pathToPicCache, relative_path)
     [head,tail] = os.path.split(cache_path)
     resizedPicPath = os.path.join(head,prefix+"."+tail)
-    return resizedPicPath
+    return os.path.normpath(resizedPicPath)
 
 
   def getName(self):
@@ -409,7 +410,16 @@ class Pic:
     [head,tail] = os.path.split(self.picPath)
     return tail 
 
-
+  @staticmethod
+  def makePathUrlFriendly(path, use_quote_plus=False):
+    # because Windows uses the backslash "\", we must be sure that paths are
+    # converted to forward slashes "/" for urls
+    url_list = os.path.normpath(path).split(os.sep)
+    if use_quote_plus:
+      return quote_plus(posixpath.join(*url_list))
+    else:
+      return quote(posixpath.join(*url_list))
+    
   def __str__(self):
     return self.getName()
 

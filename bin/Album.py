@@ -1,8 +1,8 @@
 from __future__ import print_function
-try:
-  from urllib import quote_plus
-except:
-  from urllib.parse import quote_plus
+#try:
+#  from urllib import quote_plus
+#except:
+#  from urllib.parse import quote_plus
   
 import sys, os, string, cgi
 
@@ -128,7 +128,7 @@ class Album:
   def getLinkPath(self):
     path = self.getLinkPathRaw()
     # make it safe for url
-    path = quote_plus(path)
+    path = Pic.makePathUrlFriendly(path,use_quote_plus=True)
     return path
 
 
@@ -141,7 +141,7 @@ class Album:
       [head,tail] = os.path.split(linkPath)
       runningCrumb = head
       breadCrumb.append( '<a href="?album=%s">%s</a>' % ( \
-        quote_plus(linkPath), \
+        Pic.makePathUrlFriendly(linkPath), \
         cgi.escape(tail,True).encode('ascii','xmlcharrefreplace').decode('ascii') \
       ))
       linkPath = head

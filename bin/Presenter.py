@@ -29,7 +29,7 @@ import Setup
 
 class Presenter: 
   def __init__(self, subAlbum, picName, control, start_response):
-    templateLines = open(os.path.join(Setup.pathToTemplate,'template.html'))
+    templateLines = open(Setup.pathToTemplate)
     writer = start_response('200 OK',[('Content-type','text/html; charset=utf-8')])
     self.writer = writer
     self.start_response = start_response
@@ -53,7 +53,7 @@ class Presenter:
     #self.printMetaData(currDir, pic, control)
 
     line = ''.join(templateLines)
-    line = line.replace('@path@',       Setup.webPathToTemplate)
+    line = line.replace('@path@',       Setup.webPathToStatic)
     line = line.replace('@breadcrumb@', self.formatBreadCrumb(album, pic )) 
     line = line.replace('@title@',      self.formatTitle(     album, pic ))
     line = line.replace('@albums@',     self.formatAlbums(    album      ))

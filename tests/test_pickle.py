@@ -1,7 +1,7 @@
 import unittest
 # make sure cgi-bin directory is in path
 import sys, os
-sys.path.append(os.path.join(os.pardir,'cgi-bin'))
+sys.path.append(os.path.join(os.pardir,'bin'))
 
 class TestPickleMethods(unittest.TestCase):
     def test_pickle_Pic_object(self):

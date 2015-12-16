@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 #!/usr/bin/python        # on mac
 
-## Copyright (C) 2013 Ray Cathcart (Pix2)
+## Copyright (C) 2013-2015 Ray Cathcart (Pix2)
 ## Copyright (C) 2005, 2006 Karl Chen (QuickyPix)
 ## Copyright (C) 2005 Hollis Blanchard (QuickyPix)
 ## Copyright (C) 2005 Demian Neidetcher (Pix)
@@ -26,7 +26,11 @@
 import os
 import sys
 from Application import Application
-import wsgiref
+# Python 3 has a different wsgiref module than Python 2
+try:
+  from wsgiref import guess_scheme
+except:
+  from wsgiref.util import guess_scheme
 
 def start_response(self, status, headers,exc_info=None):
     """'start_response()' callable as specified by PEP 333"""
@@ -51,7 +55,7 @@ if __name__=='__main__':
   # construct a wsgi-compliant environ dictionary
   environ = dict(os.environ.items())
   environ["wsgi.version"] = (1,0)
-  environ["wsgi.scheme"] = wsgiref.guess_scheme(environ)
+  environ["wsgi.scheme"] = guess_scheme(environ)
   environ["wsgi.input"] = sys.stdin
   environ['wsgi.errors'] = sys.stderr
   environ['wsgi.multithread'] = True

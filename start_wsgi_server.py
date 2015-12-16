@@ -1,6 +1,6 @@
 import sys
 from wsgiref.simple_server import make_server
-sys.path.append('cgi-bin')
+sys.path.append('bin')
 from Application import Application
 
 app = Application()
