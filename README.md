@@ -1,4 +1,5 @@
 # pix2
+https://github.com/GitRay/pix2  
 Fork of pix, the python photo gallery
 
 ## summary
@@ -24,133 +25,48 @@ pix2 doesn't try to do what other programs do well. In true unix style pix2 does
 - Spaces and strange Unicode characters in filenames should be handled correctly. If you find an exception, let me know.
 
 ## anatomy of a .meta file
-  - in each directory optionally create a .meta file, the format for the 
-    picture comments are
-    <pic file name> = <comment>
-  - it's not necessary to have every file in there.  in vim do: ':r!ls' to get a
-    complete listing of the files in this directory.  then just slap a 
-    '= <comment>' on each line you want to provide a comment.
-  - the comment for a picture can only be on 1 line!
-  - to add a description for the current album create 2 lines at the top,
-    literally <album description> and </album description>.  between these
-    lines put the description.
-  - to control the thumbnail order, add a '=' after the file name wether or
-    not the picture has a comment associated with it and put them in the
-    order you want in the .meta file.
-    pictures with no '=' and pictures not in the .meta file will be put at
-    the end of the thumbnails in no particular order.
-  - here is a sample .meta file (in between the snip tags!)
-    so in the example below demian_and_leo.jpg would go first, then 
-    dawn_demian_bobbi.jpg and lastly mom.jpg.  mom.jpg would go last since
-    it has no '='
-<snip>
-<album description>
-here are some pictures of my family.  these
-were taken at family reunions and stuff.
-</album description>
-demian_and_leo.jpg = this is me and my cousin leo
-mom.jpg
-dawn_demian_bobbi.jpg =
-</snip>
+  - The 'test_album' folder contains some examples of .meta files.
+  - In each directory optionally create a .meta file, the format for the picture comments are  
+    pic_file_name = comment
+  - It's not necessary to have every file in there.  In vim do: ':r!ls' to get a complete listing of the files in this directory.  then just slap a '= comment' on each line you want to provide a comment.
+  - The comment for a picture can only be on 1 line!
+  - To add a description for the current album create 2 lines at the top, literally '&lt;album description&gt;' and '&lt;/album description&gt;'. Between these lines put the description.
+  - To control the thumbnail order, add a '=' after the file name wether or not the picture has a comment associated with it and put them in the order you want in the .meta file. Pictures with no '=' and pictures not in the .meta file will be put at the end of the thumbnails in reverse alphabetical order (because autonumbered photos will then display most recent first).
+  - here is a sample .meta file (in between the snip tags!) In the example below demian_and_leo.jpg would go first, then 
+    dawn_demian_bobbi.jpg and lastly mom.jpg. mom.jpg would go last since it has no '=' and is therefore an illegal (and ignored) line.  
+&lt;snip&gt;  
+&lt;album description&gt;  
+here are some pictures of my family. these were taken at family reunions and stuff.  
+&lt;/album description&gt;  
+demian_and_leo.jpg = this is me and my cousin leo  
+mom.jpg  
+dawn_demian_bobbi.jpg =  
+&lt;/snip&gt;
 
 
-*** style sheets
-- some extra style sheets are in pix/extra_styles.  the easiest way to use them
-  is to just "cp pix/extra_styles/red_pill.css pix/style.css".
+## style sheets
+- Some extra style sheets are in pix/extra_styles. You can use these to replace the default style sheets located in the 'static' directory.
 
-*** anatomy of the template file
-the template file is 'pix/template.html' it's just a simple html document,  
-you can pretty much do with it what you want, you place the tokens for the 
-generated elements into your html.
-- @title@
- shows you the current directory with a pipe in front of it (the assumption
- is that you will have a string before the pipe, like the name of your site
-- @breadcrumb@
- a pipe "|" delimited string that shows you where you are at in the directory
- hierarchy inside the albums.  it gives you links to go to what ever level
- you want
-- @albums@
- if there are no sub-directories in the current directory this returns an
- empty string.
- if there are sub-directories this gives you the string '<h2>albums</h1>'
- followed by an unordered list of albums.
-- @pics@
- this returns thumbnail images of all the pictures in the current directory.
- the thumbnails dictate what the web sized pic will be
-- @album-description@
- if there is no currently selected web-pic we print the album description, 
- this is found in the '.meta' file.  all lines between the "album
- description" tags will be displayed as the album description.
-- @web-pic@
- when the user selects a thumbnail or picture from the list, the web pic is
- displayed.  the web pic is resized for typical web viewing.  if the user
- wants to see the original image (assuming it's larger than the web-pic)
- they can click on the web version to be directed to the actual original.
-- @comment@
- this is where the comment (if any) associated with the picture is placed.
+## anatomy of the template file
+The template file is 'pix/static/template.html' it's just a simple html document, you can pretty much do with it what you want, you place the tokens for the generated elements into your html.
+- @title@  
+ Shows you the current directory with a delimiter in front of it (the assumption is that you will have a string before the delimiter, like the name of your site. The delimiter is set in 'pix/bin/Setup.py' by changing the 'seperator' variable. Default is '&raquo;' (&amp;raquo;)
+- @breadcrumb@  
+ A delimited string that shows you where you are at in the directory hierarchy inside the albums.  It gives you links to go to whatever level you want. It uses the same delimiter as @title&#64;.
+- @albums@  
+ If there are no sub-directories in the current directory this returns an empty string. If there are sub-directories this gives you the string '&lt;h2&gt;n albums&lt;/h2&gt;', where 'n' is the number of sub-albums, followed by an list of albums in reverse-alphabetical order (my album names start with the date, so this has the effect of displaying the most recent first).
+- @pics@  
+ This returns thumbnail images of all the pictures in the current directory. Thumbnails are set to be a max of 80 width or 60 height in the file 'pix/bin/Pic.py'.
+- @album-description@  
+ If there is no currently selected web-pic we print the album description, this is found in the '.meta' file.  All lines between the "album description" tags will be displayed as the album description.
+- @web-pic@  
+ When the user selects a thumbnail or picture from the list, the web pic is displayed.  The web pic is resized for typical web viewing (set to no larger than 500x400 in 'pix/bin/Pic.py'). If the user wants to see the original image (assuming it's larger than the web-pic) they can click on the web version to be directed to the full-resolution original. The original will always be converted to JPEG for download.
+- @comment@  
+ This is where the comment (if any) associated with the picture is placed.
 
+## administration
+- All administrative functions are done on the host. This keeps pix2 simple and (hopefully) more secure.
 
-*** administration
-- to delete the cache recursively from your current album append this
-  to the url '&admin=clean'.  for example:
-  http://localhost/~demian/pix/?album=/demian&admin=clean
-  this deletes every thumbnail and web-image recursively from the 
-  demian album on down.
-
-
-*** trouble shooting
-- are there files in the album directory that are not images?
-- is the permission of the album directory 777?
-- if [Errno 13] Permission denied
-  pix (running under the web-server) needs to be able to write to all the 
-  directories so that it can create thumbnails.  you can "chmod -R 777 ./album".
-
-
-*** change log
-- 1.3.1 from 1.3.0
-  - fixed a long time 'double slash' problem that actually caused trouble under
-    aplus.net hosting services, dunno if it's a freebsd thing or what.
-
-- 1.3.0 from 1.2.2
-  - removed reference to the defunct Video object
-  - added support for ImageMagick, flip global switch in Pic.py to toggle
-    between PIL and ImageMagick.  Note that my implementation seems to have
-    trouble with image file names that have spaces in them, underscores are
-    preferred.
-
-
-- 1.2.2 from 1.2.1
-  - add an 'r' link that gives access to the README file, not sure about that
-    one.
-  - add an 'm' link that brings up the .meta file for the current directory.
-    only displayed when there is a .meta file for the current directory.
-  - add a 'polaroid' style sheet
-  - add a set of controls so you can navigate within your current album, we give
-    a first, previous, next and last button.  
-
-
-- 1.2.1 from 1.2.0
-  - improved the processing performance, i was doing a ton of 
-    un-necessary processing for each line wether or not it was needed.
-  - pictures can now be ordered in the .meta file.  pictures with no '=' 
-    after them or pictures not included in the .meta file will be 
-    forgivingly dumped at the end of the sorted thumbnails.
-  - nicely handle non-image files in albums; they're just ignored.
-
-- 1.2.0 from 1.1.3
-stole lots of great stuff form the quickypix project (http://quarl.org)
-  - minor defect fixes
-  - 'alt' text for thumbnail images so when users mouse-over they
-    can see the name of the picture.  
-  - 'alt' text for the web image to hint users to the fact that they
-    can click on it to see the original image.
-  - an all-encompassing except so that you never get a white screen
-    and the user can see the raised exception.
-  - the selected thumbnail will have a style sheet id so that it's 
-    presentation can be altered, in my style sheet i change the border
-    color to red instead of black.
-  - add an admin function to clean by appending &admin=clean to the url
-  - removed the 'list' form of displaying the pictures, the thumbnails
-    are much more useful and it simplifies the code
-  - display the numbers of sub-albums and pictures in the current album
-  - included a handful of optional style sheets that are easy to use
+## trouble shooting
+- Does the wsgi server have permission to read the pictures directory and write to the pic_cache directory?
+- Does the webserver have read access to the static files and the pic_cache directory?
