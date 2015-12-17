@@ -17,7 +17,9 @@ pix2 doesn't try to do what other programs do well. In true unix style pix2 does
 - ImageMagick may also be used, and is a fallback if PIL is not available.
 - Put the "static" directory somewhere that your web server can serve static files.
 - Put the "bin" directory somewhere that your WSGI server can start your application.
-- Edit the "bin/Setup.py" file to suit your server's setup.
+- Edit the "bin/Setup.py" file to suit your server's setup.  
+  NOTE:  
+- pix2 is best run as a WSGI application. It will, however, run in a cgi-bin environment. To do so, make sure your server can execute files in the pix/bin directory (relocate it if necessary). Change the index.cgi (or on Windows index.bat) file to point at the correct Python executable. Finally, make sure the server has read access to the pictures directory and read-write access to pic_cache. 
 
 ## album setup and guidelines
 - Your directory structure will dictate the hierarhcy for albums and picture placement
