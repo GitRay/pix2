@@ -17,8 +17,12 @@ pix2 doesn't try to do what other programs do well. In true unix style pix2 does
 - ImageMagick may also be used, and is a fallback if PIL is not available.
 - Put the "static" directory somewhere that your web server can serve static files.
 - Put the "bin" directory somewhere that your WSGI server can start your application.
+- Create an empty pic_cache folder somewhere (it can be inside "static") and make sure the WSGI server has write access.
+- Make sure the WSGI server has read access to your pictures folder (it will never make changes to the original location).
+- Make sure the web server has read access to the pic_cache folder.
 - Edit the "bin/Setup.py" file to suit your server's setup.  
-  NOTE:  
+  NOTES:  
+- If you just want to quickly test pix2, you can execute the 'pix2/start_wsgi_server.py' script, and it will run a webserver (using Python's built-in WSGI server) on port 8000. The default 'bin/Setup.py' file supports this configuration. This is great for testing, but won't hold up very well in production.
 - pix2 is best run as a WSGI application. It will, however, run in a cgi-bin environment. To do so, make sure your server can execute files in the pix/bin directory (relocate it if necessary). Change the index.cgi (or on Windows index.bat) file to point at the correct Python executable. Finally, make sure the server has read access to the pictures directory and read-write access to pic_cache. 
 
 ## album setup and guidelines
@@ -50,7 +54,7 @@ dawn_demian_bobbi.jpg =
 - Some extra style sheets are in pix/extra_styles. You can use these to replace the default style sheets located in the 'static' directory.
 
 ## anatomy of the template file
-The template file is 'pix/static/template.html' it's just a simple html document, you can pretty much do with it what you want, you place the tokens for the generated elements into your html.
+The template file is 'pix/bin/template.html' it's just a simple html document, you can pretty much do with it what you want, you place the tokens for the generated elements into your html.
 - @title@  
  Shows you the current directory with a delimiter in front of it (the assumption is that you will have a string before the delimiter, like the name of your site. The delimiter is set in 'pix/bin/Setup.py' by changing the 'seperator' variable. Default is '&raquo;' (&amp;raquo;)
 - @breadcrumb@  
@@ -65,6 +69,8 @@ The template file is 'pix/static/template.html' it's just a simple html document
  When the user selects a thumbnail or picture from the list, the web pic is displayed.  The web pic is resized for typical web viewing (set to no larger than 500x400 in 'pix/bin/Pic.py'). If the user wants to see the original image (assuming it's larger than the web-pic) they can click on the web version to be directed to the full-resolution original. The original will always be converted to JPEG for download.
 - @comment@  
  This is where the comment (if any) associated with the picture is placed.
+- @path@  
+ This will be substituted with the path to the static web directory. This is useful for linking to static resources like graphics, javascript, or other web pages.
 
 ## administration
 - All administrative functions are done on the host. This keeps pix2 simple and (hopefully) more secure.
