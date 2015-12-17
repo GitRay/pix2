@@ -119,3 +119,7 @@ class Application():
         '.h': 'text/plain',
     })
 
+if __name__ == "__main__":
+    from Application import Application
+    application = Application()
+    
