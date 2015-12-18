@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from __future__ import print_function
 
-import sys, os, string, subprocess, shutil, cgi, posixpath, errno, copy, wsgiref, posixpath
+import sys, os, string, subprocess, shutil, cgi, posixpath, errno, copy, wsgiref.util, posixpath
 # python3 has different urllib paths
 try:
     from urllib import quote_plus, quote, urlencode
@@ -146,21 +146,22 @@ class Pic:
     return posixpath.join(*split_path)
 
   def getPicDimsWithPIL(self):
-    this_image = Image.open(self.picPath)
-    [self.picDim[0], self.picDim[1]] = this_image.size
-    self.picFormat = this_image.format
-    # get the rotation
-    try:
-      this_exif = this_image._getexif()
-    except (AttributeError,IOError):
-      # this file has no EXIF data (might be a TIFF) or data could be missing or corrupt
-      this_exif = {}
-    if this_exif:
-      # I got the number for the EXIF "Orientation" field (274) from PIL.ExifTags.TAGS
-      self.picOrientation = this_exif.get(274,1)
-    else:
-      self.picOrientation = 1
-    this_image.close()
+    with open(self.picPath,'rb') as f:
+      this_image = Image.open(f)
+      [self.picDim[0], self.picDim[1]] = this_image.size
+      self.picFormat = this_image.format
+      # get the rotation
+      try:
+        this_exif = this_image._getexif()
+      except (AttributeError,IOError):
+        # this file has no EXIF data (might be a TIFF) or data could be missing or corrupt
+        this_exif = {}
+      if this_exif:
+        # I got the number for the EXIF "Orientation" field (274) from PIL.ExifTags.TAGS
+        self.picOrientation = this_exif.get(274,1)
+      else:
+        self.picOrientation = 1
+  
 
   def getPicDimsWithIM(self):
     # add "[0]" to picture path so that imagemagick only looks at the first frame of the file,
@@ -183,7 +184,7 @@ class Pic:
     self.isPic = False
     tail = os.path.splitext(self.picPath)[1][1:].strip().upper()
     if not tail in Setup.image_formats:
-      print('Not supported extension: {}'.format(tail),file=sys.stderr)
+      print('Not supported extension: {} in {}'.format(tail,self.picPath),file=sys.stderr)
       return
     if Setup.USE_PIL:
       # Look up the picture dimensions.
@@ -272,11 +273,11 @@ class Pic:
         self.resizeCalcs(this_image['width'],this_image['height'],*self.picDim)
       [pic_path, pic_name] = os.path.split(self.picPath)
       [head,tail] = os.path.splitext(pic_name)
-      this_image['path'] =  os.path.join( \
+      this_image['path'] =  os.path.normpath(os.path.join( \
         Setup.pathToPicCache, \
         os.path.relpath(pic_path,Setup.albumLoc), \
         '%sx%s.%s.%s' % (this_image['width'], this_image['height'], head, 'jpg') \
-      )
+      ))
       
       # We have the filename, now update the status flag if it exists
       if os.path.isfile(this_image['path']):
@@ -286,27 +287,28 @@ class Pic:
         
         
   def resizeWithPIL(self,this_image):
-      originalImage = Image.open(self.picPath)
-      if self.picOrientation == 3:
-        # Rotation 180
-        originalImage.draft("RGB",tuple(self.picDim))
-        newImage = originalImage.transpose(Image.ROTATE_180)
-      elif self.picOrientation == 6:
-        # Rotation 270
-        originalImage.draft("RGB",tuple(self.picDim[::-1]))
-        newImage = originalImage.transpose(Image.ROTATE_270)
-      elif self.picOrientation == 8:
-        # Rotation 90
-        originalImage.draft("RGB",tuple(self.picDim[::-1]))
-        newImage = originalImage.transpose(Image.ROTATE_90)
-      else:
-        # Leave it alone
-        originalImage.draft("RGB",tuple(self.picDim))
-        newImage = originalImage
-      
-      newImage = newImage.resize((this_image['width'], this_image['height']),Image.ANTIALIAS)
-      newImage = newImage.convert("RGB")
-      newImage.save(this_image['path'])
+      with open(self.picPath, 'rb') as f:
+        originalImage = Image.open(f)
+        if self.picOrientation == 3:
+          # Rotation 180
+          originalImage.draft("RGB",tuple(self.picDim))
+          newImage = originalImage.transpose(Image.ROTATE_180)
+        elif self.picOrientation == 6:
+          # Rotation 270
+          originalImage.draft("RGB",tuple(self.picDim[::-1]))
+          newImage = originalImage.transpose(Image.ROTATE_270)
+        elif self.picOrientation == 8:
+          # Rotation 90
+          originalImage.draft("RGB",tuple(self.picDim[::-1]))
+          newImage = originalImage.transpose(Image.ROTATE_90)
+        else:
+          # Leave it alone
+          originalImage.draft("RGB",tuple(self.picDim))
+          newImage = originalImage
+        
+        newImage = newImage.resize((this_image['width'], this_image['height']),Image.ANTIALIAS)
+        newImage = newImage.convert("RGB")
+        newImage.save(this_image['path'])
 
   def resizeWithIM(self, this_image):
     # add "[0]" to picture path so that imagemagick only looks at the first frame of the file,
@@ -350,9 +352,11 @@ class Pic:
       try:
         self.resizeWithPIL(this_image)
       except IOError as this_exception:
-        if this_exception.message == 'cannot identify image file':
+        if 'cannot identify image file' in str(this_exception):
           # PIL has failed us, try with imagemagick
           self.resizeWithIM(this_image)
+        else:
+          raise
     else:
       # use imagemagick
       self.resizeWithIM(this_image)

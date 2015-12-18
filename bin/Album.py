@@ -25,7 +25,7 @@ class Album:
         #pathAndEntry = '%s%s%s' % (albumDir, os.sep, entry)
         pathAndEntry = os.path.join(albumDir,entry)
         if os.path.isdir(pathAndEntry):
-          self.albums.append(Album(pathAndEntry, False))
+          self.albums.append(Album(pathAndEntry, start_response, recurse=False))
         elif os.path.isfile(pathAndEntry):
           # for performance, try to load pickled version
           try:

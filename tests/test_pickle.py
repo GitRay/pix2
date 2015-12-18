@@ -1,5 +1,5 @@
 import unittest
-# make sure cgi-bin directory is in path
+# make sure bin directory is in path
 import sys, os
 sys.path.append(os.path.join(os.pardir,'bin'))
 
