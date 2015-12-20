@@ -1,8 +1,10 @@
 from __future__ import print_function
-#try:
-#  from urllib import quote_plus
-#except:
-#  from urllib.parse import quote_plus
+# Python 2 has no "FileNotFoundError"
+try:
+  FileNotFoundError
+except:
+  class FileNotFoundError(IOError):
+    pass
   
 import sys, os, string, cgi
 
@@ -16,27 +18,31 @@ class Album:
     self.albums = []
     self.pics   = []
     
-    if not recurse:
+    if recurse < 1:
       return
 
+    recurse -= 1
     for entry in sorted(os.listdir(albumDir),reverse=True):
-      if (entry[0] != '.'):
-        # skip files that start with a dot
-        #pathAndEntry = '%s%s%s' % (albumDir, os.sep, entry)
-        pathAndEntry = os.path.join(albumDir,entry)
-        if os.path.isdir(pathAndEntry):
-          self.albums.append(Album(pathAndEntry, start_response, recurse=False))
-        elif os.path.isfile(pathAndEntry):
-          # for performance, try to load pickled version
+      if entry[0] in ['.',"`","'"] or entry in ['info.txt','captions.txt']:
+        # skip files that start with a dot or "grave accent" or single quote, 
+        # which was used to ignore photos in yappa. Also skip the yappa-style
+        # info.txt or captions.txt files. 
+        continue
+      #pathAndEntry = '%s%s%s' % (albumDir, os.sep, entry)
+      pathAndEntry = os.path.join(albumDir,entry)
+      if os.path.isdir(pathAndEntry):
+        self.albums.append(Album(pathAndEntry, start_response, recurse=recurse))
+      elif os.path.isfile(pathAndEntry):
+        # for performance, try to load pickled version
+        try:
+          self.pics.append(Pic.loadPickledVersion(start_response,pathAndEntry))
+        except (IOError, EOFError, FileNotFoundError, ValueError):
+          # load from scratch
           try:
-            self.pics.append(Pic.loadPickledVersion(start_response,pathAndEntry))
-          except (IOError, EOFError):
-            # load from scratch
-            try:
-              #remove faulty pickled version
-              self.pics.append(Pic(start_response,pathAndEntry))
-            except: 
-              print('file in picture folder is not a picture: %s\n  reason: %s' % (pathAndEntry,sys.exc_info()[0]), file=sys.stderr)
+            #remove faulty pickled version
+            self.pics.append(Pic(start_response,pathAndEntry))
+          except: 
+            print('file in picture folder is not a picture: %s\n  reason: %s' % (pathAndEntry,sys.exc_info()[0]), file=sys.stderr)
 
 
   def getAlbums(self):
@@ -150,6 +156,7 @@ class Album:
     return breadCrumb
   
   def getDescription(self):
+    # TODO: support yappa-style info.txt and caption.txt files
     try:
       metaFile = open('%s%s.meta' % (self.albumDir, os.sep))
     except:

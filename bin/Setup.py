@@ -19,7 +19,8 @@ pixVersion = '2.1.0'
 serveStaticFiles = True
 
 # Absolute path to the bin directory on your webserver
-pathToCGI = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])),'bin')
+pathToCGI,_ = os.path.split(os.path.realpath(__file__))
+#pathToCGI = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])),'bin')
 
 # Absolute path to the photo album on the webserver
 albumLoc = os.path.join(pathToCGI,os.pardir,'test_album')
@@ -64,3 +65,6 @@ elif os.path.isfile(r"C:\Program Files\ImageMagick-6.9.2-Q16\identify.exe"):
 # list the image formats you want to include in the album
 image_formats = ['JPG', 'JPEG', 'TIF', 'TIFF', 'PICT', 'GIF', 'BMP', 'PSD', 'PNG', 'PCT']
 video_formats = ['MP4', 'M4A', 'M4P', 'M4B', 'M4R', 'M4V', 'MPG', 'MPEG', 'M2P', 'PS', 'TS', 'MOV', 'QT', 'AVI', '3GP', '3P2', 'SWF']
+
+# Maximum filename length
+f_namemax = os.statvfs(pathToPicCache).f_namemax

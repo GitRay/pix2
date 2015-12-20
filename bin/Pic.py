@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from __future__ import print_function
 
-import sys, os, string, subprocess, shutil, cgi, posixpath, errno, copy, wsgiref.util, posixpath
+import sys, os, string, subprocess, shutil, cgi, posixpath, errno, copy, wsgiref.util, posixpath, warnings, hashlib, imghdr
 # python3 has different urllib paths
 try:
     from urllib import quote_plus, quote, urlencode
@@ -65,13 +65,28 @@ class Pic:
     pic_relpic = os.path.relpath(pic_path, Setup.albumLoc)
     pic_cache = os.path.join(Setup.pathToPicCache, pic_relpic)
     [head, tail] = os.path.split(pic_cache)
+    pickle_suffix = '_' + str(os.path.getmtime(pic_path)) + "_" + str(os.path.getsize(pic_path))
     pickle_path = os.path.join( \
       head, \
-      '.pickle_' + tail + '_' + str(os.path.getmtime(pic_path)) + "_" + str(os.path.getsize(pic_path)) \
+      '.pickle_' + tail + pickle_suffix \
     )
+    if len(pickle_path) > Setup.f_namemax:
+      pickle_path = os.path.join( head, '.pickle_{}_{}'.format(Pic.getShortenedName(tail),pickle_suffix))
     return os.path.normpath(pickle_path)
 
   
+  @staticmethod
+  def getShortenedName(orig_name):
+    # sometimes the pickled or resized names are too big for the filesystem
+    # We'll try to make a unique name by using two different hashes tacked together
+    # Stitch together SHA1 and MD5, since those are short-ish hashes gauranteed
+    # to be available in hashlib
+    b_fname = orig_name.encode()
+    sha_text = hashlib.sha1(b_fname).hexdigest()
+    md5_text = hashlib.md5(b_fname).hexdigest()
+    return sha_text + '_' + md5_text
+    
+    
   def savePickledVersion(self):
     pickle_path = self.getPicklePath(self.picPath)
     [head, tail] = os.path.split(pickle_path)
@@ -147,13 +162,24 @@ class Pic:
 
   def getPicDimsWithPIL(self):
     with open(self.picPath,'rb') as f:
-      this_image = Image.open(f)
+      # PIL uses logger to throw crap onto stderr. We'll redirect it for now
+      old_stderr = sys.stderr
+      with open(os.devnull,'w') as devnull:
+        sys.stderr = devnull
+        try:
+          this_image = Image.open(f)
+        except:
+          sys.stderr = old_stderr
+          raise
+      sys.stderr = old_stderr
       [self.picDim[0], self.picDim[1]] = this_image.size
       self.picFormat = this_image.format
       # get the rotation
       try:
+        warnings.simplefilter("ignore")
         this_exif = this_image._getexif()
-      except (AttributeError,IOError):
+        warnings.resetwarnings()
+      except (AttributeError,IOError,ZeroDivisionError,ValueError):
         # this file has no EXIF data (might be a TIFF) or data could be missing or corrupt
         this_exif = {}
       if this_exif:
@@ -167,9 +193,12 @@ class Pic:
     # add "[0]" to picture path so that imagemagick only looks at the first frame of the file,
     # just in case it is a big video
     this_path = self.picPath + '[0]'
-    text = subprocess.check_output( \
-      [Setup.pathToIdentify, '-format', '%w %h %m %[exif:orientation]', this_path] \
-    )
+    # swallow any subprocess stderr output by redirecting to dev/null
+    with open(os.devnull, 'w') as dev_null:
+      text = subprocess.check_output( \
+        [Setup.pathToIdentify, '-format', '%w %h %m %[exif:orientation]', this_path],\
+        stderr=dev_null \
+      )
     picDim = text.split()
     self.picDim[0] = int(picDim[0])
     self.picDim[1] = int(picDim[1])
@@ -183,10 +212,19 @@ class Pic:
   def updatePicInfo(self):
     self.isPic = False
     tail = os.path.splitext(self.picPath)[1][1:].strip().upper()
+    if tail == '':
+      # file has no extension - see if we can still figure it out
+      # Needed to do this because many of my old pictures came from Mac, which
+      # formerly did not make much use of extensions.
+      this_type = imghdr.what(self.picPath)
+      if not this_type is None:
+        tail = this_type.upper()
+      print('Missing extension, guess: {} in {}'.format(tail, self.picPath), file=sys.stderr)
     if not tail in Setup.image_formats:
       print('Not supported extension: {} in {}'.format(tail,self.picPath),file=sys.stderr)
       return
-    if Setup.USE_PIL:
+    # PIL is usually faster, but not for PhotoShop files.
+    if Setup.USE_PIL and not tail == 'PSD':
       # Look up the picture dimensions.
       try:
         self.getPicDimsWithPIL()
@@ -273,12 +311,19 @@ class Pic:
         self.resizeCalcs(this_image['width'],this_image['height'],*self.picDim)
       [pic_path, pic_name] = os.path.split(self.picPath)
       [head,tail] = os.path.splitext(pic_name)
+      path_pre = '%sx%s' % (this_image['width'], this_image['height'])
       this_image['path'] =  os.path.normpath(os.path.join( \
         Setup.pathToPicCache, \
         os.path.relpath(pic_path,Setup.albumLoc), \
-        '%sx%s.%s.%s' % (this_image['width'], this_image['height'], head, 'jpg') \
+        '{}.{}.jpg'.format(path_pre,head) \
       ))
-      
+      if len(this_image['path']) > Setup.f_namemax:
+        this_image['path'] =  os.path.normpath(os.path.join( \
+          Setup.pathToPicCache, \
+          os.path.relpath(pic_path,Setup.albumLoc), \
+          '{}.{}.jpg'.format(path_pre,self.getShortenedName(head)) \
+        ))
+
       # We have the filename, now update the status flag if it exists
       if os.path.isfile(this_image['path']):
         this_image['exists'] = True
@@ -288,7 +333,16 @@ class Pic:
         
   def resizeWithPIL(self,this_image):
       with open(self.picPath, 'rb') as f:
-        originalImage = Image.open(f)
+        # PIL uses logger to throw crap onto stderr. We'll redirect it for now
+        old_stderr = sys.stderr
+        with open(os.devnull,'w') as devnull:
+          sys.stderr = devnull
+          try:
+            originalImage = Image.open(f)
+          except:
+            sys.stderr = old_stderr
+            raise
+        sys.stderr = old_stderr
         if self.picOrientation == 3:
           # Rotation 180
           originalImage.draft("RGB",tuple(self.picDim))
@@ -345,14 +399,16 @@ class Pic:
       '200 OK',
       [
         ("Content-Type","image/jpeg"),
-        ("Content-Disposition",'attachment; filename="{}".jpeg'.format(f_name,))
+        ("Content-Disposition",'attachment; filename="{}".jpeg'.format(f_name))
       ]
     )
-    if Setup.USE_PIL:
+    # PIL is usually faster than ImageMagic - but not on Photoshop files
+    if Setup.USE_PIL and not f_ext.lower() == 'psd':
       try:
         self.resizeWithPIL(this_image)
-      except IOError as this_exception:
-        if 'cannot identify image file' in str(this_exception):
+      except (IOError,ValueError) as this_exception:
+        if 'cannot identify image file' in str(this_exception) or\
+           'image has wrong mode'       in str(this_exception):
           # PIL has failed us, try with imagemagick
           self.resizeWithIM(this_image)
         else:
