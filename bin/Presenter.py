@@ -46,7 +46,7 @@ class Presenter:
       if (control == 'previous'):
       	pic = Pic(start_response,os.path.join(currDir,album.getPreviousPic(picName)))
       if (control == 'next'):
-      	pic = Pic(start,response,os.path.join(currDir,album.getNextPic(picName)))
+      	pic = Pic(start_response,os.path.join(currDir,album.getNextPic(picName)))
       if (control == 'last'):
       	pic = Pic(start_response,os.path.join(currDir,album.getLastPic()))
 
