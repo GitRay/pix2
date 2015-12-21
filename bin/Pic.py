@@ -179,7 +179,7 @@ class Pic:
         warnings.simplefilter("ignore")
         this_exif = this_image._getexif()
         warnings.resetwarnings()
-      except (AttributeError,IOError,ZeroDivisionError,ValueError):
+      except (AttributeError,IOError,ZeroDivisionError,ValueError, IndexError):
         # this file has no EXIF data (might be a TIFF) or data could be missing or corrupt
         this_exif = {}
       if this_exif:
