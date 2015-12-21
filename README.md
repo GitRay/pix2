@@ -1,6 +1,9 @@
 # pix2
 https://github.com/GitRay/pix2  
 Fork of pix, the python photo gallery
+## demo album
+I have put up a demo site on pythonanywhere:
+http://pythonray.pythonanywhere.com/
 
 ## summary
 pix2 is a minimalist gallery system. To organize all your photos, we traverse a directory structure and as-needed
