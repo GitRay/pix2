@@ -14,7 +14,11 @@ try:
 except ImportError:
     import pickle
 
-
+# cgi.escape triggers a depricated warning in Python 3.2
+try:
+  from html import escape
+except ImportError:
+  from cgi import escape
 
 import Setup
 
@@ -393,6 +397,9 @@ class Pic:
     except OSError as exception:
       if exception.errno != errno.EEXIST:
           raise
+    except WindowsError as exception:
+      if exception.errno != 183: # Cannot create a file when that file already exists
+          raise
     [_, tail] = os.path.split(self.picPath)
     [f_name, f_ext] = os.path.splitext(tail)
     writer = self.start_response(
@@ -462,7 +469,7 @@ class Pic:
     # split the full path file name to just the name with no extension
     [pic_name, _] = os.path.splitext(tail)
     # make it html-friendly
-    pic_name_safe = cgi.escape(pic_name,True).encode('ascii','xmlcharrefreplace')
+    pic_name_safe = escape(pic_name,True).encode('ascii','xmlcharrefreplace')
     return pic_name_safe.decode()
 
 

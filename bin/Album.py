@@ -7,6 +7,10 @@ except:
     pass
   
 import sys, os, string, cgi
+try:
+  from html import escape
+except ImportError:
+  from cgi import escape
 
 from Pic import Pic
 import Setup
@@ -123,7 +127,7 @@ class Album:
 
   def getName(self):
     [head,tail] = os.path.split(self.albumDir)
-    return cgi.escape(tail,True).encode('ascii','xmlcharrefreplace')
+    return escape(tail,True).encode('ascii','xmlcharrefreplace')
 
 
   def getLinkPathRaw(self):
@@ -148,7 +152,7 @@ class Album:
       runningCrumb = head
       breadCrumb.append( '<a href="?album=%s">%s</a>' % ( \
         Pic.makePathUrlFriendly(linkPath), \
-        cgi.escape(tail,True).encode('ascii','xmlcharrefreplace').decode('ascii') \
+        escape(tail,True).encode('ascii','xmlcharrefreplace').decode('ascii') \
       ))
       linkPath = head
 

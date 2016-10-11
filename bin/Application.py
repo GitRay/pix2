@@ -1,5 +1,5 @@
 from __future__ import print_function
-import cgi, os, sys, traceback, posixpath, mimetypes, wsgiref
+import cgi, os, sys, traceback, posixpath, mimetypes, wsgiref, random
 # python3 has different urllib paths
 try:
     from urllib import unquote_plus
@@ -7,6 +7,7 @@ except:
     from urllib.parse import unquote_plus
 from Presenter import Presenter
 from Pic import Pic
+from Album import Album
 import Setup
 
 class Application():
@@ -41,7 +42,8 @@ class Application():
             pic         = self._getArg(iForm, 'pic')
             control     = self._getArg(iForm, 'control')
             adminAction = self._getArg(iForm, 'admin')
-        
+            random_pic  = self._getArg(iForm, 'random')
+            
             pict_creator = self._getArg(iForm, 'pict_creator')
             download = self._getArg(iForm, 'download')
             # assume that the application is invoked with either a blank path "/"
@@ -50,7 +52,7 @@ class Application():
                 if not Setup.serveStaticFiles:
                     # throw a 404 page
                     start_response('404 NOT FOUND', [('Content-Type', 'text/plain')])
-                    return [b'Not Configure to Serve Static Pages']
+                    return [b'Not Configured to Serve Static Pages']
                     
                 # Assume this is a static file. This should really be handled by
                 # the web server, but we'll handle it here gracefully for poorly
@@ -87,6 +89,42 @@ class Application():
                 pict_path = self._getArg(iForm, 'pict_path')
                 pic_obj = Pic(start_response,os.path.join(Setup.albumLoc, pict_path))
                 return pic_obj.downloadImage(download)
+            elif random_pic != '':
+                # send a single randomized photo
+                # Using a recursion limit of 10 just for safety. Increase if necessary.
+                if album == '':
+                    currDir = Setup.albumLoc
+                else:
+                    currDir = os.path.join(Setup.albumLoc,album)
+                album_obj = Album(currDir,start_response,recurse=10)
+                # each album is recursively filled, and each contains pictures
+                def get_albums(album):
+                    album_list = [album]
+                    for x in album.albums:
+                        album_list.extend(get_albums(x))
+                    return album_list
+                all_albums = get_albums(album_obj)
+                all_pics = []
+                for x in all_albums:
+                    all_pics.extend(x.pics)
+                if len(all_pics) < 1:
+                    # empty album
+                    start_response('404 NOT FOUND', [('Content-Type', 'text/plain')])
+                    return [b'Empty Album']
+                for x in range(1000000): # limit to a million tries so there is no infinite loop
+                    random_pic = random.choice(all_pics)
+                    if random_pic.isPic:
+                        break
+                [
+                    pic_fname_safe, pic_relpic_safe, pic_name_safe, 
+                    pic_relweb_safe, pic_width, pic_height
+                ] = random_pic.getResizedLink('web') 
+                start_response('200 OK', [('Content-Type','text/html')])
+                output = '<img alt="{}" title="{}" src="{}" width="{}" height="{}" />'.format(
+                    pic_fname_safe, pic_name_safe, pic_relweb_safe,pic_width, pic_height
+                )
+                return [output.encode('utf-8')]
+
             else:
                 # make the web page
                 #print('Content-type: text/html; charset=utf-8\n') 

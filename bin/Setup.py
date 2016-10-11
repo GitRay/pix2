@@ -67,4 +67,9 @@ image_formats = ['JPG', 'JPEG', 'TIF', 'TIFF', 'PICT', 'GIF', 'BMP', 'PSD', 'PNG
 video_formats = ['MP4', 'M4A', 'M4P', 'M4B', 'M4R', 'M4V', 'MPG', 'MPEG', 'M2P', 'PS', 'TS', 'MOV', 'QT', 'AVI', '3GP', '3P2', 'SWF']
 
 # Maximum filename length
-f_namemax = os.statvfs(pathToPicCache).f_namemax
+try:
+    # Unix
+    f_namemax = os.statvfs(pathToPicCache).f_namemax 
+except AttributeError:    
+    from ctypes.wintypes import MAX_PATH as f_namemax # windows
+
